@@ -18,7 +18,7 @@ ruff_db = { workspace = true, features = ["junit", "serde"] }
 ruff_diagnostics = { workspace = true, features = ["serde"] }
 ruff_macros = { workspace = true }
 ruff_notebook = { workspace = true }
-ruff_python_ast = { workspace = true, features = ["serde", "cache"] }
+ruff_python_ast = { workspace = true }
 ruff_python_codegen = { workspace = true }
 ruff_python_importer = { workspace = true }
 ruff_python_index = { workspace = true }
