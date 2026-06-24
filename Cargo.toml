@@ -27,19 +27,19 @@ ruff_markdown = { path = "crates/ruff_markdown" }
 ruff_memory_usage = { path = "crates/ruff_memory_usage" }
 ruff_notebook = { path = "crates/ruff_notebook" }
 ruff_options_metadata = { path = "crates/ruff_options_metadata" }
-ruff_python_ast = { path = "crates/ruff_python_ast" }
+ruff_python_ast = { package = "rustpython-ruff_python_ast", path = "crates/ruff_python_ast", version = "0.15.9" }
 ruff_python_codegen = { path = "crates/ruff_python_codegen" }
 ruff_python_formatter = { path = "crates/ruff_python_formatter" }
 ruff_python_importer = { path = "crates/ruff_python_importer" }
 ruff_python_index = { path = "crates/ruff_python_index" }
 ruff_python_literal = { path = "crates/ruff_python_literal" }
-ruff_python_parser = { path = "crates/ruff_python_parser" }
+ruff_python_parser = { package = "rustpython-ruff_python_parser", path = "crates/ruff_python_parser", version = "0.15.9" }
 ruff_python_semantic = { path = "crates/ruff_python_semantic" }
 ruff_python_stdlib = { path = "crates/ruff_python_stdlib" }
-ruff_python_trivia = { path = "crates/ruff_python_trivia" }
+ruff_python_trivia = { package = "rustpython-ruff_python_trivia", path = "crates/ruff_python_trivia", version = "0.15.9" }
 ruff_server = { path = "crates/ruff_server" }
-ruff_source_file = { path = "crates/ruff_source_file" }
-ruff_text_size = { path = "crates/ruff_text_size" }
+ruff_source_file = { package = "rustpython-ruff_source_file", path = "crates/ruff_source_file", version = "0.15.9" }
+ruff_text_size = { package = "rustpython-ruff_text_size", path = "crates/ruff_text_size", version = "0.15.9" }
 ruff_workspace = { path = "crates/ruff_workspace" }
 
 ty = { path = "crates/ty" }
@@ -285,9 +285,9 @@ codegen-units = 16
 # Some crates don't change as much but benefit more from
 # more expensive optimization passes, so we selectively
 # decrease codegen-units in some cases.
-[profile.release.package.ruff_python_parser]
+[profile.release.package.rustpython-ruff_python_parser]
 codegen-units = 1
-[profile.release.package.ruff_python_ast]
+[profile.release.package.rustpython-ruff_python_ast]
 codegen-units = 1
 [profile.release.package.salsa]
 codegen-units = 1
@@ -309,7 +309,7 @@ opt-level = 3
 
 # Reduce complexity of a parser function that would trigger a locals limit in a wasm tool.
 # https://github.com/bytecodealliance/wasm-tools/blob/b5c3d98e40590512a3b12470ef358d5c7b983b15/crates/wasmparser/src/limits.rs#L29
-[profile.dev.package.ruff_python_parser]
+[profile.dev.package.rustpython-ruff_python_parser]
 opt-level = 1
 
 # This profile is meant to mimic the `release` profile as closely as

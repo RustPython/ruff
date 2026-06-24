@@ -8,8 +8,6 @@ use crate::generated::ExprName;
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "cache", derive(ruff_macros::CacheKey))]
-#[cfg_attr(feature = "salsa", derive(salsa::Update))]
 #[cfg_attr(feature = "get-size", derive(get_size2::GetSize))]
 #[cfg_attr(
     feature = "schemars",
