@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/re_lexing/fstring_format_spec_1.py
 ---
 ## AST
 
@@ -74,6 +73,9 @@ Module(
                                                                 ],
                                                             },
                                                         ),
+                                                        runtime_str: None,
+                                                        runtime_interpolation_format_spec: None,
+                                                        runtime_formatted_value_format_spec: None,
                                                     },
                                                 ),
                                             ],
@@ -87,6 +89,8 @@ Module(
                                     ),
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -210,6 +214,9 @@ Module(
                                                                 ],
                                                             },
                                                         ),
+                                                        runtime_str: None,
+                                                        runtime_interpolation_format_spec: None,
+                                                        runtime_formatted_value_format_spec: None,
                                                     },
                                                 ),
                                             ],
@@ -223,6 +230,8 @@ Module(
                                     ),
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -318,6 +327,9 @@ Module(
                                                                 ],
                                                             },
                                                         ),
+                                                        runtime_str: None,
+                                                        runtime_interpolation_format_spec: None,
+                                                        runtime_formatted_value_format_spec: None,
                                                     },
                                                 ),
                                             ],
@@ -331,6 +343,8 @@ Module(
                                     ),
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -391,6 +405,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

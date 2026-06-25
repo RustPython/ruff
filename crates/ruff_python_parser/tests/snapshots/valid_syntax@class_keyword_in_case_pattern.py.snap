@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/class_keyword_in_case_pattern.py
 ---
 ## AST
 
@@ -69,6 +68,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -86,11 +88,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

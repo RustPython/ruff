@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/emoji_identifiers.py
 ---
 ## AST
 
@@ -32,6 +31,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -56,6 +58,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -80,6 +85,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

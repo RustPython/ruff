@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/statement/with.py
 ---
 ## AST
 
@@ -44,6 +43,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -89,6 +91,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -138,6 +143,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -205,6 +213,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -262,6 +273,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -328,6 +342,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -356,6 +373,8 @@ Module(
                                         node_index: NodeIndex(None),
                                         args: [],
                                         keywords: [],
+                                        runtime_args: None,
+                                        runtime_bases: None,
                                     },
                                 },
                             ),
@@ -385,6 +404,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -413,6 +435,8 @@ Module(
                                         node_index: NodeIndex(None),
                                         args: [],
                                         keywords: [],
+                                        runtime_args: None,
+                                        runtime_bases: None,
                                     },
                                 },
                             ),
@@ -454,9 +478,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

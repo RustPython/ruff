@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/named/missing_expression_2.py
 ---
 ## AST
 
@@ -59,6 +58,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -72,9 +73,11 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/assign_targets_terminator.py
 ---
 ## AST
 
@@ -49,6 +48,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -79,6 +81,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -122,6 +125,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -152,11 +158,13 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/lambda_default_parameters.py
 ---
 ## AST
 
@@ -36,6 +35,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -51,6 +52,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: Some(
                                                 NumberLiteral(
@@ -76,6 +79,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -83,6 +88,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: NumberLiteral(
@@ -99,6 +105,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

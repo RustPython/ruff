@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/with_items_parenthesized_missing_colon.py
 ---
 ## AST
 
@@ -51,9 +50,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

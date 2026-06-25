@@ -1321,6 +1321,7 @@ pub enum Expr {
     BooleanLiteral(crate::ExprBooleanLiteral),
     NoneLiteral(crate::ExprNoneLiteral),
     EllipsisLiteral(crate::ExprEllipsisLiteral),
+    Constant(crate::ExprConstant),
     Attribute(crate::ExprAttribute),
     Subscript(crate::ExprSubscript),
     Starred(crate::ExprStarred),
@@ -1481,6 +1482,12 @@ impl From<crate::ExprEllipsisLiteral> for Expr {
     }
 }
 
+impl From<crate::ExprConstant> for Expr {
+    fn from(node: crate::ExprConstant) -> Self {
+        Self::Constant(node)
+    }
+}
+
 impl From<crate::ExprAttribute> for Expr {
     fn from(node: crate::ExprAttribute) -> Self {
         Self::Attribute(node)
@@ -1557,6 +1564,7 @@ impl ruff_text_size::Ranged for Expr {
             Self::BooleanLiteral(node) => node.range(),
             Self::NoneLiteral(node) => node.range(),
             Self::EllipsisLiteral(node) => node.range(),
+            Self::Constant(node) => node.range(),
             Self::Attribute(node) => node.range(),
             Self::Subscript(node) => node.range(),
             Self::Starred(node) => node.range(),
@@ -1597,6 +1605,7 @@ impl crate::HasNodeIndex for Expr {
             Self::BooleanLiteral(node) => node.node_index(),
             Self::NoneLiteral(node) => node.node_index(),
             Self::EllipsisLiteral(node) => node.node_index(),
+            Self::Constant(node) => node.node_index(),
             Self::Attribute(node) => node.node_index(),
             Self::Subscript(node) => node.node_index(),
             Self::Starred(node) => node.node_index(),
@@ -2532,6 +2541,43 @@ impl Expr {
     pub fn as_ellipsis_literal_expr(&self) -> Option<&crate::ExprEllipsisLiteral> {
         match self {
             Self::EllipsisLiteral(val) => Some(val),
+            _ => None,
+        }
+    }
+
+    #[inline]
+    pub const fn is_constant_expr(&self) -> bool {
+        matches!(self, Self::Constant(_))
+    }
+
+    #[inline]
+    pub fn constant_expr(self) -> Option<crate::ExprConstant> {
+        match self {
+            Self::Constant(val) => Some(val),
+            _ => None,
+        }
+    }
+
+    #[inline]
+    pub fn expect_constant_expr(self) -> crate::ExprConstant {
+        match self {
+            Self::Constant(val) => val,
+            _ => panic!("called expect on {self:?}"),
+        }
+    }
+
+    #[inline]
+    pub fn as_constant_expr_mut(&mut self) -> Option<&mut crate::ExprConstant> {
+        match self {
+            Self::Constant(val) => Some(val),
+            _ => None,
+        }
+    }
+
+    #[inline]
+    pub fn as_constant_expr(&self) -> Option<&crate::ExprConstant> {
+        match self {
+            Self::Constant(val) => Some(val),
             _ => None,
         }
     }
@@ -3876,6 +3922,12 @@ impl ruff_text_size::Ranged for crate::ExprEllipsisLiteral {
     }
 }
 
+impl ruff_text_size::Ranged for crate::ExprConstant {
+    fn range(&self) -> ruff_text_size::TextRange {
+        self.range
+    }
+}
+
 impl ruff_text_size::Ranged for crate::ExprAttribute {
     fn range(&self) -> ruff_text_size::TextRange {
         self.range
@@ -4440,6 +4492,12 @@ impl crate::HasNodeIndex for crate::ExprEllipsisLiteral {
     }
 }
 
+impl crate::HasNodeIndex for crate::ExprConstant {
+    fn node_index(&self) -> &crate::AtomicNodeIndex {
+        &self.node_index
+    }
+}
+
 impl crate::HasNodeIndex for crate::ExprAttribute {
     fn node_index(&self) -> &crate::AtomicNodeIndex {
         &self.node_index
@@ -4773,6 +4831,7 @@ impl Expr {
             Expr::BooleanLiteral(node) => node.visit_source_order(visitor),
             Expr::NoneLiteral(node) => node.visit_source_order(visitor),
             Expr::EllipsisLiteral(node) => node.visit_source_order(visitor),
+            Expr::Constant(node) => node.visit_source_order(visitor),
             Expr::Attribute(node) => node.visit_source_order(visitor),
             Expr::Subscript(node) => node.visit_source_order(visitor),
             Expr::Starred(node) => node.visit_source_order(visitor),
@@ -5246,6 +5305,8 @@ pub enum ExprRef<'a> {
     NoneLiteral(&'a crate::ExprNoneLiteral),
     #[is(name = "ellipsis_literal_expr")]
     EllipsisLiteral(&'a crate::ExprEllipsisLiteral),
+    #[is(name = "constant_expr")]
+    Constant(&'a crate::ExprConstant),
     #[is(name = "attribute_expr")]
     Attribute(&'a crate::ExprAttribute),
     #[is(name = "subscript_expr")]
@@ -5292,6 +5353,7 @@ impl<'a> From<&'a Expr> for ExprRef<'a> {
             Expr::BooleanLiteral(node) => ExprRef::BooleanLiteral(node),
             Expr::NoneLiteral(node) => ExprRef::NoneLiteral(node),
             Expr::EllipsisLiteral(node) => ExprRef::EllipsisLiteral(node),
+            Expr::Constant(node) => ExprRef::Constant(node),
             Expr::Attribute(node) => ExprRef::Attribute(node),
             Expr::Subscript(node) => ExprRef::Subscript(node),
             Expr::Starred(node) => ExprRef::Starred(node),
@@ -5454,6 +5516,12 @@ impl<'a> From<&'a crate::ExprEllipsisLiteral> for ExprRef<'a> {
     }
 }
 
+impl<'a> From<&'a crate::ExprConstant> for ExprRef<'a> {
+    fn from(node: &'a crate::ExprConstant) -> Self {
+        Self::Constant(node)
+    }
+}
+
 impl<'a> From<&'a crate::ExprAttribute> for ExprRef<'a> {
     fn from(node: &'a crate::ExprAttribute) -> Self {
         Self::Attribute(node)
@@ -5530,6 +5598,7 @@ impl ruff_text_size::Ranged for ExprRef<'_> {
             Self::BooleanLiteral(node) => node.range(),
             Self::NoneLiteral(node) => node.range(),
             Self::EllipsisLiteral(node) => node.range(),
+            Self::Constant(node) => node.range(),
             Self::Attribute(node) => node.range(),
             Self::Subscript(node) => node.range(),
             Self::Starred(node) => node.range(),
@@ -5570,6 +5639,7 @@ impl crate::HasNodeIndex for ExprRef<'_> {
             Self::BooleanLiteral(node) => node.node_index(),
             Self::NoneLiteral(node) => node.node_index(),
             Self::EllipsisLiteral(node) => node.node_index(),
+            Self::Constant(node) => node.node_index(),
             Self::Attribute(node) => node.node_index(),
             Self::Subscript(node) => node.node_index(),
             Self::Starred(node) => node.node_index(),
@@ -5887,6 +5957,7 @@ pub enum AnyNodeRef<'a> {
     ExprBooleanLiteral(&'a crate::ExprBooleanLiteral),
     ExprNoneLiteral(&'a crate::ExprNoneLiteral),
     ExprEllipsisLiteral(&'a crate::ExprEllipsisLiteral),
+    ExprConstant(&'a crate::ExprConstant),
     ExprAttribute(&'a crate::ExprAttribute),
     ExprSubscript(&'a crate::ExprSubscript),
     ExprStarred(&'a crate::ExprStarred),
@@ -6086,6 +6157,7 @@ impl<'a> From<&'a Expr> for AnyNodeRef<'a> {
             Expr::BooleanLiteral(node) => AnyNodeRef::ExprBooleanLiteral(node),
             Expr::NoneLiteral(node) => AnyNodeRef::ExprNoneLiteral(node),
             Expr::EllipsisLiteral(node) => AnyNodeRef::ExprEllipsisLiteral(node),
+            Expr::Constant(node) => AnyNodeRef::ExprConstant(node),
             Expr::Attribute(node) => AnyNodeRef::ExprAttribute(node),
             Expr::Subscript(node) => AnyNodeRef::ExprSubscript(node),
             Expr::Starred(node) => AnyNodeRef::ExprStarred(node),
@@ -6126,6 +6198,7 @@ impl<'a> From<ExprRef<'a>> for AnyNodeRef<'a> {
             ExprRef::BooleanLiteral(node) => AnyNodeRef::ExprBooleanLiteral(node),
             ExprRef::NoneLiteral(node) => AnyNodeRef::ExprNoneLiteral(node),
             ExprRef::EllipsisLiteral(node) => AnyNodeRef::ExprEllipsisLiteral(node),
+            ExprRef::Constant(node) => AnyNodeRef::ExprConstant(node),
             ExprRef::Attribute(node) => AnyNodeRef::ExprAttribute(node),
             ExprRef::Subscript(node) => AnyNodeRef::ExprSubscript(node),
             ExprRef::Starred(node) => AnyNodeRef::ExprStarred(node),
@@ -6166,6 +6239,7 @@ impl<'a> AnyNodeRef<'a> {
             Self::ExprBooleanLiteral(node) => Some(ExprRef::BooleanLiteral(node)),
             Self::ExprNoneLiteral(node) => Some(ExprRef::NoneLiteral(node)),
             Self::ExprEllipsisLiteral(node) => Some(ExprRef::EllipsisLiteral(node)),
+            Self::ExprConstant(node) => Some(ExprRef::Constant(node)),
             Self::ExprAttribute(node) => Some(ExprRef::Attribute(node)),
             Self::ExprSubscript(node) => Some(ExprRef::Subscript(node)),
             Self::ExprStarred(node) => Some(ExprRef::Starred(node)),
@@ -6636,6 +6710,12 @@ impl<'a> From<&'a crate::ExprEllipsisLiteral> for AnyNodeRef<'a> {
     }
 }
 
+impl<'a> From<&'a crate::ExprConstant> for AnyNodeRef<'a> {
+    fn from(node: &'a crate::ExprConstant) -> AnyNodeRef<'a> {
+        AnyNodeRef::ExprConstant(node)
+    }
+}
+
 impl<'a> From<&'a crate::ExprAttribute> for AnyNodeRef<'a> {
     fn from(node: &'a crate::ExprAttribute) -> AnyNodeRef<'a> {
         AnyNodeRef::ExprAttribute(node)
@@ -6943,6 +7023,7 @@ impl ruff_text_size::Ranged for AnyNodeRef<'_> {
             AnyNodeRef::ExprBooleanLiteral(node) => node.range(),
             AnyNodeRef::ExprNoneLiteral(node) => node.range(),
             AnyNodeRef::ExprEllipsisLiteral(node) => node.range(),
+            AnyNodeRef::ExprConstant(node) => node.range(),
             AnyNodeRef::ExprAttribute(node) => node.range(),
             AnyNodeRef::ExprSubscript(node) => node.range(),
             AnyNodeRef::ExprStarred(node) => node.range(),
@@ -7044,6 +7125,7 @@ impl crate::HasNodeIndex for AnyNodeRef<'_> {
             AnyNodeRef::ExprBooleanLiteral(node) => node.node_index(),
             AnyNodeRef::ExprNoneLiteral(node) => node.node_index(),
             AnyNodeRef::ExprEllipsisLiteral(node) => node.node_index(),
+            AnyNodeRef::ExprConstant(node) => node.node_index(),
             AnyNodeRef::ExprAttribute(node) => node.node_index(),
             AnyNodeRef::ExprSubscript(node) => node.node_index(),
             AnyNodeRef::ExprStarred(node) => node.node_index(),
@@ -7145,6 +7227,7 @@ impl AnyNodeRef<'_> {
             AnyNodeRef::ExprBooleanLiteral(node) => std::ptr::NonNull::from(*node).cast(),
             AnyNodeRef::ExprNoneLiteral(node) => std::ptr::NonNull::from(*node).cast(),
             AnyNodeRef::ExprEllipsisLiteral(node) => std::ptr::NonNull::from(*node).cast(),
+            AnyNodeRef::ExprConstant(node) => std::ptr::NonNull::from(*node).cast(),
             AnyNodeRef::ExprAttribute(node) => std::ptr::NonNull::from(*node).cast(),
             AnyNodeRef::ExprSubscript(node) => std::ptr::NonNull::from(*node).cast(),
             AnyNodeRef::ExprStarred(node) => std::ptr::NonNull::from(*node).cast(),
@@ -7252,6 +7335,7 @@ impl<'a> AnyNodeRef<'a> {
             AnyNodeRef::ExprBooleanLiteral(node) => node.visit_source_order(visitor),
             AnyNodeRef::ExprNoneLiteral(node) => node.visit_source_order(visitor),
             AnyNodeRef::ExprEllipsisLiteral(node) => node.visit_source_order(visitor),
+            AnyNodeRef::ExprConstant(node) => node.visit_source_order(visitor),
             AnyNodeRef::ExprAttribute(node) => node.visit_source_order(visitor),
             AnyNodeRef::ExprSubscript(node) => node.visit_source_order(visitor),
             AnyNodeRef::ExprStarred(node) => node.visit_source_order(visitor),
@@ -7369,6 +7453,7 @@ impl AnyNodeRef<'_> {
                 | AnyNodeRef::ExprBooleanLiteral(_)
                 | AnyNodeRef::ExprNoneLiteral(_)
                 | AnyNodeRef::ExprEllipsisLiteral(_)
+                | AnyNodeRef::ExprConstant(_)
                 | AnyNodeRef::ExprAttribute(_)
                 | AnyNodeRef::ExprSubscript(_)
                 | AnyNodeRef::ExprStarred(_)
@@ -8027,6 +8112,16 @@ impl<'a> TryFrom<AnyRootNodeRef<'a>> for &'a crate::ExprEllipsisLiteral {
     fn try_from(node: AnyRootNodeRef<'a>) -> Result<&'a crate::ExprEllipsisLiteral, ()> {
         match node {
             AnyRootNodeRef::Expr(Expr::EllipsisLiteral(node)) => Ok(node),
+            _ => Err(()),
+        }
+    }
+}
+
+impl<'a> TryFrom<AnyRootNodeRef<'a>> for &'a crate::ExprConstant {
+    type Error = ();
+    fn try_from(node: AnyRootNodeRef<'a>) -> Result<&'a crate::ExprConstant, ()> {
+        match node {
+            AnyRootNodeRef::Expr(Expr::Constant(node)) => Ok(node),
             _ => Err(()),
         }
     }
@@ -8802,6 +8897,7 @@ pub enum NodeKind {
     ExprBooleanLiteral,
     ExprNoneLiteral,
     ExprEllipsisLiteral,
+    ExprConstant,
     ExprAttribute,
     ExprSubscript,
     ExprStarred,
@@ -8901,6 +8997,7 @@ impl AnyNodeRef<'_> {
             AnyNodeRef::ExprBooleanLiteral(_) => NodeKind::ExprBooleanLiteral,
             AnyNodeRef::ExprNoneLiteral(_) => NodeKind::ExprNoneLiteral,
             AnyNodeRef::ExprEllipsisLiteral(_) => NodeKind::ExprEllipsisLiteral,
+            AnyNodeRef::ExprConstant(_) => NodeKind::ExprConstant,
             AnyNodeRef::ExprAttribute(_) => NodeKind::ExprAttribute,
             AnyNodeRef::ExprSubscript(_) => NodeKind::ExprSubscript,
             AnyNodeRef::ExprStarred(_) => NodeKind::ExprStarred,
@@ -8956,6 +9053,7 @@ pub struct ModModule {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub body: Vec<Stmt>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [Module](https://docs.python.org/3/library/ast.html#ast.Module)
@@ -8983,6 +9081,10 @@ pub struct StmtFunctionDef {
     pub parameters: Box<crate::Parameters>,
     pub returns: Option<Box<Expr>>,
     pub body: Vec<Stmt>,
+    pub runtime_decorator_list: Option<Vec<Option<crate::Expr>>>,
+    pub runtime_type_comment: Option<Box<str>>,
+    pub runtime_type_comment_bytes: Option<Vec<u8>>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [ClassDef](https://docs.python.org/3/library/ast.html#ast.ClassDef)
@@ -8996,6 +9098,8 @@ pub struct StmtClassDef {
     pub type_params: Option<Box<crate::TypeParams>>,
     pub arguments: Option<Box<crate::Arguments>>,
     pub body: Vec<Stmt>,
+    pub runtime_decorator_list: Option<Vec<Option<crate::Expr>>>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [Return](https://docs.python.org/3/library/ast.html#ast.Return)
@@ -9014,6 +9118,7 @@ pub struct StmtDelete {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub targets: Vec<Expr>,
+    pub runtime_targets: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [TypeAlias](https://docs.python.org/3/library/ast.html#ast.TypeAlias)
@@ -9035,6 +9140,9 @@ pub struct StmtAssign {
     pub range: ruff_text_size::TextRange,
     pub targets: Vec<Expr>,
     pub value: Box<Expr>,
+    pub runtime_targets: Option<Vec<Option<crate::Expr>>>,
+    pub runtime_type_comment: Option<Box<str>>,
+    pub runtime_type_comment_bytes: Option<Vec<u8>>,
 }
 
 /// See also [AugAssign](https://docs.python.org/3/library/ast.html#ast.AugAssign)
@@ -9058,6 +9166,7 @@ pub struct StmtAnnAssign {
     pub annotation: Box<Expr>,
     pub value: Option<Box<Expr>>,
     pub simple: bool,
+    pub runtime_simple: Option<i32>,
 }
 
 /// See also [For](https://docs.python.org/3/library/ast.html#ast.For)
@@ -9074,6 +9183,10 @@ pub struct StmtFor {
     pub iter: Box<Expr>,
     pub body: Vec<Stmt>,
     pub orelse: Vec<Stmt>,
+    pub runtime_type_comment: Option<Box<str>>,
+    pub runtime_type_comment_bytes: Option<Vec<u8>>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
+    pub runtime_orelse: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [While](https://docs.python.org/3/library/ast.html#ast.While)
@@ -9086,6 +9199,8 @@ pub struct StmtWhile {
     pub test: Box<Expr>,
     pub body: Vec<Stmt>,
     pub orelse: Vec<Stmt>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
+    pub runtime_orelse: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [If](https://docs.python.org/3/library/ast.html#ast.If)
@@ -9097,6 +9212,7 @@ pub struct StmtIf {
     pub test: Box<Expr>,
     pub body: Vec<Stmt>,
     pub elif_else_clauses: Vec<crate::ElifElseClause>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [With](https://docs.python.org/3/library/ast.html#ast.With)
@@ -9111,6 +9227,9 @@ pub struct StmtWith {
     pub is_async: bool,
     pub items: Vec<crate::WithItem>,
     pub body: Vec<Stmt>,
+    pub runtime_type_comment: Option<Box<str>>,
+    pub runtime_type_comment_bytes: Option<Vec<u8>>,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [Match](https://docs.python.org/3/library/ast.html#ast.Match)
@@ -9145,6 +9264,10 @@ pub struct StmtTry {
     pub orelse: Vec<Stmt>,
     pub finalbody: Vec<Stmt>,
     pub is_star: bool,
+    pub runtime_body: Option<Vec<Option<crate::Stmt>>>,
+    pub runtime_handlers: Option<Vec<Option<crate::ExceptHandler>>>,
+    pub runtime_orelse: Option<Vec<Option<crate::Stmt>>>,
+    pub runtime_finalbody: Option<Vec<Option<crate::Stmt>>>,
 }
 
 /// See also [Assert](https://docs.python.org/3/library/ast.html#ast.Assert)
@@ -9177,6 +9300,7 @@ pub struct StmtImportFrom {
     pub names: Vec<crate::Alias>,
     pub level: u32,
     pub is_lazy: bool,
+    pub runtime_level: Option<i32>,
 }
 
 /// See also [Global](https://docs.python.org/3/library/ast.html#ast.Global)
@@ -9301,6 +9425,7 @@ pub struct ExprBoolOp {
     pub range: ruff_text_size::TextRange,
     pub op: crate::BoolOp,
     pub values: Vec<Expr>,
+    pub runtime_values: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [NamedExpr](https://docs.python.org/3/library/ast.html#ast.NamedExpr)
@@ -9362,6 +9487,7 @@ pub struct ExprDict {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub items: Vec<crate::DictItem>,
+    pub runtime_values: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [Set](https://docs.python.org/3/library/ast.html#ast.Set)
@@ -9371,6 +9497,7 @@ pub struct ExprSet {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub elts: Vec<Expr>,
+    pub runtime_elts: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [ListComp](https://docs.python.org/3/library/ast.html#ast.ListComp)
@@ -9451,6 +9578,7 @@ pub struct ExprCompare {
     pub left: Box<Expr>,
     pub ops: Box<[crate::CmpOp]>,
     pub comparators: Box<[Expr]>,
+    pub runtime_comparators: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [Call](https://docs.python.org/3/library/ast.html#ast.Call)
@@ -9477,6 +9605,8 @@ pub struct ExprFString {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub value: crate::FStringValue,
+    pub runtime_joined_str: Option<Vec<crate::Expr>>,
+    pub runtime_values: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// An AST node that represents either a single-part t-string literal
@@ -9493,6 +9623,8 @@ pub struct ExprTString {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub value: crate::TStringValue,
+    pub runtime_template_str: Option<Vec<crate::Expr>>,
+    pub runtime_values: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// An AST node that represents either a single-part string literal
@@ -9545,6 +9677,17 @@ pub struct ExprEllipsisLiteral {
     pub range: ruff_text_size::TextRange,
 }
 
+/// See also [Constant](https://docs.python.org/3/library/ast.html#ast.Constant)
+#[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "get-size", derive(get_size2::GetSize))]
+pub struct ExprConstant {
+    pub node_index: crate::AtomicNodeIndex,
+    pub range: ruff_text_size::TextRange,
+    pub value: crate::ConstantValue,
+    pub kind: Option<Box<str>>,
+    pub invalid_type: Option<Box<str>>,
+}
+
 /// See also [Attribute](https://docs.python.org/3/library/ast.html#ast.Attribute)
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "get-size", derive(get_size2::GetSize))]
@@ -9595,6 +9738,7 @@ pub struct ExprList {
     pub range: ruff_text_size::TextRange,
     pub elts: Vec<Expr>,
     pub ctx: crate::ExprContext,
+    pub runtime_elts: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [Tuple](https://docs.python.org/3/library/ast.html#ast.Tuple)
@@ -9606,6 +9750,7 @@ pub struct ExprTuple {
     pub elts: Vec<Expr>,
     pub ctx: crate::ExprContext,
     pub parenthesized: bool,
+    pub runtime_elts: Option<Vec<Option<crate::Expr>>>,
 }
 
 /// See also [Slice](https://docs.python.org/3/library/ast.html#ast.Slice)
@@ -9664,6 +9809,7 @@ pub struct PatternMatchSequence {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub patterns: Vec<Pattern>,
+    pub runtime_patterns: Option<Vec<Option<crate::Pattern>>>,
 }
 
 /// See also [MatchMapping](https://docs.python.org/3/library/ast.html#ast.MatchMapping)
@@ -9675,6 +9821,8 @@ pub struct PatternMatchMapping {
     pub keys: Vec<Expr>,
     pub patterns: Vec<Pattern>,
     pub rest: Option<crate::Identifier>,
+    pub runtime_keys: Option<Vec<Option<crate::Expr>>>,
+    pub runtime_patterns: Option<Vec<Option<crate::Pattern>>>,
 }
 
 /// See also [MatchClass](https://docs.python.org/3/library/ast.html#ast.MatchClass)
@@ -9685,6 +9833,9 @@ pub struct PatternMatchClass {
     pub range: ruff_text_size::TextRange,
     pub cls: Box<Expr>,
     pub arguments: crate::PatternArguments,
+    pub runtime_patterns: Option<Vec<Option<crate::Pattern>>>,
+    pub runtime_kwd_attrs: Option<Vec<crate::Identifier>>,
+    pub runtime_kwd_patterns: Option<Vec<Option<crate::Pattern>>>,
 }
 
 /// See also [MatchStar](https://docs.python.org/3/library/ast.html#ast.MatchStar)
@@ -9713,6 +9864,7 @@ pub struct PatternMatchOr {
     pub node_index: crate::AtomicNodeIndex,
     pub range: ruff_text_size::TextRange,
     pub patterns: Vec<Pattern>,
+    pub runtime_patterns: Option<Vec<Option<crate::Pattern>>>,
 }
 
 /// See also [TypeVar](https://docs.python.org/3/library/ast.html#ast.TypeVar)
@@ -9753,6 +9905,7 @@ impl ModModule {
     {
         let ModModule {
             body,
+            runtime_body: _,
             range: _,
             node_index: _,
         } = self;
@@ -9787,6 +9940,10 @@ impl StmtFunctionDef {
             parameters,
             returns,
             body,
+            runtime_decorator_list: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
             range: _,
             node_index: _,
         } = self;
@@ -9821,6 +9978,8 @@ impl StmtClassDef {
             type_params,
             arguments,
             body,
+            runtime_decorator_list: _,
+            runtime_body: _,
             range: _,
             node_index: _,
         } = self;
@@ -9866,6 +10025,7 @@ impl StmtDelete {
     {
         let StmtDelete {
             targets,
+            runtime_targets: _,
             range: _,
             node_index: _,
         } = self;
@@ -9906,6 +10066,9 @@ impl StmtAssign {
         let StmtAssign {
             targets,
             value,
+            runtime_targets: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
             range: _,
             node_index: _,
         } = self;
@@ -9945,6 +10108,7 @@ impl StmtAnnAssign {
             annotation,
             value,
             simple: _,
+            runtime_simple: _,
             range: _,
             node_index: _,
         } = self;
@@ -9968,6 +10132,10 @@ impl StmtFor {
             iter,
             body,
             orelse,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
+            runtime_orelse: _,
             range: _,
             node_index: _,
         } = self;
@@ -9987,6 +10155,8 @@ impl StmtWhile {
             test,
             body,
             orelse,
+            runtime_body: _,
+            runtime_orelse: _,
             range: _,
             node_index: _,
         } = self;
@@ -10005,6 +10175,7 @@ impl StmtIf {
             test,
             body,
             elif_else_clauses,
+            runtime_body: _,
             range: _,
             node_index: _,
         } = self;
@@ -10026,6 +10197,9 @@ impl StmtWith {
             is_async: _,
             items,
             body,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
             range: _,
             node_index: _,
         } = self;
@@ -10089,6 +10263,10 @@ impl StmtTry {
             orelse,
             finalbody,
             is_star: _,
+            runtime_body: _,
+            runtime_handlers: _,
+            runtime_orelse: _,
+            runtime_finalbody: _,
             range: _,
             node_index: _,
         } = self;
@@ -10149,6 +10327,7 @@ impl StmtImportFrom {
             names,
             level: _,
             is_lazy: _,
+            runtime_level: _,
             range: _,
             node_index: _,
         } = self;
@@ -10356,6 +10535,7 @@ impl ExprSet {
     {
         let ExprSet {
             elts,
+            runtime_elts: _,
             range: _,
             node_index: _,
         } = self;
@@ -10556,6 +10736,21 @@ impl ExprEllipsisLiteral {
     }
 }
 
+impl ExprConstant {
+    pub(crate) fn visit_source_order<'a, V>(&'a self, _: &mut V)
+    where
+        V: SourceOrderVisitor<'a> + ?Sized,
+    {
+        let ExprConstant {
+            value: _,
+            kind: _,
+            invalid_type: _,
+            range: _,
+            node_index: _,
+        } = self;
+    }
+}
+
 impl ExprAttribute {
     pub(crate) fn visit_source_order<'a, V>(&'a self, visitor: &mut V)
     where
@@ -10627,6 +10822,7 @@ impl ExprList {
         let ExprList {
             elts,
             ctx: _,
+            runtime_elts: _,
             range: _,
             node_index: _,
         } = self;
@@ -10646,6 +10842,7 @@ impl ExprTuple {
             elts,
             ctx: _,
             parenthesized: _,
+            runtime_elts: _,
             range: _,
             node_index: _,
         } = self;
@@ -10732,6 +10929,7 @@ impl PatternMatchSequence {
     {
         let PatternMatchSequence {
             patterns,
+            runtime_patterns: _,
             range: _,
             node_index: _,
         } = self;
@@ -10750,6 +10948,9 @@ impl PatternMatchClass {
         let PatternMatchClass {
             cls,
             arguments,
+            runtime_patterns: _,
+            runtime_kwd_attrs: _,
+            runtime_kwd_patterns: _,
             range: _,
             node_index: _,
         } = self;
@@ -10804,6 +11005,7 @@ impl PatternMatchOr {
     {
         let PatternMatchOr {
             patterns,
+            runtime_patterns: _,
             range: _,
             node_index: _,
         } = self;

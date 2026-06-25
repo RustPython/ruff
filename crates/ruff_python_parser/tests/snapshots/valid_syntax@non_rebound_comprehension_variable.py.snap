@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/non_rebound_comprehension_variable.py
 ---
 ## AST
 
@@ -80,11 +79,15 @@ Module(
                                                     ),
                                                 ],
                                                 keywords: [],
+                                                runtime_args: None,
+                                                runtime_bases: None,
                                             },
                                         },
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -92,6 +95,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

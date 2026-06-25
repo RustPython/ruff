@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/except_stmt_unparenthesized_tuple_no_as_py314.py
 ---
 ## AST
 
@@ -52,6 +51,7 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
@@ -64,12 +64,17 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -114,6 +119,7 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
@@ -126,15 +132,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

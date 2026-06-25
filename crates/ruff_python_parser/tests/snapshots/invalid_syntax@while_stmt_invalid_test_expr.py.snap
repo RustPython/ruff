@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/while_stmt_invalid_test_expr.py
 ---
 ## AST
 
@@ -44,6 +43,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -81,6 +82,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -97,6 +100,8 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             AnnAssign(
@@ -119,6 +124,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             While(
@@ -150,6 +156,8 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             AnnAssign(
@@ -172,9 +180,11 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

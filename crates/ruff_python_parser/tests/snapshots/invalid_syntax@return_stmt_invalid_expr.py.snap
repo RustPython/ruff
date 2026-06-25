@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/return_stmt_invalid_expr.py
 ---
 ## AST
 
@@ -142,6 +141,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                                 ctx: Load,
@@ -151,6 +151,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

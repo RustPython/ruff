@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/compare/starred_expression.py
 ---
 ## AST
 
@@ -46,6 +45,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -86,6 +86,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -123,6 +124,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Load,
@@ -163,6 +165,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Load,
@@ -171,6 +174,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

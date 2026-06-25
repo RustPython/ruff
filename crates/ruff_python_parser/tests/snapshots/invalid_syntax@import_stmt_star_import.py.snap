@@ -92,11 +92,13 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

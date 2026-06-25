@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/function_def_unclosed_type_param_list.py
 ---
 ## AST
 
@@ -52,6 +51,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     parameters: Parameters {
@@ -71,6 +71,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -86,6 +88,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -93,6 +97,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -128,6 +133,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             Assign(
@@ -153,9 +162,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

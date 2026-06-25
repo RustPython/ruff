@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/mixed_bytes_and_non_bytes_literals.py
 ---
 ## AST
 
@@ -101,6 +100,8 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -166,11 +167,14 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -67,7 +67,10 @@ doc = "See also [mod](https://docs.python.org/3/library/ast.html#ast.mod)"
 
 [Mod.nodes.ModModule]
 doc = "See also [Module](https://docs.python.org/3/library/ast.html#ast.Module)"
-fields = [{ name = "body", type = "Stmt*" }]
+fields = [
+  { name = "body", type = "Stmt*" },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
+]
 
 [Mod.nodes.ModExpression]
 doc = "See also [Module](https://docs.python.org/3/library/ast.html#ast.Module)"
@@ -91,6 +94,10 @@ fields = [
   { name = "parameters", type = "Box<crate::Parameters>" },
   { name = "returns", type = "Expr?", is_annotation = true },
   { name = "body", type = "Stmt*" },
+  { name = "runtime_decorator_list", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+  { name = "runtime_type_comment", type = "Box<str>?", skip_visit = true },
+  { name = "runtime_type_comment_bytes", type = "Vec<u8>?", skip_visit = true },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtClassDef]
@@ -101,6 +108,8 @@ fields = [
   { name = "type_params", type = "Box<crate::TypeParams>?" },
   { name = "arguments", type = "Box<crate::Arguments>?" },
   { name = "body", type = "Stmt*" },
+  { name = "runtime_decorator_list", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtReturn]
@@ -109,7 +118,10 @@ fields = [{ name = "value", type = "Expr?" }]
 
 [Stmt.nodes.StmtDelete]
 doc = "See also [Delete](https://docs.python.org/3/library/ast.html#ast.Delete)"
-fields = [{ name = "targets", type = "Expr*" }]
+fields = [
+  { name = "targets", type = "Expr*" },
+  { name = "runtime_targets", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 
 [Stmt.nodes.StmtTypeAlias]
 doc = "See also [TypeAlias](https://docs.python.org/3/library/ast.html#ast.TypeAlias)"
@@ -124,6 +136,9 @@ doc = "See also [Assign](https://docs.python.org/3/library/ast.html#ast.Assign)"
 fields = [
   { name = "targets", type = "Expr*" },
   { name = "value", type = "Expr" },
+  { name = "runtime_targets", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+  { name = "runtime_type_comment", type = "Box<str>?", skip_visit = true },
+  { name = "runtime_type_comment_bytes", type = "Vec<u8>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtAugAssign]
@@ -141,6 +156,7 @@ fields = [
   { name = "annotation", type = "Expr", is_annotation = true },
   { name = "value", type = "Expr?" },
   { name = "simple", type = "bool" },
+  { name = "runtime_simple", type = "i32?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtFor]
@@ -154,6 +170,10 @@ fields = [
   { name = "iter", type = "Expr" },
   { name = "body", type = "Stmt*" },
   { name = "orelse", type = "Stmt*" },
+  { name = "runtime_type_comment", type = "Box<str>?", skip_visit = true },
+  { name = "runtime_type_comment_bytes", type = "Vec<u8>?", skip_visit = true },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
+  { name = "runtime_orelse", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtWhile]
@@ -163,6 +183,8 @@ fields = [
   { name = "test", type = "Expr" },
   { name = "body", type = "Stmt*" },
   { name = "orelse", type = "Stmt*" },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
+  { name = "runtime_orelse", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtIf]
@@ -172,6 +194,7 @@ fields = [
   { name = "test", type = "Expr" },
   { name = "body", type = "Stmt*" },
   { name = "elif_else_clauses", type = "ElifElseClause*" },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtWith]
@@ -183,6 +206,9 @@ fields = [
   { name = "is_async", type = "bool" },
   { name = "items", type = "WithItem*" },
   { name = "body", type = "Stmt*" },
+  { name = "runtime_type_comment", type = "Box<str>?", skip_visit = true },
+  { name = "runtime_type_comment_bytes", type = "Vec<u8>?", skip_visit = true },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtMatch]
@@ -205,6 +231,10 @@ fields = [
   { name = "orelse", type = "Stmt*" },
   { name = "finalbody", type = "Stmt*" },
   { name = "is_star", type = "bool" },
+  { name = "runtime_body", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
+  { name = "runtime_handlers", type = "Vec<Option<crate::ExceptHandler>>?", skip_visit = true },
+  { name = "runtime_orelse", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
+  { name = "runtime_finalbody", type = "Vec<Option<crate::Stmt>>?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtAssert]
@@ -225,6 +255,7 @@ fields = [
   { name = "names", type = "Alias*" },
   { name = "level", type = "u32" },
   { name = "is_lazy", type = "bool" },
+  { name = "runtime_level", type = "i32?", skip_visit = true },
 ]
 
 [Stmt.nodes.StmtGlobal]
@@ -319,7 +350,11 @@ doc = "See also [expr](https://docs.python.org/3/library/ast.html#ast.expr)"
 
 [Expr.nodes.ExprBoolOp]
 doc = "See also [BoolOp](https://docs.python.org/3/library/ast.html#ast.BoolOp)"
-fields = [{ name = "op", type = "BoolOp" }, { name = "values", type = "Expr*" }]
+fields = [
+  { name = "op", type = "BoolOp" },
+  { name = "values", type = "Expr*" },
+  { name = "runtime_values", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 custom_source_order = true
 
 [Expr.nodes.ExprNamed]
@@ -359,12 +394,18 @@ source_order = ["body", "test", "orelse"]
 
 [Expr.nodes.ExprDict]
 doc = "See also [Dict](https://docs.python.org/3/library/ast.html#ast.Dict)"
-fields = [{ name = "items", type = "DictItem*" }]
+fields = [
+  { name = "items", type = "DictItem*" },
+  { name = "runtime_values", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 custom_source_order = true
 
 [Expr.nodes.ExprSet]
 doc = "See also [Set](https://docs.python.org/3/library/ast.html#ast.Set)"
-fields = [{ name = "elts", type = "Expr*" }]
+fields = [
+  { name = "elts", type = "Expr*" },
+  { name = "runtime_elts", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 
 [Expr.nodes.ExprListComp]
 doc = "See also [ListComp](https://docs.python.org/3/library/ast.html#ast.ListComp)"
@@ -414,6 +455,7 @@ fields = [
   { name = "left", type = "Expr" },
   { name = "ops", type = "&CmpOp*" },
   { name = "comparators", type = "&Expr*" },
+  { name = "runtime_comparators", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
 ]
 # The fields must be visited simultaneously
 custom_source_order = true
@@ -434,7 +476,11 @@ doesn't join the implicitly concatenated parts into a single string. Instead,
 it keeps them separate and provide various methods to access the parts.
 
 See also [JoinedStr](https://docs.python.org/3/library/ast.html#ast.JoinedStr)"""
-fields = [{ name = "value", type = "FStringValue" }]
+fields = [
+  { name = "value", type = "FStringValue" },
+  { name = "runtime_joined_str", type = "Vec<crate::Expr>?", skip_visit = true },
+  { name = "runtime_values", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 custom_source_order = true
 
 [Expr.nodes.ExprTString]
@@ -446,7 +492,11 @@ doesn't join the implicitly concatenated parts into a single string. Instead,
 it keeps them separate and provide various methods to access the parts.
 
 See also [TemplateStr](https://docs.python.org/3/library/ast.html#ast.TemplateStr)"""
-fields = [{ name = "value", type = "TStringValue" }]
+fields = [
+  { name = "value", type = "TStringValue" },
+  { name = "runtime_template_str", type = "Vec<crate::Expr>?", skip_visit = true },
+  { name = "runtime_values", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+]
 custom_source_order = true
 
 [Expr.nodes.ExprStringLiteral]
@@ -475,8 +525,17 @@ fields = []
 derives = ["Default"]
 
 [Expr.nodes.ExprEllipsisLiteral]
-fields = []
+fields = [
+]
 derives = ["Default"]
+
+[Expr.nodes.ExprConstant]
+doc = "See also [Constant](https://docs.python.org/3/library/ast.html#ast.Constant)"
+fields = [
+  { name = "value", type = "ConstantValue", skip_visit = true },
+  { name = "kind", type = "Box<str>?", skip_visit = true },
+  { name = "invalid_type", type = "Box<str>?", skip_visit = true },
+]
 
 [Expr.nodes.ExprAttribute]
 doc = "See also [Attribute](https://docs.python.org/3/library/ast.html#ast.Attribute)"
@@ -513,6 +572,7 @@ doc = "See also [List](https://docs.python.org/3/library/ast.html#ast.List)"
 fields = [
   { name = "elts", type = "Expr*" },
   { name = "ctx", type = "ExprContext" },
+  { name = "runtime_elts", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
 ]
 
 [Expr.nodes.ExprTuple]
@@ -521,6 +581,7 @@ fields = [
   { name = "elts", type = "Expr*" },
   { name = "ctx", type = "ExprContext" },
   { name = "parenthesized", type = "bool" },
+  { name = "runtime_elts", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
 ]
 
 [Expr.nodes.ExprSlice]
@@ -573,7 +634,10 @@ fields = [{ name = "value", type = "Singleton" }]
 
 [Pattern.nodes.PatternMatchSequence]
 doc = "See also [MatchSequence](https://docs.python.org/3/library/ast.html#ast.MatchSequence)"
-fields = [{ name = "patterns", type = "Pattern*" }]
+fields = [
+  { name = "patterns", type = "Pattern*" },
+  { name = "runtime_patterns", type = "Vec<Option<crate::Pattern>>?", skip_visit = true },
+]
 
 [Pattern.nodes.PatternMatchMapping]
 doc = "See also [MatchMapping](https://docs.python.org/3/library/ast.html#ast.MatchMapping)"
@@ -581,6 +645,8 @@ fields = [
   { name = "keys", type = "Expr*" },
   { name = "patterns", type = "Pattern*" },
   { name = "rest", type = "Identifier?" },
+  { name = "runtime_keys", type = "Vec<Option<crate::Expr>>?", skip_visit = true },
+  { name = "runtime_patterns", type = "Vec<Option<crate::Pattern>>?", skip_visit = true },
 ]
 custom_source_order = true
 
@@ -589,6 +655,9 @@ doc = "See also [MatchClass](https://docs.python.org/3/library/ast.html#ast.Matc
 fields = [
   { name = "cls", type = "Box<Expr>" },
   { name = "arguments", type = "PatternArguments" },
+  { name = "runtime_patterns", type = "Vec<Option<crate::Pattern>>?", skip_visit = true },
+  { name = "runtime_kwd_attrs", type = "Vec<crate::Identifier>?", skip_visit = true },
+  { name = "runtime_kwd_patterns", type = "Vec<Option<crate::Pattern>>?", skip_visit = true },
 ]
 
 [Pattern.nodes.PatternMatchStar]
@@ -604,7 +673,10 @@ fields = [
 
 [Pattern.nodes.PatternMatchOr]
 doc = "See also [MatchOr](https://docs.python.org/3/library/ast.html#ast.MatchOr)"
-fields = [{ name = "patterns", type = "Pattern*" }]
+fields = [
+  { name = "patterns", type = "Pattern*" },
+  { name = "runtime_patterns", type = "Vec<Option<crate::Pattern>>?", skip_visit = true },
+]
 
 [TypeParam]
 doc = "See also [type_param](https://docs.python.org/3/library/ast.html#ast.type_param)"

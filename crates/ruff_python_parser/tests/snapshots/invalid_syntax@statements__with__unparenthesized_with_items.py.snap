@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/with/unparenthesized_with_items.py
 ---
 ## AST
 
@@ -38,6 +37,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -77,6 +79,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -114,6 +119,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -160,6 +168,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -219,6 +230,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -278,6 +292,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -331,9 +348,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

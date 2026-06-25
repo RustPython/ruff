@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/function_def_unclosed_parameter_list.py
 ---
 ## AST
 
@@ -48,6 +47,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -63,6 +64,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -70,9 +73,14 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -95,6 +103,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -116,6 +125,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -156,6 +169,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -180,6 +195,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -195,6 +212,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: Some(
                                     NumberLiteral(
@@ -212,12 +231,18 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

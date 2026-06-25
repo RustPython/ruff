@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/with/unclosed_ambiguous_lpar_eof.py
 ---
 ## AST
 
@@ -31,9 +30,13 @@ Module(
                         },
                     ],
                     body: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

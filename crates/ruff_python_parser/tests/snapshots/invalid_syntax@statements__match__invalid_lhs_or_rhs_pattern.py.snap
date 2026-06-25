@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/match/invalid_lhs_or_rhs_pattern.py
 ---
 ## AST
 
@@ -51,6 +50,8 @@ Module(
                                                         node_index: NodeIndex(None),
                                                         args: [],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -78,6 +79,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 65..90,
@@ -122,6 +124,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 95..120,
@@ -166,6 +169,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 125..156,
@@ -227,6 +231,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 161..191,
@@ -264,6 +269,7 @@ Module(
                                                         ),
                                                     ],
                                                     ctx: Store,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                             op: Add,
@@ -290,6 +296,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 196..229,
@@ -328,6 +335,7 @@ Module(
                                                             ),
                                                         },
                                                     ],
+                                                    runtime_values: None,
                                                 },
                                             ),
                                             op: Add,
@@ -354,6 +362,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 234..260,
@@ -400,6 +409,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 265..292,
@@ -453,6 +463,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 297..332,
@@ -491,6 +502,8 @@ Module(
                                                             ),
                                                         ],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -518,6 +531,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -573,6 +587,8 @@ Module(
                                                         node_index: NodeIndex(None),
                                                         args: [],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -589,6 +605,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 398..422,
@@ -632,6 +649,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 427..451,
@@ -675,6 +693,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 456..486,
@@ -735,6 +754,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 491..520,
@@ -782,6 +802,7 @@ Module(
                                                         ),
                                                     ],
                                                     ctx: Store,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         },
@@ -797,6 +818,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 525..557,
@@ -845,6 +867,7 @@ Module(
                                                             ),
                                                         },
                                                     ],
+                                                    runtime_values: None,
                                                 },
                                             ),
                                         },
@@ -860,6 +883,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 562..586,
@@ -904,6 +928,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 591..625,
@@ -952,6 +977,8 @@ Module(
                                                             ),
                                                         ],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -968,6 +995,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -1013,6 +1041,8 @@ Module(
                                                         node_index: NodeIndex(None),
                                                         args: [],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -1034,6 +1064,8 @@ Module(
                                                         node_index: NodeIndex(None),
                                                         args: [],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -1050,11 +1082,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

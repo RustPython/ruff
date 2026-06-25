@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/for_iter_unpack_py38.py
 ---
 ## AST
 
@@ -54,6 +53,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -71,6 +71,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -117,6 +121,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -134,6 +139,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -187,6 +196,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -204,9 +214,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/for_in_target_valid_expr.py
 ---
 ## AST
 
@@ -52,6 +51,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Store,
@@ -80,6 +80,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -116,6 +120,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             slice: NumberLiteral(
@@ -153,6 +158,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -189,6 +198,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             attr: Identifier {
@@ -222,9 +232,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

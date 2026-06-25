@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/if/recover.py
 ---
 ## AST
 
@@ -83,6 +82,8 @@ Module(
                                                             node_index: NodeIndex(None),
                                                         },
                                                         annotation: None,
+                                                        runtime_type_comment: None,
+                                                        runtime_type_comment_bytes: None,
                                                     },
                                                     default: None,
                                                 },
@@ -90,6 +91,7 @@ Module(
                                             vararg: None,
                                             kwonlyargs: [],
                                             kwarg: None,
+                                            runtime_defaults: None,
                                         },
                                     ),
                                     body: Name(
@@ -338,6 +340,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

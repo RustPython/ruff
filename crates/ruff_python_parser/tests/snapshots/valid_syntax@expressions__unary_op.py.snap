@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/expressions/unary_op.py
 ---
 ## AST
 
@@ -354,6 +353,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -438,6 +438,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                                 BoolOp(
@@ -492,9 +493,11 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -579,6 +582,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

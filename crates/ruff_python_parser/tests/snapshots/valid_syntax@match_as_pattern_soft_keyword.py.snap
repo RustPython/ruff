@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/match_as_pattern_soft_keyword.py
 ---
 ## AST
 
@@ -55,6 +54,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -104,6 +104,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -153,11 +154,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

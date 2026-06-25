@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/param_with_annotation.py
 ---
 ## AST
 
@@ -48,6 +47,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -55,6 +56,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -71,6 +73,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -124,6 +130,8 @@ Module(
                                                                         node_index: NodeIndex(None),
                                                                     },
                                                                     annotation: None,
+                                                                    runtime_type_comment: None,
+                                                                    runtime_type_comment_bytes: None,
                                                                 },
                                                                 default: None,
                                                             },
@@ -131,6 +139,7 @@ Module(
                                                         vararg: None,
                                                         kwonlyargs: [],
                                                         kwarg: None,
+                                                        runtime_defaults: None,
                                                     },
                                                 ),
                                                 body: Name(
@@ -144,6 +153,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -151,6 +162,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -167,9 +179,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

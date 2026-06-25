@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/assign_stmt_keyword_target.py
 ---
 ## AST
 
@@ -40,6 +39,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -109,6 +111,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -141,6 +146,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

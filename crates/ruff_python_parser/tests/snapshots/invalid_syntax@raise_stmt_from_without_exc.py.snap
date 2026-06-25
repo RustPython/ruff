@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/raise_stmt_from_without_exc.py
 ---
 ## AST
 
@@ -43,6 +42,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

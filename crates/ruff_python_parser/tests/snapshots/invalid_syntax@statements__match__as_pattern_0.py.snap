@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/match/as_pattern_0.py
 ---
 ## AST
 
@@ -73,6 +72,9 @@ Module(
                                         ],
                                         keywords: [],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -84,11 +86,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/assign_stmt_invalid_value_expr.py
 ---
 ## AST
 
@@ -56,6 +55,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -64,8 +64,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -122,8 +126,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -178,8 +186,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -227,6 +239,8 @@ Module(
                                                                         node_index: NodeIndex(None),
                                                                     },
                                                                     annotation: None,
+                                                                    runtime_type_comment: None,
+                                                                    runtime_type_comment_bytes: None,
                                                                 },
                                                                 default: None,
                                                             },
@@ -234,6 +248,7 @@ Module(
                                                         vararg: None,
                                                         kwonlyargs: [],
                                                         kwarg: None,
+                                                        runtime_defaults: None,
                                                     },
                                                 ),
                                                 body: Name(
@@ -252,8 +267,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -278,6 +297,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -296,6 +318,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

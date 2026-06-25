@@ -38,6 +38,9 @@ expression: suite
                     },
                 },
             ),
+            runtime_targets: None,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
         },
     ),
 ]

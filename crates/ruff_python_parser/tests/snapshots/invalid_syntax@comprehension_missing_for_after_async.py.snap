@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/comprehension_missing_for_after_async.py
 ---
 ## AST
 
@@ -62,6 +61,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: true,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                             parenthesized: true,
@@ -70,6 +71,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

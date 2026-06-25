@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/type_params_empty.py
 ---
 ## AST
 
@@ -26,6 +25,7 @@ Module(
                             range: 7..9,
                             node_index: NodeIndex(None),
                             type_params: [],
+                            runtime_type_params: None,
                         },
                     ),
                     parameters: Parameters {
@@ -36,6 +36,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -46,6 +47,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             TypeAlias(
@@ -65,6 +70,7 @@ Module(
                             range: 36..38,
                             node_index: NodeIndex(None),
                             type_params: [],
+                            runtime_type_params: None,
                         },
                     ),
                     value: BinOp(
@@ -93,6 +99,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

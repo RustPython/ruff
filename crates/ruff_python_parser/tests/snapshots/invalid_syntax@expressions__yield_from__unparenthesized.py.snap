@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/yield_from/unparenthesized.py
 ---
 ## AST
 
@@ -77,6 +76,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -131,6 +131,7 @@ Module(
                                                                 },
                                                             ),
                                                         ],
+                                                        runtime_values: None,
                                                     },
                                                 ),
                                                 ctx: Load,
@@ -139,6 +140,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -146,6 +148,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

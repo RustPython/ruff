@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/unparenthesized_named_expr_set_comp_py38.py
 ---
 ## AST
 
@@ -79,11 +78,15 @@ Module(
                                                     ),
                                                 ],
                                                 keywords: [],
+                                                runtime_args: None,
+                                                runtime_bases: None,
                                             },
                                         },
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -91,6 +94,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/star_index_py311.py
 ---
 ## AST
 
@@ -49,6 +48,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -115,6 +115,7 @@ Module(
                                                 ],
                                                 ctx: Load,
                                                 parenthesized: false,
+                                                runtime_elts: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -122,6 +123,8 @@ Module(
                                 ),
                             ],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -138,6 +141,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -195,6 +200,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -257,6 +263,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -318,6 +325,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -393,6 +401,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -401,6 +410,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/match/star_pattern_usage.py
 ---
 ## AST
 
@@ -42,6 +41,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 102..128,
@@ -77,6 +77,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 133..156,
@@ -103,6 +104,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 161..188,
@@ -141,6 +143,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -152,6 +155,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 193..220,
@@ -190,6 +194,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -201,6 +206,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 225..251,
@@ -231,6 +237,9 @@ Module(
                                         ],
                                         keywords: [],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -242,6 +251,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 256..284,
@@ -281,6 +291,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -292,6 +305,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 289..312,
@@ -334,6 +348,8 @@ Module(
                                         ),
                                     ],
                                     rest: None,
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -345,6 +361,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 317..343,
@@ -388,6 +405,8 @@ Module(
                                         ),
                                     ],
                                     rest: None,
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -399,6 +418,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 348..377,
@@ -425,6 +445,8 @@ Module(
                                         ),
                                     ],
                                     rest: None,
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -436,6 +458,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 382..407,
@@ -486,11 +509,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

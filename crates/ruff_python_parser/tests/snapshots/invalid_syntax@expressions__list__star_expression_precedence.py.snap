@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/list/star_expression_precedence.py
 ---
 ## AST
 
@@ -44,6 +43,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -86,6 +86,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_comparators: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -101,6 +102,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -146,6 +148,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -186,6 +189,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -201,6 +205,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -241,6 +246,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -256,6 +262,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -315,6 +322,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -354,6 +362,8 @@ Module(
                                                                         node_index: NodeIndex(None),
                                                                     },
                                                                     annotation: None,
+                                                                    runtime_type_comment: None,
+                                                                    runtime_type_comment_bytes: None,
                                                                 },
                                                                 default: None,
                                                             },
@@ -361,6 +371,7 @@ Module(
                                                         vararg: None,
                                                         kwonlyargs: [],
                                                         kwarg: None,
+                                                        runtime_defaults: None,
                                                     },
                                                 ),
                                                 body: Name(
@@ -386,6 +397,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -439,11 +451,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

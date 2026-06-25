@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/match_attr_pattern_soft_keyword.py
 ---
 ## AST
 
@@ -67,6 +66,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 39..57,
@@ -112,6 +112,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 62..80,
@@ -157,6 +158,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 85..130,
@@ -262,11 +264,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

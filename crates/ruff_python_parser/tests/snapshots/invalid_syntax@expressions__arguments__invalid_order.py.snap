@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/arguments/invalid_order.py
 ---
 ## AST
 
@@ -54,6 +53,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -110,6 +111,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -179,6 +182,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -235,6 +240,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -291,12 +298,15 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

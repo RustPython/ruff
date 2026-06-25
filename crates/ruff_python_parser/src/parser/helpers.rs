@@ -70,6 +70,7 @@ pub(super) fn detect_invalid_pre_py39_decorator_node(
             Number::Float(_) => "a float literal",
             Number::Complex { .. } => "a complex literal",
         },
+        Expr::Constant(_) => "a constant literal",
 
         Expr::BoolOp(_) => "boolean expression",
         Expr::BinOp(_) => "binary-operation expression",

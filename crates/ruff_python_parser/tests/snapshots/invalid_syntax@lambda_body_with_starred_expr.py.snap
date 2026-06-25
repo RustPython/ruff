@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/lambda_body_with_starred_expr.py
 ---
 ## AST
 
@@ -36,6 +35,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -43,6 +44,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Starred(
@@ -95,6 +97,8 @@ Module(
                                                                 node_index: NodeIndex(None),
                                                             },
                                                             annotation: None,
+                                                            runtime_type_comment: None,
+                                                            runtime_type_comment_bytes: None,
                                                         },
                                                         default: None,
                                                     },
@@ -102,6 +106,7 @@ Module(
                                                 vararg: None,
                                                 kwonlyargs: [],
                                                 kwarg: None,
+                                                runtime_defaults: None,
                                             },
                                         ),
                                         body: Starred(
@@ -124,6 +129,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -159,6 +165,8 @@ Module(
                                                                 node_index: NodeIndex(None),
                                                             },
                                                             annotation: None,
+                                                            runtime_type_comment: None,
+                                                            runtime_type_comment_bytes: None,
                                                         },
                                                         default: None,
                                                     },
@@ -166,6 +174,7 @@ Module(
                                                 vararg: None,
                                                 kwonlyargs: [],
                                                 kwarg: None,
+                                                runtime_defaults: None,
                                             },
                                         ),
                                         body: Starred(
@@ -196,6 +205,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -226,6 +236,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -233,6 +245,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Starred(
@@ -262,6 +275,7 @@ Module(
                                                     },
                                                 ),
                                             ],
+                                            runtime_values: None,
                                         },
                                     ),
                                     ctx: Load,
@@ -272,6 +286,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

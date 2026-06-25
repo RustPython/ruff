@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/expressions/name.py
 ---
 ## AST
 
@@ -137,6 +136,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/params_duplicate_names.py
 ---
 ## AST
 
@@ -39,6 +38,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -54,6 +55,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: Some(
                                     NumberLiteral(
@@ -78,6 +81,8 @@ Module(
                                     node_index: NodeIndex(None),
                                 },
                                 annotation: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [
@@ -93,6 +98,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -117,6 +124,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -131,8 +140,11 @@ Module(
                                     node_index: NodeIndex(None),
                                 },
                                 annotation: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -149,9 +161,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

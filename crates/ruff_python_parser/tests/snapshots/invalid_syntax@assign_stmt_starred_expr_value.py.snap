@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/assign_stmt_starred_expr_value.py
 ---
 ## AST
 
@@ -44,11 +43,15 @@ Module(
                                         ),
                                     ],
                                     ctx: Load,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -84,11 +87,15 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -126,12 +133,17 @@ Module(
                                         node_index: NodeIndex(None),
                                         args: [],
                                         keywords: [],
+                                        runtime_args: None,
+                                        runtime_bases: None,
                                     },
                                 },
                             ),
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -178,9 +190,13 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

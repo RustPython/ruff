@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/match/invalid_class_pattern.py
 ---
 ## AST
 
@@ -69,6 +68,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -80,6 +82,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 102..135,
@@ -127,6 +130,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -138,6 +144,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 140..174,
@@ -185,6 +192,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -196,6 +206,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 179..217,
@@ -243,6 +254,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -254,6 +268,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 222..249,
@@ -301,6 +316,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -312,6 +330,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 254..285,
@@ -359,6 +378,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -370,11 +392,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

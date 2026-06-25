@@ -15,6 +15,7 @@ impl ast::ElifElseClause {
             node_index: _,
             test,
             body,
+            ..
         } = self;
         if let Some(test) = test {
             visitor.visit_expr(test);
@@ -32,6 +33,7 @@ impl ast::ExprDict {
             items,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         for ast::DictItem { key, value } in items {
@@ -53,6 +55,7 @@ impl ast::ExprBoolOp {
             values,
             range: _,
             node_index: _,
+            ..
         } = self;
         match values.as_slice() {
             [left, rest @ ..] => {
@@ -80,6 +83,7 @@ impl ast::ExprCompare {
             comparators,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         visitor.visit_expr(left);
@@ -144,6 +148,7 @@ impl ast::ExprFString {
             value,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         for f_string_part in value {
@@ -168,6 +173,7 @@ impl ast::ExprTString {
             value,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         for t_string in value {
@@ -185,6 +191,7 @@ impl ast::ExprStringLiteral {
             value,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         for string_literal in value {
@@ -202,6 +209,7 @@ impl ast::ExprBytesLiteral {
             value,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         for bytes_literal in value {
@@ -221,6 +229,7 @@ impl ast::ExceptHandlerExceptHandler {
             type_,
             name,
             body,
+            ..
         } = self;
         if let Some(expr) = type_ {
             visitor.visit_expr(expr);
@@ -245,6 +254,7 @@ impl ast::PatternMatchMapping {
             rest,
             range: _,
             node_index: _,
+            ..
         } = self;
 
         let mut rest = rest.as_ref();
@@ -311,6 +321,7 @@ impl ast::Comprehension {
             iter,
             ifs,
             is_async: _,
+            ..
         } = self;
         visitor.visit_expr(target);
         visitor.visit_expr(iter);
@@ -361,6 +372,7 @@ impl ast::Parameter {
             node_index: _,
             name,
             annotation,
+            ..
         } = self;
 
         visitor.visit_identifier(name);
@@ -457,6 +469,7 @@ impl ast::MatchCase {
             pattern,
             guard,
             body,
+            ..
         } = self;
 
         visitor.visit_pattern(pattern);
@@ -491,6 +504,7 @@ impl ast::TypeParams {
             range: _,
             node_index: _,
             type_params,
+            ..
         } = self;
 
         for type_param in type_params {

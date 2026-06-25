@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/yield/star_expression.py
 ---
 ## AST
 
@@ -80,6 +79,7 @@ Module(
                                                                     },
                                                                 ),
                                                             ],
+                                                            runtime_values: None,
                                                         },
                                                     ),
                                                     ctx: Load,
@@ -96,6 +96,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -104,6 +105,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

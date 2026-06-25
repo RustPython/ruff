@@ -16,7 +16,7 @@
 //! have the same shape in that they evaluate to the same value.
 
 use crate as ast;
-use crate::{Expr, Number};
+use crate::{ConstantValue, Expr, Number};
 use std::borrow::Cow;
 use std::hash::Hash;
 
@@ -365,6 +365,44 @@ impl<'a> From<&'a ast::Number> for ComparableNumber<'a> {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum ComparableConstantValue<'a> {
+    None,
+    Boolean(bool),
+    Str(&'a str),
+    Bytes(Cow<'a, [u8]>),
+    Integer(&'a str),
+    Tuple(Vec<Self>),
+    Frozenset(Vec<Self>),
+    Float(u64),
+    Complex { real: u64, imag: u64 },
+    Ellipsis,
+}
+
+impl<'a> From<&'a ConstantValue> for ComparableConstantValue<'a> {
+    fn from(value: &'a ConstantValue) -> Self {
+        match value {
+            ConstantValue::None => Self::None,
+            ConstantValue::Boolean(value) => Self::Boolean(*value),
+            ConstantValue::Str(value) => Self::Str(value),
+            ConstantValue::Bytes(value) => Self::Bytes(Cow::from(value.as_ref())),
+            ConstantValue::Integer(value) => Self::Integer(value),
+            ConstantValue::Tuple(elements) => {
+                Self::Tuple(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Frozenset(elements) => {
+                Self::Frozenset(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Float(value) => Self::Float(value.to_bits()),
+            ConstantValue::Complex { real, imag } => Self::Complex {
+                real: real.to_bits(),
+                imag: imag.to_bits(),
+            },
+            ConstantValue::Ellipsis => Self::Ellipsis,
+        }
+    }
+}
+
 #[derive(Debug, Default, PartialEq, Eq, Hash)]
 pub struct ComparableArguments<'a> {
     args: Vec<ComparableExpr<'a>>,
@@ -548,6 +586,7 @@ impl<'a> From<&'a ast::InterpolatedElement> for InterpolatedElement<'a> {
             format_spec,
             range: _,
             node_index: _,
+            ..
         } = interpolated_element;
 
         Self {
@@ -580,6 +619,7 @@ impl<'a> From<&'a ast::ElifElseClause> for ComparableElifElseClause<'a> {
             node_index: _,
             test,
             body,
+            ..
         } = elif_else_clause;
         Self {
             test: test.as_ref().map(Into::into),
@@ -957,6 +997,11 @@ pub struct ExprNumberLiteral<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
+pub struct ExprConstant<'a> {
+    value: ComparableConstantValue<'a>,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct ExprBoolLiteral {
     value: bool,
 }
@@ -1032,6 +1077,7 @@ pub enum ComparableExpr<'a> {
     StringLiteral(ExprStringLiteral<'a>),
     BytesLiteral(ExprBytesLiteral<'a>),
     NumberLiteral(ExprNumberLiteral<'a>),
+    Constant(ExprConstant<'a>),
     BoolLiteral(ExprBoolLiteral),
     NoneLiteral,
     EllipsisLiteral,
@@ -1065,6 +1111,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 values,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::BoolOp(ExprBoolOp {
                 op: (*op).into(),
                 values: values.iter().map(Into::into).collect(),
@@ -1074,6 +1121,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::NamedExpr(ExprNamed {
                 target: target.into(),
                 value: value.into(),
@@ -1084,6 +1132,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 right,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::BinOp(ExprBinOp {
                 left: left.into(),
                 op: (*op).into(),
@@ -1094,6 +1143,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 operand,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::UnaryOp(ExprUnaryOp {
                 op: (*op).into(),
                 operand: operand.into(),
@@ -1103,6 +1153,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 body,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Lambda(ExprLambda {
                 parameters: parameters.as_ref().map(Into::into),
                 body: body.into(),
@@ -1113,6 +1164,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 orelse,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::IfExp(ExprIf {
                 test: test.into(),
                 body: body.into(),
@@ -1122,6 +1174,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 items,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Dict(ExprDict {
                 items: items.iter().map(ComparableDictItem::from).collect(),
             }),
@@ -1129,6 +1182,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 elts,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Set(ExprSet {
                 elts: elts.iter().map(Into::into).collect(),
             }),
@@ -1137,6 +1191,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 generators,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::ListComp(ExprListComp {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
@@ -1146,6 +1201,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 generators,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::SetComp(ExprSetComp {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
@@ -1156,6 +1212,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 generators,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::DictComp(ExprDictComp {
                 key: key.into(),
                 value: value.into(),
@@ -1167,6 +1224,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 range: _,
                 node_index: _,
                 parenthesized: _,
+                ..
             }) => Self::GeneratorExp(ExprGenerator {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
@@ -1175,6 +1233,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Await(ExprAwait {
                 value: value.into(),
             }),
@@ -1182,6 +1241,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Yield(ExprYield {
                 value: value.as_ref().map(Into::into),
             }),
@@ -1189,6 +1249,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::YieldFrom(ExprYieldFrom {
                 value: value.into(),
             }),
@@ -1198,6 +1259,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 comparators,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Compare(ExprCompare {
                 left: left.into(),
                 ops: ops.iter().copied().map(Into::into).collect(),
@@ -1208,6 +1270,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 arguments,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Call(ExprCall {
                 func: func.into(),
                 arguments: arguments.into(),
@@ -1216,6 +1279,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::FString(ExprFString {
                 value: value.into(),
             }),
@@ -1223,6 +1287,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::TString(ExprTString {
                 value: value.into(),
             }),
@@ -1230,6 +1295,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::StringLiteral(ExprStringLiteral {
                 value: ComparableStringLiteral {
                     value: value.to_str(),
@@ -1239,6 +1305,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::BytesLiteral(ExprBytesLiteral {
                 value: ComparableBytesLiteral {
                     value: Cow::from(value),
@@ -1248,13 +1315,23 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::NumberLiteral(ExprNumberLiteral {
+                value: value.into(),
+            }),
+            ast::Expr::Constant(ast::ExprConstant {
+                value,
+                range: _,
+                node_index: _,
+                ..
+            }) => Self::Constant(ExprConstant {
                 value: value.into(),
             }),
             ast::Expr::BooleanLiteral(ast::ExprBooleanLiteral {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::BoolLiteral(ExprBoolLiteral { value: *value }),
             ast::Expr::NoneLiteral(_) => Self::NoneLiteral,
             ast::Expr::EllipsisLiteral(_) => Self::EllipsisLiteral,
@@ -1264,6 +1341,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 ctx: _,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Attribute(ExprAttribute {
                 value: value.into(),
                 attr: attr.as_str(),
@@ -1274,6 +1352,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 ctx: _,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Subscript(ExprSubscript {
                 value: value.into(),
                 slice: slice.into(),
@@ -1283,6 +1362,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 ctx: _,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Starred(ExprStarred {
                 value: value.into(),
             }),
@@ -1292,6 +1372,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 ctx: _,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::List(ExprList {
                 elts: elts.iter().map(Into::into).collect(),
             }),
@@ -1301,6 +1382,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 range: _,
                 node_index: _,
                 parenthesized: _,
+                ..
             }) => Self::Tuple(ExprTuple {
                 elts: elts.iter().map(Into::into).collect(),
             }),
@@ -1310,6 +1392,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 step,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Slice(ExprSlice {
                 lower: lower.as_ref().map(Into::into),
                 upper: upper.as_ref().map(Into::into),
@@ -1320,6 +1403,7 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::IpyEscapeCommand(ExprIpyEscapeCommand { kind: *kind, value }),
         }
     }
@@ -1405,6 +1489,7 @@ impl<'a> From<&'a ast::TypeParam> for ComparableTypeParam<'a> {
                 default,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::TypeVar(TypeParamTypeVar {
                 name: name.as_str(),
                 bound: bound.as_ref().map(Into::into),
@@ -1415,6 +1500,7 @@ impl<'a> From<&'a ast::TypeParam> for ComparableTypeParam<'a> {
                 default,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::TypeVarTuple(TypeParamTypeVarTuple {
                 name: name.as_str(),
                 default: default.as_ref().map(Into::into),
@@ -1424,6 +1510,7 @@ impl<'a> From<&'a ast::TypeParam> for ComparableTypeParam<'a> {
                 default,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::ParamSpec(TypeParamParamSpec {
                 name: name.as_str(),
                 default: default.as_ref().map(Into::into),
@@ -1606,6 +1693,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 type_params,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::FunctionDef(StmtFunctionDef {
                 is_async: *is_async,
                 name: name.as_str(),
@@ -1623,6 +1711,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 type_params,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::ClassDef(StmtClassDef {
                 name: name.as_str(),
                 arguments: arguments.as_ref().map(Into::into).unwrap_or_default(),
@@ -1634,6 +1723,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Return(StmtReturn {
                 value: value.as_ref().map(Into::into),
             }),
@@ -1641,6 +1731,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 targets,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Delete(StmtDelete {
                 targets: targets.iter().map(Into::into).collect(),
             }),
@@ -1660,6 +1751,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Assign(StmtAssign {
                 targets: targets.iter().map(Into::into).collect(),
                 value: value.into(),
@@ -1670,6 +1762,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::AugAssign(StmtAugAssign {
                 target: target.into(),
                 op: (*op).into(),
@@ -1682,6 +1775,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 simple,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::AnnAssign(StmtAnnAssign {
                 target: target.into(),
                 annotation: annotation.into(),
@@ -1696,6 +1790,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 orelse,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::For(StmtFor {
                 is_async: *is_async,
                 target: target.into(),
@@ -1709,6 +1804,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 orelse,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::While(StmtWhile {
                 test: test.into(),
                 body: body.iter().map(Into::into).collect(),
@@ -1720,6 +1816,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 elif_else_clauses,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::If(StmtIf {
                 test: test.into(),
                 body: body.iter().map(Into::into).collect(),
@@ -1731,6 +1828,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 body,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::With(StmtWith {
                 is_async: *is_async,
                 items: items.iter().map(Into::into).collect(),
@@ -1741,6 +1839,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 cases,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Match(StmtMatch {
                 subject: subject.into(),
                 cases: cases.iter().map(Into::into).collect(),
@@ -1750,6 +1849,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 cause,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Raise(StmtRaise {
                 exc: exc.as_ref().map(Into::into),
                 cause: cause.as_ref().map(Into::into),
@@ -1762,6 +1862,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 is_star,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Try(StmtTry {
                 body: body.iter().map(Into::into).collect(),
                 handlers: handlers.iter().map(Into::into).collect(),
@@ -1774,6 +1875,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 msg,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Assert(StmtAssert {
                 test: test.into(),
                 msg: msg.as_ref().map(Into::into),
@@ -1783,6 +1885,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 is_lazy,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Import(StmtImport {
                 names: names.iter().map(Into::into).collect(),
                 is_lazy: *is_lazy,
@@ -1794,6 +1897,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 is_lazy,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::ImportFrom(StmtImportFrom {
                 module: module.as_deref(),
                 names: names.iter().map(Into::into).collect(),
@@ -1804,6 +1908,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 names,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Global(StmtGlobal {
                 names: names.iter().map(ast::Identifier::as_str).collect(),
             }),
@@ -1811,6 +1916,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 names,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Nonlocal(StmtNonlocal {
                 names: names.iter().map(ast::Identifier::as_str).collect(),
             }),
@@ -1819,11 +1925,13 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::IpyEscapeCommand(StmtIpyEscapeCommand { kind: *kind, value }),
             ast::Stmt::Expr(ast::StmtExpr {
                 value,
                 range: _,
                 node_index: _,
+                ..
             }) => Self::Expr(StmtExpr {
                 value: value.into(),
             }),
@@ -1915,6 +2023,10 @@ impl<'a> From<&'a Expr> for HashableExpr<'a> {
                 Expr::NumberLiteral(number) => as_bool(number)
                     .map(|value| ComparableExpr::BoolLiteral(ExprBoolLiteral { value }))
                     .unwrap_or_else(|| ComparableExpr::from(expr)),
+                Expr::Constant(ast::ExprConstant {
+                    value: ConstantValue::Boolean(value),
+                    ..
+                }) => ComparableExpr::BoolLiteral(ExprBoolLiteral { value: *value }),
                 Expr::Tuple(tuple) => ComparableExpr::Tuple(ExprTuple {
                     elts: tuple.iter().map(as_hashable).collect(),
                 }),

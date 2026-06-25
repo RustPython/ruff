@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/ann_assign_stmt_invalid_target.py
 ---
 ## AST
 
@@ -67,6 +66,7 @@ Module(
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -90,6 +90,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -125,6 +127,7 @@ Module(
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -181,10 +184,12 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -207,6 +212,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                     annotation: Name(
@@ -229,6 +235,7 @@ Module(
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -259,6 +266,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                     annotation: Name(
@@ -296,10 +304,12 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -330,6 +340,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     annotation: Name(
@@ -367,10 +378,12 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -392,6 +405,7 @@ Module(
                                 ),
                             ],
                             ctx: Store,
+                            runtime_elts: None,
                         },
                     ),
                     annotation: Name(
@@ -414,6 +428,7 @@ Module(
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -443,6 +458,7 @@ Module(
                                 ),
                             ],
                             ctx: Store,
+                            runtime_elts: None,
                         },
                     ),
                     annotation: Name(
@@ -480,13 +496,16 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

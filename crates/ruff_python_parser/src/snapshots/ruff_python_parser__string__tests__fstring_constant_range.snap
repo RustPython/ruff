@@ -40,6 +40,9 @@ expression: suite
                                                 debug_text: None,
                                                 conversion: None,
                                                 format_spec: None,
+                                                runtime_str: None,
+                                                runtime_interpolation_format_spec: None,
+                                                runtime_formatted_value_format_spec: None,
                                             },
                                         ),
                                         Literal(
@@ -64,6 +67,9 @@ expression: suite
                                                 debug_text: None,
                                                 conversion: None,
                                                 format_spec: None,
+                                                runtime_str: None,
+                                                runtime_interpolation_format_spec: None,
+                                                runtime_formatted_value_format_spec: None,
                                             },
                                         ),
                                         Literal(
@@ -84,6 +90,8 @@ expression: suite
                             ),
                         ),
                     },
+                    runtime_joined_str: None,
+                    runtime_values: None,
                 },
             ),
         },

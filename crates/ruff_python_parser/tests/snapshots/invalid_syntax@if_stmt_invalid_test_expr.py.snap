@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/if_stmt_invalid_test_expr.py
 ---
 ## AST
 
@@ -44,6 +43,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -81,6 +81,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -116,9 +117,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/arguments/missing_expression.py
 ---
 ## AST
 
@@ -41,6 +40,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -87,6 +88,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -137,6 +140,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -157,6 +162,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

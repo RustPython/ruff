@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/ann_assign_stmt_type_alias_annotation.py
 ---
 ## AST
 
@@ -32,6 +31,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Assign(
@@ -56,6 +56,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -101,9 +104,13 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

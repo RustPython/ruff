@@ -84,6 +84,9 @@ impl Transformer for Relocator {
             Expr::NumberLiteral(ast::ExprNumberLiteral { range, .. }) => {
                 *range = self.range;
             }
+            Expr::Constant(ast::ExprConstant { range, .. }) => {
+                *range = self.range;
+            }
             Expr::BooleanLiteral(ast::ExprBooleanLiteral { range, .. }) => {
                 *range = self.range;
             }

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_lambda_without_parentheses.py
 ---
 ## AST
 
@@ -50,6 +49,8 @@ Module(
                                                                                     node_index: NodeIndex(None),
                                                                                 },
                                                                                 annotation: None,
+                                                                                runtime_type_comment: None,
+                                                                                runtime_type_comment_bytes: None,
                                                                             },
                                                                             default: None,
                                                                         },
@@ -57,6 +58,7 @@ Module(
                                                                     vararg: None,
                                                                     kwonlyargs: [],
                                                                     kwarg: None,
+                                                                    runtime_defaults: None,
                                                                 },
                                                             ),
                                                             body: Name(
@@ -72,6 +74,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                             Literal(
@@ -91,11 +96,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

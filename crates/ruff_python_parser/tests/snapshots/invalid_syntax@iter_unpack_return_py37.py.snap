@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/iter_unpack_return_py37.py
 ---
 ## AST
 
@@ -59,8 +58,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             FunctionDef(
@@ -83,6 +86,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -141,15 +145,21 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/while_stmt_missing_colon.py
 ---
 ## AST
 
@@ -40,6 +39,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     body: [
@@ -51,9 +51,12 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

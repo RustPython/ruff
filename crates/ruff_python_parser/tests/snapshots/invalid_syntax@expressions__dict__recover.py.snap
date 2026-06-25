@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/dict/recover.py
 ---
 ## AST
 
@@ -28,6 +27,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -86,6 +86,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -122,6 +123,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -180,6 +182,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -215,6 +218,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -240,6 +244,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -305,6 +310,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -393,6 +399,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -461,11 +468,13 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

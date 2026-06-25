@@ -16,7 +16,7 @@ use crate::{
     self as ast, Arguments, AtomicNodeIndex, CmpOp, DictItem, ExceptHandler, Expr, ExprNoneLiteral,
     InterpolatedStringElement, MatchCase, Operator, Pattern, Stmt, TypeParam,
 };
-use crate::{AnyNodeRef, ExprContext};
+use crate::{AnyNodeRef, ConstantValue, ExprContext};
 
 /// Return `true` if the `Stmt` is a compound statement (as opposed to a simple statement).
 pub const fn is_compound_statement(stmt: &Stmt) -> bool {
@@ -55,6 +55,7 @@ where
             arguments,
             range: _,
             node_index: _,
+            ..
         }) = expr
         {
             // Ex) `list()`
@@ -75,6 +76,7 @@ where
                 Expr::StringLiteral(_)
                     | Expr::BytesLiteral(_)
                     | Expr::NumberLiteral(_)
+                    | Expr::Constant(_)
                     | Expr::BooleanLiteral(_)
                     | Expr::NoneLiteral(_)
                     | Expr::EllipsisLiteral(_)
@@ -94,6 +96,7 @@ where
                 Expr::StringLiteral(_)
                     | Expr::BytesLiteral(_)
                     | Expr::NumberLiteral(_)
+                    | Expr::Constant(_)
                     | Expr::BooleanLiteral(_)
                     | Expr::NoneLiteral(_)
                     | Expr::EllipsisLiteral(_)
@@ -149,6 +152,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             value,
             range: _,
             node_index: _,
+            ..
         }) => any_over_expr(target, func) || any_over_expr(value, func),
         Expr::BinOp(ast::ExprBinOp { left, right, .. }) => {
             any_over_expr(left, func) || any_over_expr(right, func)
@@ -161,11 +165,13 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             orelse,
             range: _,
             node_index: _,
+            ..
         }) => any_over_expr(test, func) || any_over_expr(body, func) || any_over_expr(orelse, func),
         Expr::Dict(ast::ExprDict {
             items,
             range: _,
             node_index: _,
+            ..
         }) => items.iter().any(|ast::DictItem { key, value }| {
             any_over_expr(value, func) || key.as_ref().is_some_and(|key| any_over_expr(key, func))
         }),
@@ -173,6 +179,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             elts,
             range: _,
             node_index: _,
+            ..
         })
         | Expr::List(ast::ExprList {
             elts,
@@ -191,12 +198,14 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             generators,
             range: _,
             node_index: _,
+            ..
         })
         | Expr::SetComp(ast::ExprSetComp {
             elt,
             generators,
             range: _,
             node_index: _,
+            ..
         })
         | Expr::Generator(ast::ExprGenerator {
             elt,
@@ -204,6 +213,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             range: _,
             node_index: _,
             parenthesized: _,
+            ..
         }) => {
             any_over_expr(elt, func)
                 || generators.iter().any(|generator| {
@@ -218,6 +228,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             generators,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_expr(key, func)
                 || any_over_expr(value, func)
@@ -231,11 +242,13 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             value,
             range: _,
             node_index: _,
+            ..
         })
         | Expr::YieldFrom(ast::ExprYieldFrom {
             value,
             range: _,
             node_index: _,
+            ..
         })
         | Expr::Attribute(ast::ExprAttribute {
             value,
@@ -253,6 +266,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             value,
             range: _,
             node_index: _,
+            ..
         }) => value
             .as_ref()
             .is_some_and(|value| any_over_expr(value, func)),
@@ -264,6 +278,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             arguments,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_expr(call_func, func)
                 // Note that this is the evaluation order but not necessarily the declaration order
@@ -282,6 +297,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
             step,
             range: _,
             node_index: _,
+            ..
         }) => {
             lower
                 .as_ref()
@@ -297,6 +313,7 @@ pub fn any_over_expr(expr: &Expr, func: &dyn Fn(&Expr) -> bool) -> bool {
         | Expr::StringLiteral(_)
         | Expr::BytesLiteral(_)
         | Expr::NumberLiteral(_)
+        | Expr::Constant(_)
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_)
@@ -329,12 +346,14 @@ pub fn any_over_pattern(pattern: &Pattern, func: &dyn Fn(&Expr) -> bool) -> bool
             value,
             range: _,
             node_index: _,
+            ..
         }) => any_over_expr(value, func),
         Pattern::MatchSingleton(_) => false,
         Pattern::MatchSequence(ast::PatternMatchSequence {
             patterns,
             range: _,
             node_index: _,
+            ..
         }) => patterns
             .iter()
             .any(|pattern| any_over_pattern(pattern, func)),
@@ -363,6 +382,7 @@ pub fn any_over_pattern(pattern: &Pattern, func: &dyn Fn(&Expr) -> bool) -> bool
             patterns,
             range: _,
             node_index: _,
+            ..
         }) => patterns
             .iter()
             .any(|pattern| any_over_pattern(pattern, func)),
@@ -450,6 +470,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             value,
             range: _,
             node_index: _,
+            ..
         }) => value
             .as_ref()
             .is_some_and(|value| any_over_expr(value, func)),
@@ -457,6 +478,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             targets,
             range: _,
             node_index: _,
+            ..
         }) => targets.iter().any(|expr| any_over_expr(expr, func)),
         Stmt::TypeAlias(ast::StmtTypeAlias {
             name,
@@ -508,6 +530,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             orelse,
             range: _,
             node_index: _,
+            ..
         }) => any_over_expr(test, func) || any_over_body(body, func) || any_over_body(orelse, func),
         Stmt::If(ast::StmtIf {
             test,
@@ -515,6 +538,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             elif_else_clauses,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_expr(test, func)
                 || any_over_body(body, func)
@@ -540,6 +564,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             cause,
             range: _,
             node_index: _,
+            ..
         }) => {
             exc.as_ref().is_some_and(|value| any_over_expr(value, func))
                 || cause
@@ -554,6 +579,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             is_star: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_body(body, func)
                 || handlers.iter().any(|handler| {
@@ -573,6 +599,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             msg,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_expr(test, func)
                 || msg.as_ref().is_some_and(|value| any_over_expr(value, func))
@@ -582,6 +609,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             cases,
             range: _,
             node_index: _,
+            ..
         }) => {
             any_over_expr(subject, func)
                 || cases.iter().any(|case| {
@@ -591,6 +619,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
                         body,
                         range: _,
                         node_index: _,
+                        ..
                     } = case;
                     any_over_pattern(pattern, func)
                         || guard.as_ref().is_some_and(|expr| any_over_expr(expr, func))
@@ -605,6 +634,7 @@ pub fn any_over_stmt(stmt: &Stmt, func: &dyn Fn(&Expr) -> bool) -> bool {
             value,
             range: _,
             node_index: _,
+            ..
         }) => any_over_expr(value, func),
         Stmt::Pass(_) | Stmt::Break(_) | Stmt::Continue(_) => false,
         Stmt::IpyEscapeCommand(_) => false,
@@ -654,7 +684,13 @@ pub fn is_assignment_to_a_dunder(stmt: &Stmt) -> bool {
 pub const fn is_singleton(expr: &Expr) -> bool {
     matches!(
         expr,
-        Expr::NoneLiteral(_) | Expr::BooleanLiteral(_) | Expr::EllipsisLiteral(_)
+        Expr::NoneLiteral(_)
+            | Expr::BooleanLiteral(_)
+            | Expr::EllipsisLiteral(_)
+            | Expr::Constant(ast::ExprConstant {
+                value: ConstantValue::None | ConstantValue::Boolean(_) | ConstantValue::Ellipsis,
+                ..
+            })
     )
 }
 
@@ -1026,6 +1062,7 @@ impl<'a> StatementVisitor<'a> for RaiseStatementVisitor<'a> {
                 cause,
                 range: _,
                 node_index: _,
+                ..
             }) => {
                 self.raises
                     .push((stmt.range(), exc.as_deref(), cause.as_deref()));
@@ -1099,6 +1136,7 @@ pub fn is_docstring_stmt(stmt: &Stmt) -> bool {
         value,
         range: _,
         node_index: _,
+        ..
     }) = stmt
     {
         value.is_string_literal_expr()
@@ -1137,6 +1175,7 @@ pub fn on_conditional_branch<'a>(parents: &mut impl Iterator<Item = &'a Stmt>) -
             value,
             range: _,
             node_index: _,
+            ..
         }) = parent
         {
             if value.is_if_expr() {
@@ -1279,6 +1318,59 @@ impl Truthiness {
                     }
                 }
             },
+            Expr::Constant(ast::ExprConstant { value, .. }) => match value {
+                ConstantValue::None => Self::None,
+                ConstantValue::Boolean(value) => {
+                    if *value {
+                        Self::True
+                    } else {
+                        Self::False
+                    }
+                }
+                ConstantValue::Str(value) => {
+                    if value.is_empty() {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Integer(value) => {
+                    if value.as_ref() == "0" {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Bytes(value) => {
+                    if value.is_empty() {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Tuple(elements) | ConstantValue::Frozenset(elements) => {
+                    if elements.is_empty() {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Float(value) => {
+                    if *value == 0.0 {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Complex { real, imag } => {
+                    if *real == 0.0 && *imag == 0.0 {
+                        Self::Falsey
+                    } else {
+                        Self::Truthy
+                    }
+                }
+                ConstantValue::Ellipsis => Self::Truthy,
+            },
             Expr::BooleanLiteral(ast::ExprBooleanLiteral { value, .. }) => {
                 if *value {
                     Self::True
@@ -1349,6 +1441,7 @@ impl Truthiness {
                                 // raise a type error (non-iterable types like numbers, booleans,
                                 // None, etc.).
                                 Expr::NumberLiteral(_)
+                                | Expr::Constant(_)
                                 | Expr::BooleanLiteral(_)
                                 | Expr::NoneLiteral(_)
                                 | Expr::EllipsisLiteral(_)
@@ -1398,6 +1491,7 @@ fn is_non_empty_f_string(expr: &ast::ExprFString) -> bool {
             Expr::DictComp(_) => true,
             Expr::Compare(_) => true,
             Expr::NumberLiteral(_) => true,
+            Expr::Constant(_) => true,
             Expr::BooleanLiteral(_) => true,
             Expr::NoneLiteral(_) => true,
             Expr::EllipsisLiteral(_) => true,
@@ -1553,6 +1647,7 @@ pub fn pep_604_union(elts: &[Expr]) -> Expr {
             range: TextRange::default(),
             node_index: AtomicNodeIndex::NONE,
             parenthesized: true,
+            runtime_elts: None,
         }),
         [Expr::Tuple(ast::ExprTuple { elts, .. })] => pep_604_union(elts),
         [elt] => elt.clone(),
@@ -1600,6 +1695,7 @@ pub fn typing_union(elts: &[Expr], binding: Name) -> Expr {
             elts: elts.to_vec(),
             ctx: ExprContext::Load,
             parenthesized: false,
+            runtime_elts: None,
         })),
         ctx: ExprContext::Load,
         range: TextRange::default(),
@@ -1780,6 +1876,7 @@ mod tests {
             name: Box::new(name.clone()),
             type_params: Some(Box::new(TypeParams {
                 type_params: vec![type_var_one, type_var_two],
+                runtime_type_params: None,
                 range: TextRange::default(),
                 node_index: AtomicNodeIndex::NONE,
             })),

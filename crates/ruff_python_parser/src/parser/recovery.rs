@@ -50,11 +50,13 @@ pub(super) fn pattern_to_expr(pattern: Pattern) -> Expr {
             range,
             node_index,
             patterns,
+            ..
         }) => Expr::List(ast::ExprList {
             elts: patterns.into_iter().map(pattern_to_expr).collect(),
             ctx: ExprContext::Store,
             range,
             node_index,
+            runtime_elts: None,
         }),
         Pattern::MatchMapping(ast::PatternMatchMapping {
             range,
@@ -62,6 +64,7 @@ pub(super) fn pattern_to_expr(pattern: Pattern) -> Expr {
             keys,
             patterns,
             rest,
+            ..
         }) => {
             let mut items: Vec<ast::DictItem> = keys
                 .into_iter()
@@ -84,6 +87,7 @@ pub(super) fn pattern_to_expr(pattern: Pattern) -> Expr {
                 range,
                 node_index,
                 items,
+                runtime_values: None,
             })
         }
         Pattern::MatchClass(ast::PatternMatchClass {
@@ -91,6 +95,7 @@ pub(super) fn pattern_to_expr(pattern: Pattern) -> Expr {
             node_index,
             cls,
             arguments,
+            ..
         }) => Expr::Call(ast::ExprCall {
             range,
             node_index: node_index.clone(),
@@ -113,6 +118,8 @@ pub(super) fn pattern_to_expr(pattern: Pattern) -> Expr {
                         value: pattern_to_expr(keyword_pattern.pattern),
                     })
                     .collect(),
+                runtime_args: None,
+                runtime_bases: None,
             },
         }),
         Pattern::MatchStar(ast::PatternMatchStar {

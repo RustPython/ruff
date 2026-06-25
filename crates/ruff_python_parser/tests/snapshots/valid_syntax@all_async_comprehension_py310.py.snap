@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/all_async_comprehension_py310.py
 ---
 ## AST
 
@@ -30,6 +29,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -92,11 +92,15 @@ Module(
                                                                             ),
                                                                         ],
                                                                         keywords: [],
+                                                                        runtime_args: None,
+                                                                        runtime_bases: None,
                                                                     },
                                                                 },
                                                             ),
                                                             ifs: [],
                                                             is_async: true,
+                                                            runtime_ifs: None,
+                                                            runtime_is_async: None,
                                                         },
                                                     ],
                                                 },
@@ -140,11 +144,15 @@ Module(
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     ifs: [],
                                                     is_async: true,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                         },
@@ -153,9 +161,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

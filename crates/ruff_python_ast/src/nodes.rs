@@ -27,6 +27,21 @@ use crate::{
     str::{Quote, TripleQuotes},
 };
 
+#[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "get-size", derive(get_size2::GetSize))]
+pub enum ConstantValue {
+    None,
+    Boolean(bool),
+    Str(Box<str>),
+    Bytes(Box<[u8]>),
+    Integer(Box<str>),
+    Tuple(Vec<Self>),
+    Frozenset(Vec<Self>),
+    Float(f64),
+    Complex { real: f64, imag: f64 },
+    Ellipsis,
+}
+
 impl StmtClassDef {
     /// Return an iterator over the bases of the class.
     pub fn bases(&self) -> &[Expr] {
@@ -52,6 +67,8 @@ pub struct ElifElseClause {
     pub node_index: AtomicNodeIndex,
     pub test: Option<Expr>,
     pub body: Vec<Stmt>,
+    pub runtime_body: Option<Vec<Option<Stmt>>>,
+    pub runtime_orelse: Option<Vec<Option<Stmt>>>,
 }
 
 impl Expr {
@@ -334,6 +351,9 @@ pub struct InterpolatedElement {
     pub debug_text: Option<DebugText>,
     pub conversion: ConversionFlag,
     pub format_spec: Option<Box<InterpolatedStringFormatSpec>>,
+    pub runtime_str: Option<crate::ConstantValue>,
+    pub runtime_interpolation_format_spec: Option<Box<Expr>>,
+    pub runtime_formatted_value_format_spec: Option<Box<Expr>>,
 }
 
 /// An `FStringLiteralElement` with an empty `value` is an invalid f-string element.
@@ -1150,6 +1170,8 @@ impl From<FString> for Expr {
             node_index: payload.node_index.clone(),
             range: payload.range,
             value: FStringValue::single(payload),
+            runtime_joined_str: None,
+            runtime_values: None,
         }
         .into()
     }
@@ -1242,6 +1264,8 @@ impl From<TString> for Expr {
             node_index: payload.node_index.clone(),
             range: payload.range,
             value: TStringValue::single(payload),
+            runtime_template_str: None,
+            runtime_values: None,
         }
         .into()
     }
@@ -2702,6 +2726,8 @@ pub struct Comprehension {
     pub iter: Expr,
     pub ifs: Vec<Expr>,
     pub is_async: bool,
+    pub runtime_ifs: Option<Vec<Option<Expr>>>,
+    pub runtime_is_async: Option<i32>,
 }
 
 /// See also [ExceptHandler](https://docs.python.org/3/library/ast.html#ast.ExceptHandler)
@@ -2713,6 +2739,7 @@ pub struct ExceptHandlerExceptHandler {
     pub type_: Option<Box<Expr>>,
     pub name: Option<Identifier>,
     pub body: Vec<Stmt>,
+    pub runtime_body: Option<Vec<Option<Stmt>>>,
 }
 
 /// See also [arg](https://docs.python.org/3/library/ast.html#ast.arg)
@@ -2723,6 +2750,8 @@ pub struct Parameter {
     pub node_index: AtomicNodeIndex,
     pub name: Identifier,
     pub annotation: Option<Box<Expr>>,
+    pub runtime_type_comment: Option<Box<str>>,
+    pub runtime_type_comment_bytes: Option<Vec<u8>>,
 }
 
 impl Parameter {
@@ -2774,6 +2803,7 @@ pub struct MatchCase {
     pub pattern: Pattern,
     pub guard: Option<Box<Expr>>,
     pub body: Vec<Stmt>,
+    pub runtime_body: Option<Vec<Option<Stmt>>>,
 }
 
 impl Pattern {
@@ -3032,6 +3062,7 @@ pub struct Parameters {
     pub vararg: Option<Box<Parameter>>,
     pub kwonlyargs: Vec<ParameterWithDefault>,
     pub kwarg: Option<Box<Parameter>>,
+    pub runtime_defaults: Option<Vec<Option<Expr>>>,
 }
 
 impl Parameters {
@@ -3073,6 +3104,7 @@ impl Parameters {
             vararg,
             kwonlyargs,
             kwarg,
+            ..
         } = self;
         // Safety: a Python function can have an arbitrary number of parameters,
         // so theoretically this could be a number that wouldn't fit into a usize,
@@ -3143,6 +3175,7 @@ impl<'a> ParametersIterator<'a> {
             vararg,
             kwonlyargs,
             kwarg,
+            ..
         } = parameters;
         Self {
             posonlyargs: posonlyargs.iter(),
@@ -3391,6 +3424,8 @@ pub struct Arguments {
     pub node_index: AtomicNodeIndex,
     pub args: Box<[Expr]>,
     pub keywords: Box<[Keyword]>,
+    pub runtime_args: Option<Vec<Option<Expr>>>,
+    pub runtime_bases: Option<Vec<Option<Expr>>>,
 }
 
 /// An entry in the argument list of a function call.
@@ -3590,6 +3625,7 @@ pub struct TypeParams {
     pub range: TextRange,
     pub node_index: AtomicNodeIndex,
     pub type_params: Vec<TypeParam>,
+    pub runtime_type_params: Option<Vec<Option<TypeParam>>>,
 }
 
 impl Deref for TypeParams {
@@ -3811,42 +3847,42 @@ mod tests {
     #[test]
     #[cfg(target_pointer_width = "64")]
     fn size() {
-        assert_eq!(std::mem::size_of::<Stmt>(), 128);
-        assert_eq!(std::mem::size_of::<StmtFunctionDef>(), 128);
-        assert_eq!(std::mem::size_of::<StmtClassDef>(), 120);
-        assert_eq!(std::mem::size_of::<StmtTry>(), 112);
-        assert_eq!(std::mem::size_of::<Mod>(), 40);
-        assert_eq!(std::mem::size_of::<Pattern>(), 104);
-        assert_eq!(std::mem::size_of::<Expr>(), 80);
+        assert_eq!(std::mem::size_of::<Stmt>(), 216);
+        assert_eq!(std::mem::size_of::<StmtFunctionDef>(), 216);
+        assert_eq!(std::mem::size_of::<StmtClassDef>(), 168);
+        assert_eq!(std::mem::size_of::<StmtTry>(), 208);
+        assert_eq!(std::mem::size_of::<Mod>(), 64);
+        assert_eq!(std::mem::size_of::<Pattern>(), 160);
+        assert_eq!(std::mem::size_of::<Expr>(), 120);
         assert_eq!(std::mem::size_of::<ExprAttribute>(), 64);
         assert_eq!(std::mem::size_of::<ExprAwait>(), 24);
         assert_eq!(std::mem::size_of::<ExprBinOp>(), 32);
-        assert_eq!(std::mem::size_of::<ExprBoolOp>(), 40);
+        assert_eq!(std::mem::size_of::<ExprBoolOp>(), 64);
         assert_eq!(std::mem::size_of::<ExprBooleanLiteral>(), 16);
         assert_eq!(std::mem::size_of::<ExprBytesLiteral>(), 48);
-        assert_eq!(std::mem::size_of::<ExprCall>(), 72);
-        assert_eq!(std::mem::size_of::<ExprCompare>(), 56);
-        assert_eq!(std::mem::size_of::<ExprDict>(), 40);
+        assert_eq!(std::mem::size_of::<ExprCall>(), 120);
+        assert_eq!(std::mem::size_of::<ExprCompare>(), 80);
+        assert_eq!(std::mem::size_of::<ExprDict>(), 64);
         assert_eq!(std::mem::size_of::<ExprDictComp>(), 56);
         assert_eq!(std::mem::size_of::<ExprEllipsisLiteral>(), 12);
-        assert_eq!(std::mem::size_of::<ExprFString>(), 56);
+        assert_eq!(std::mem::size_of::<ExprFString>(), 104);
         assert_eq!(std::mem::size_of::<ExprGenerator>(), 48);
         assert_eq!(std::mem::size_of::<ExprIf>(), 40);
         assert_eq!(std::mem::size_of::<ExprIpyEscapeCommand>(), 32);
         assert_eq!(std::mem::size_of::<ExprLambda>(), 32);
-        assert_eq!(std::mem::size_of::<ExprList>(), 40);
+        assert_eq!(std::mem::size_of::<ExprList>(), 64);
         assert_eq!(std::mem::size_of::<ExprListComp>(), 48);
         assert_eq!(std::mem::size_of::<ExprName>(), 40);
         assert_eq!(std::mem::size_of::<ExprNamed>(), 32);
         assert_eq!(std::mem::size_of::<ExprNoneLiteral>(), 12);
         assert_eq!(std::mem::size_of::<ExprNumberLiteral>(), 40);
-        assert_eq!(std::mem::size_of::<ExprSet>(), 40);
+        assert_eq!(std::mem::size_of::<ExprSet>(), 64);
         assert_eq!(std::mem::size_of::<ExprSetComp>(), 48);
         assert_eq!(std::mem::size_of::<ExprSlice>(), 40);
         assert_eq!(std::mem::size_of::<ExprStarred>(), 24);
         assert_eq!(std::mem::size_of::<ExprStringLiteral>(), 64);
         assert_eq!(std::mem::size_of::<ExprSubscript>(), 32);
-        assert_eq!(std::mem::size_of::<ExprTuple>(), 40);
+        assert_eq!(std::mem::size_of::<ExprTuple>(), 64);
         assert_eq!(std::mem::size_of::<ExprUnaryOp>(), 24);
         assert_eq!(std::mem::size_of::<ExprYield>(), 24);
         assert_eq!(std::mem::size_of::<ExprYieldFrom>(), 24);

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/case_expect_indented_block.py
 ---
 ## AST
 
@@ -43,6 +42,7 @@ Module(
                             ),
                             guard: None,
                             body: [],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 31..42,
@@ -77,11 +77,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

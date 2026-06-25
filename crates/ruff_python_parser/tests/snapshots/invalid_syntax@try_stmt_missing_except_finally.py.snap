@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/try_stmt_missing_except_finally.py
 ---
 ## AST
 
@@ -26,6 +25,10 @@ Module(
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -51,9 +54,14 @@ Module(
                     ],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
