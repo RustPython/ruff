@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/parenthesized/missing_closing_paren_0.py
 ---
 ## AST
 
@@ -25,6 +24,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

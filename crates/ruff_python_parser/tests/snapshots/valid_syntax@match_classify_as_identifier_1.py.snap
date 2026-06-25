@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/match_classify_as_identifier_1.py
 ---
 ## AST
 
@@ -39,11 +38,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

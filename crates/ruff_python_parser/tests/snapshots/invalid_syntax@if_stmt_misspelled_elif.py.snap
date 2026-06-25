@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/if_stmt_misspelled_elif.py
 ---
 ## AST
 
@@ -30,6 +29,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             AnnAssign(
@@ -54,6 +54,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Pass(
@@ -69,6 +70,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

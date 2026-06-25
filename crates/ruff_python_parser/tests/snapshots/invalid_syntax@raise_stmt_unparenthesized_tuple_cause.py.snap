@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/raise_stmt_unparenthesized_tuple_cause.py
 ---
 ## AST
 
@@ -41,6 +40,7 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
@@ -85,12 +85,14 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

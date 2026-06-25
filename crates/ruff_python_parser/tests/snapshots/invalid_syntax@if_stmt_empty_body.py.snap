@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/if_stmt_empty_body.py
 ---
 ## AST
 
@@ -23,6 +22,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -57,6 +57,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

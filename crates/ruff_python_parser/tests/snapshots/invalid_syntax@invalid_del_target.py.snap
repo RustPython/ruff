@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/invalid_del_target.py
 ---
 ## AST
 
@@ -40,6 +39,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -87,9 +87,11 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_values: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -145,9 +147,11 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_elts: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -215,9 +219,11 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

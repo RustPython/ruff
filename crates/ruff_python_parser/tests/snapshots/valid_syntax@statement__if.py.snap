@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/statement/if.py
 ---
 ## AST
 
@@ -72,6 +71,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 20..28,
@@ -94,8 +95,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -139,6 +143,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -171,6 +176,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     body: [
@@ -200,8 +206,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -252,8 +261,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -283,6 +295,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     body: [
@@ -326,6 +339,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 158..173,
@@ -354,6 +369,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 174..189,
@@ -382,6 +399,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 190..203,
@@ -409,14 +428,19 @@ Module(
                                                     node_index: NodeIndex(None),
                                                     args: [],
                                                     keywords: [],
+                                                    runtime_args: None,
+                                                    runtime_bases: None,
                                                 },
                                             },
                                         ),
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -501,8 +525,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -531,6 +558,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -538,6 +567,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Name(
@@ -591,6 +621,8 @@ Module(
                                                                 node_index: NodeIndex(None),
                                                             },
                                                             annotation: None,
+                                                            runtime_type_comment: None,
+                                                            runtime_type_comment_bytes: None,
                                                         },
                                                         default: None,
                                                     },
@@ -598,6 +630,7 @@ Module(
                                                 vararg: None,
                                                 kwonlyargs: [],
                                                 kwarg: None,
+                                                runtime_defaults: None,
                                             },
                                         ),
                                         body: Name(
@@ -625,8 +658,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -695,8 +731,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -769,11 +808,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

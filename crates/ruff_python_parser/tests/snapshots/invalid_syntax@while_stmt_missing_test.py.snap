@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/while_stmt_missing_test.py
 ---
 ## AST
 
@@ -37,6 +36,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -75,13 +76,19 @@ Module(
                                         ),
                                     },
                                 ),
+                                runtime_targets: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

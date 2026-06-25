@@ -176,6 +176,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = value {
                 visitor.visit_expr(expr);
@@ -185,6 +186,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             targets,
             range: _,
             node_index: _,
+            ..
         }) => {
             for expr in targets {
                 visitor.visit_expr(expr);
@@ -215,6 +217,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_operator(op);
@@ -250,6 +253,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             orelse,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_body(body);
@@ -261,6 +265,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             elif_else_clauses,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_body(body);
@@ -282,6 +287,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             cases,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(subject);
             for match_case in cases {
@@ -293,6 +299,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             cause,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = exc {
                 visitor.visit_expr(expr);
@@ -309,6 +316,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             is_star: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_body(body);
             for except_handler in handlers {
@@ -322,6 +330,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             msg,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(test);
             if let Some(expr) = msg {
@@ -333,6 +342,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             is_lazy: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             for alias in names {
                 visitor.visit_alias(alias);
@@ -349,6 +359,7 @@ pub fn walk_stmt<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, stmt: &'a Stmt) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => visitor.visit_expr(value),
         Stmt::Pass(_) | Stmt::Break(_) | Stmt::Continue(_) | Stmt::IpyEscapeCommand(_) => {}
     }
@@ -369,6 +380,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             values,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_bool_op(op);
             for expr in values {
@@ -380,6 +392,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_expr(target);
@@ -390,6 +403,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             right,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(left);
             visitor.visit_operator(op);
@@ -400,6 +414,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             operand,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_unary_op(op);
             visitor.visit_expr(operand);
@@ -409,6 +424,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             body,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(parameters) = parameters {
                 visitor.visit_parameters(parameters);
@@ -421,6 +437,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             orelse,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_expr(body);
@@ -430,6 +447,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             items,
             range: _,
             node_index: _,
+            ..
         }) => {
             for ast::DictItem { key, value } in items {
                 if let Some(key) = key {
@@ -442,6 +460,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             elts,
             range: _,
             node_index: _,
+            ..
         }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
@@ -452,6 +471,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             generators,
             range: _,
             node_index: _,
+            ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -463,6 +483,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             generators,
             range: _,
             node_index: _,
+            ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -475,6 +496,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             generators,
             range: _,
             node_index: _,
+            ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -488,6 +510,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             range: _,
             node_index: _,
             parenthesized: _,
+            ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -498,11 +521,13 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => visitor.visit_expr(value),
         Expr::Yield(ast::ExprYield {
             value,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = value {
                 visitor.visit_expr(expr);
@@ -512,6 +537,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             value,
             range: _,
             node_index: _,
+            ..
         }) => visitor.visit_expr(value),
         Expr::Compare(ast::ExprCompare {
             left,
@@ -519,6 +545,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             comparators,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(left);
             for cmp_op in ops {
@@ -533,6 +560,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             arguments,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(func);
             visitor.visit_arguments(arguments);
@@ -563,6 +591,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             }
         }
         Expr::NumberLiteral(_)
+        | Expr::Constant(_)
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_) => {}
@@ -576,6 +605,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             ctx,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_expr(slice);
@@ -586,6 +616,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             ctx,
             range: _,
             node_index: _,
+            ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_expr_context(ctx);
@@ -598,6 +629,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             ctx,
             range: _,
             node_index: _,
+            ..
         }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
@@ -610,6 +642,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             range: _,
             node_index: _,
             parenthesized: _,
+            ..
         }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
@@ -622,6 +655,7 @@ pub fn walk_expr<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, expr: &'a Expr) {
             step,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = lower {
                 visitor.visit_expr(expr);
@@ -719,6 +753,7 @@ pub fn walk_type_param<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, type_param:
             name: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = bound {
                 visitor.visit_expr(expr);
@@ -732,6 +767,7 @@ pub fn walk_type_param<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, type_param:
             name: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = default {
                 visitor.visit_expr(expr);
@@ -742,6 +778,7 @@ pub fn walk_type_param<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, type_param:
             name: _,
             range: _,
             node_index: _,
+            ..
         }) => {
             if let Some(expr) = default {
                 visitor.visit_expr(expr);

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/ann_assign_stmt_invalid_value.py
 ---
 ## AST
 
@@ -58,6 +57,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                                 ctx: Load,
@@ -65,6 +65,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -98,6 +99,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Expr(
@@ -206,6 +208,7 @@ Module(
                                                             },
                                                         ),
                                                     ],
+                                                    runtime_values: None,
                                                 },
                                             ),
                                             ctx: Load,
@@ -213,13 +216,16 @@ Module(
                                     ),
                                 ],
                                 ctx: Load,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

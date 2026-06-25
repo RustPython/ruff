@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/different_match_pattern_bindings.py
 ---
 ## AST
 
@@ -51,6 +50,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                         MatchSequence(
@@ -73,9 +73,11 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -93,6 +95,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 37..62,
@@ -136,6 +139,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                         MatchSequence(
@@ -172,9 +176,11 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -192,6 +198,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 67..89,
@@ -249,9 +256,11 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -269,6 +278,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 94..119,
@@ -306,6 +316,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                         MatchSequence(
@@ -336,9 +347,11 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -356,6 +369,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 124..146,
@@ -385,6 +399,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                         MatchSequence(
@@ -425,12 +440,17 @@ Module(
                                                                 ],
                                                                 keywords: [],
                                                             },
+                                                            runtime_patterns: None,
+                                                            runtime_kwd_attrs: None,
+                                                            runtime_kwd_patterns: None,
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -448,11 +468,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

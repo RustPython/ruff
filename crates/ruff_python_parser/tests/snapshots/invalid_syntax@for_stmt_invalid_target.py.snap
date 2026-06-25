@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/for_stmt_invalid_target.py
 ---
 ## AST
 
@@ -47,6 +46,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -98,6 +101,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -132,6 +139,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             ctx: Store,
@@ -160,6 +168,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -220,6 +232,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -264,6 +280,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -301,6 +321,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                             ),
@@ -329,6 +350,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -398,6 +423,7 @@ Module(
                                                     ),
                                                 ],
                                                 ctx: Store,
+                                                runtime_elts: None,
                                             },
                                         ),
                                         ctx: Store,
@@ -405,6 +431,7 @@ Module(
                                 ),
                             ],
                             ctx: Store,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -430,9 +457,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

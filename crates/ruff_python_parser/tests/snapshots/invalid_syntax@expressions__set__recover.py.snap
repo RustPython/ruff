@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/set/recover.py
 ---
 ## AST
 
@@ -28,6 +27,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -60,6 +60,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -83,6 +84,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -115,6 +117,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -151,6 +154,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -197,6 +201,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -229,6 +234,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -259,11 +265,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

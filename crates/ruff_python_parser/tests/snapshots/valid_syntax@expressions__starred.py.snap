@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/expressions/starred.py
 ---
 ## AST
 
@@ -175,11 +174,15 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -247,6 +250,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                                 ctx: Store,
@@ -261,6 +265,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -317,6 +324,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -392,6 +400,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -400,6 +409,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

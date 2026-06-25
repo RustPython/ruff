@@ -153,6 +153,7 @@ impl<'src> Parser<'src> {
             body,
             range: TextRange::new(self.start_offset, self.current_token_range().end()),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
         }
     }
 

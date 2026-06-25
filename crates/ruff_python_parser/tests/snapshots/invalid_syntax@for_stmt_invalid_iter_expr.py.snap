@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/for_stmt_invalid_iter_expr.py
 ---
 ## AST
 
@@ -50,6 +49,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             ctx: Load,
@@ -70,6 +70,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -116,6 +120,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -141,6 +149,10 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             AnnAssign(
@@ -164,9 +176,11 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

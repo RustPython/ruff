@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/if_stmt_missing_colon.py
 ---
 ## AST
 
@@ -24,6 +23,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -47,6 +47,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Assign(
@@ -72,9 +73,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

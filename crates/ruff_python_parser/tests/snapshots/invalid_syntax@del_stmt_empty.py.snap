@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/del_stmt_empty.py
 ---
 ## AST
 
@@ -15,9 +14,11 @@ Module(
                     node_index: NodeIndex(None),
                     range: 0..3,
                     targets: [],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

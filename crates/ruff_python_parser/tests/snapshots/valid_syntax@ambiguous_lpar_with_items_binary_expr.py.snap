@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/ambiguous_lpar_with_items_binary_expr.py
 ---
 ## AST
 
@@ -42,6 +41,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             optional_vars: None,
@@ -61,6 +61,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -97,6 +100,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             optional_vars: None,
@@ -116,6 +120,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -164,9 +171,11 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             optional_vars: None,
@@ -186,6 +195,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -226,6 +238,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         Name(
@@ -237,6 +250,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             optional_vars: None,
@@ -256,6 +270,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -337,6 +354,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -419,9 +439,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

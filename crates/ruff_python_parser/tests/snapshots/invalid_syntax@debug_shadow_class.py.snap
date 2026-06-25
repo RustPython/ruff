@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/debug_shadow_class.py
 ---
 ## AST
 
@@ -36,6 +35,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -67,6 +68,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: None,
@@ -84,9 +86,12 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

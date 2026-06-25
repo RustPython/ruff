@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/re_lexing/triple_quoted_fstring_3.py
 ---
 ## AST
 
@@ -70,6 +69,9 @@ Module(
                                                                                 ],
                                                                             },
                                                                         ),
+                                                                        runtime_str: None,
+                                                                        runtime_interpolation_format_spec: None,
+                                                                        runtime_formatted_value_format_spec: None,
                                                                     },
                                                                 ),
                                                             ],
@@ -83,10 +85,14 @@ Module(
                                                     ),
                                                 ),
                                             },
+                                            runtime_joined_str: None,
+                                            runtime_values: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -99,9 +105,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

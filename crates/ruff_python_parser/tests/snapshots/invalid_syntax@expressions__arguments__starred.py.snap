@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/arguments/starred.py
 ---
 ## AST
 
@@ -71,6 +70,8 @@ Module(
                                                     ),
                                                     ifs: [],
                                                     is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                             parenthesized: false,
@@ -78,6 +79,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -128,6 +131,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -176,12 +181,15 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/type_param_type_var_tuple.py
 ---
 ## AST
 
@@ -40,6 +39,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -91,6 +91,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -149,6 +150,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -204,6 +206,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -268,6 +271,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -281,6 +285,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/implicitly_concatenated_unterminated_string.py
 ---
 ## AST
 
@@ -135,6 +134,9 @@ Module(
                                                             debug_text: None,
                                                             conversion: None,
                                                             format_spec: None,
+                                                            runtime_str: None,
+                                                            runtime_interpolation_format_spec: None,
+                                                            runtime_formatted_value_format_spec: None,
                                                         },
                                                     ),
                                                 ],
@@ -149,6 +151,8 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -185,6 +189,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

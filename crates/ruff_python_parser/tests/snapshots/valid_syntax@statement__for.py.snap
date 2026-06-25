@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/statement/for.py
 ---
 ## AST
 
@@ -40,6 +39,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -90,6 +93,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -101,6 +105,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -145,6 +153,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -157,6 +167,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -217,6 +231,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -257,6 +275,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     body: [
@@ -268,6 +287,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -306,6 +329,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     body: [
@@ -317,6 +341,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -356,6 +384,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -375,6 +404,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -406,6 +439,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -425,6 +459,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -465,6 +503,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -476,6 +515,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -520,6 +563,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -557,6 +604,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -564,6 +613,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Name(
@@ -591,6 +641,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -650,6 +704,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             If(
@@ -695,6 +753,10 @@ Module(
                                     ),
                                 ],
                                 orelse: [],
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
+                                runtime_orelse: None,
                             },
                         ),
                     ],
@@ -711,11 +773,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

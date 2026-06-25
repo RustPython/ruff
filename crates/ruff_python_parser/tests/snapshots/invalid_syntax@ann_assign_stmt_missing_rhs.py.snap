@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/ann_assign_stmt_missing_rhs.py
 ---
 ## AST
 
@@ -32,9 +31,11 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

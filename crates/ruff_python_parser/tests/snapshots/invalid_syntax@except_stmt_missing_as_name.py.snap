@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/except_stmt_missing_as_name.py
 ---
 ## AST
 
@@ -46,6 +45,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -71,15 +71,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

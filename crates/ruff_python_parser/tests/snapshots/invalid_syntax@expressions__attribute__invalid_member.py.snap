@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/attribute/invalid_member.py
 ---
 ## AST
 
@@ -126,6 +125,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

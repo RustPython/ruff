@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/class_def_empty_body.py
 ---
 ## AST
 
@@ -23,6 +22,8 @@ Module(
                     type_params: None,
                     arguments: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -42,9 +43,13 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             Assign(
@@ -70,9 +75,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

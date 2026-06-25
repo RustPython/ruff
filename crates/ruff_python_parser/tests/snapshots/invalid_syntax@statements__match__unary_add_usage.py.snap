@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/statements/match/unary_add_usage.py
 ---
 ## AST
 
@@ -57,6 +56,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 119..149,
@@ -126,6 +126,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -137,6 +138,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 154..184,
@@ -206,6 +208,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -217,6 +220,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 189..223,
@@ -302,6 +306,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -313,6 +320,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 228..268,
@@ -384,6 +392,8 @@ Module(
                                         ),
                                     ],
                                     rest: None,
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -395,11 +405,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

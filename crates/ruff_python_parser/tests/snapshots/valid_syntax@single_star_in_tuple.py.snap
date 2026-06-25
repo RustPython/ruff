@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/single_star_in_tuple.py
 ---
 ## AST
 
@@ -30,6 +29,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -65,6 +65,7 @@ Module(
                                                     ],
                                                     ctx: Load,
                                                     parenthesized: true,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
@@ -73,6 +74,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -95,6 +100,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -126,12 +132,17 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: true,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             For(
@@ -170,6 +181,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     body: [
@@ -187,6 +199,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -217,6 +233,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -242,9 +259,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

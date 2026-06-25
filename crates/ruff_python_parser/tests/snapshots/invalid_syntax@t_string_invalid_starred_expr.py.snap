@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_invalid_starred_expr.py
 ---
 ## AST
 
@@ -46,6 +45,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -58,6 +60,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -107,6 +111,7 @@ Module(
                                                                             },
                                                                         ),
                                                                     ],
+                                                                    runtime_values: None,
                                                                 },
                                                             ),
                                                             ctx: Load,
@@ -115,6 +120,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -127,6 +135,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -175,6 +185,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -187,11 +200,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

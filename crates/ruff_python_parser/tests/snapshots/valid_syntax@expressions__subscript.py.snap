@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/expressions/subscript.py
 ---
 ## AST
 
@@ -98,6 +97,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -148,6 +148,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -207,6 +208,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -276,6 +278,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -398,6 +401,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -500,6 +504,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -558,6 +563,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -757,6 +763,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -812,6 +819,7 @@ Module(
                                                                 },
                                                             ),
                                                         ],
+                                                        runtime_values: None,
                                                     },
                                                 ),
                                                 ctx: Load,
@@ -820,6 +828,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -880,6 +889,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Load,
@@ -888,6 +898,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/write_to_debug_expr.py
 ---
 ## AST
 
@@ -24,6 +23,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -64,6 +64,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Assign(
@@ -89,6 +90,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -136,6 +140,7 @@ Module(
                                 ],
                                 ctx: Store,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ],
@@ -183,11 +188,16 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

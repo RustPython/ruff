@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/lambda_with_valid_body.py
 ---
 ## AST
 
@@ -36,6 +35,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -43,6 +44,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Name(
@@ -83,6 +85,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -90,6 +94,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: If(
@@ -151,6 +156,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -158,6 +165,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Await(
@@ -204,6 +212,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -211,6 +221,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Lambda(
@@ -235,6 +246,8 @@ Module(
                                                             node_index: NodeIndex(None),
                                                         },
                                                         annotation: None,
+                                                        runtime_type_comment: None,
+                                                        runtime_type_comment_bytes: None,
                                                     },
                                                     default: None,
                                                 },
@@ -242,6 +255,7 @@ Module(
                                             vararg: None,
                                             kwonlyargs: [],
                                             kwarg: None,
+                                            runtime_defaults: None,
                                         },
                                     ),
                                     body: BinOp(
@@ -299,6 +313,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -306,6 +322,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Yield(
@@ -359,6 +376,8 @@ Module(
                                                                 node_index: NodeIndex(None),
                                                             },
                                                             annotation: None,
+                                                            runtime_type_comment: None,
+                                                            runtime_type_comment_bytes: None,
                                                         },
                                                         default: None,
                                                     },
@@ -366,6 +385,7 @@ Module(
                                                 vararg: None,
                                                 kwonlyargs: [],
                                                 kwarg: None,
+                                                runtime_defaults: None,
                                             },
                                         ),
                                         body: Name(
@@ -396,11 +416,13 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

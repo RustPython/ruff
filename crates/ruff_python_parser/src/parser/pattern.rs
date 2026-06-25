@@ -114,6 +114,7 @@ impl Parser<'_> {
                 range: self.node_range(start),
                 patterns,
                 node_index: AtomicNodeIndex::NONE,
+                runtime_patterns: None,
             });
         }
 
@@ -257,6 +258,8 @@ impl Parser<'_> {
             patterns,
             rest,
             node_index: AtomicNodeIndex::NONE,
+            runtime_keys: None,
+            runtime_patterns: None,
         }
     }
 
@@ -321,6 +324,7 @@ impl Parser<'_> {
                 patterns: vec![],
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_patterns: None,
             });
         }
 
@@ -376,6 +380,7 @@ impl Parser<'_> {
             range: self.node_range(start),
             patterns,
             node_index: AtomicNodeIndex::NONE,
+            runtime_patterns: None,
         }
     }
 
@@ -748,6 +753,9 @@ impl Parser<'_> {
             },
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_patterns: None,
+            runtime_kwd_attrs: None,
+            runtime_kwd_patterns: None,
         }
     }
 }

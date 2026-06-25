@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/param_with_invalid_star_annotation.py
 ---
 ## AST
 
@@ -53,10 +52,13 @@ Module(
                                         },
                                     ),
                                 ),
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -73,6 +75,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -133,10 +139,13 @@ Module(
                                         },
                                     ),
                                 ),
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -153,6 +162,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -209,16 +222,20 @@ Module(
                                                             },
                                                         ),
                                                     ],
+                                                    runtime_values: None,
                                                 },
                                             ),
                                             ctx: Load,
                                         },
                                     ),
                                 ),
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -235,6 +252,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -288,10 +309,13 @@ Module(
                                         },
                                     ),
                                 ),
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -308,9 +332,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

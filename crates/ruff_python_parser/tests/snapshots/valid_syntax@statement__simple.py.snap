@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/statement/simple.py
 ---
 ## AST
 
@@ -49,6 +48,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -71,6 +71,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -213,6 +214,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_targets: None,
                             },
                         ),
                     ],
@@ -237,8 +239,11 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -278,9 +283,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

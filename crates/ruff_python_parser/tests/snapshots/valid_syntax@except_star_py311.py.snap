@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/except_star_py311.py
 ---
 ## AST
 
@@ -58,15 +57,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

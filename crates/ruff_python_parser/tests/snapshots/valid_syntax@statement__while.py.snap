@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/statement/while.py
 ---
 ## AST
 
@@ -37,6 +36,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -75,6 +76,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                                 Name(
@@ -86,6 +88,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     body: [
@@ -110,6 +113,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -139,6 +144,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     body: [
@@ -197,6 +203,8 @@ Module(
                                                 ),
                                             ],
                                             keywords: [],
+                                            runtime_args: None,
+                                            runtime_bases: None,
                                         },
                                     },
                                 ),
@@ -247,6 +255,8 @@ Module(
                                                 ),
                                             ],
                                             keywords: [],
+                                            runtime_args: None,
+                                            runtime_bases: None,
                                         },
                                     },
                                 ),
@@ -265,6 +275,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -308,6 +320,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -351,6 +365,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     body: [
@@ -368,6 +383,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -396,6 +413,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -403,6 +422,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Name(
@@ -430,6 +450,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             While(
@@ -465,6 +487,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             If(
@@ -507,6 +531,8 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
+                                runtime_orelse: None,
                             },
                         ),
                     ],
@@ -523,11 +549,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

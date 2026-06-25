@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/valid/expressions/yield.py
 ---
 ## AST
 
@@ -115,6 +114,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                             ),
@@ -148,6 +148,8 @@ Module(
                                             node_index: NodeIndex(None),
                                             args: [],
                                             keywords: [],
+                                            runtime_args: None,
+                                            runtime_bases: None,
                                         },
                                     },
                                 ),
@@ -190,6 +192,7 @@ Module(
                                             ),
                                         ],
                                         ctx: Load,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -230,6 +233,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -273,6 +277,7 @@ Module(
                                                 ),
                                             },
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                             ),
@@ -313,6 +318,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -353,6 +359,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: true,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -394,6 +401,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                             ),
@@ -478,6 +486,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -517,6 +526,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -525,6 +535,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

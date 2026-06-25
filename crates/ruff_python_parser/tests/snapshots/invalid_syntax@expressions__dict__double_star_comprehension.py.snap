@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/dict/double_star_comprehension.py
 ---
 ## AST
 
@@ -97,6 +96,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_comparators: None,
                                             },
                                         ),
                                     ),
@@ -110,11 +110,13 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

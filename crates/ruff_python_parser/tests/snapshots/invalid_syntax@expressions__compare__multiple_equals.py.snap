@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/compare/multiple_equals.py
 ---
 ## AST
 
@@ -40,6 +39,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_comparators: None,
                             },
                         ),
                     ],
@@ -51,6 +51,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -83,6 +86,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_comparators: None,
                             },
                         ),
                     ],
@@ -94,9 +98,13 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

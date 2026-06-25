@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/match_sequence_pattern_parentheses_terminator.py
 ---
 ## AST
 
@@ -60,6 +59,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -77,6 +77,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 40..56,
@@ -115,6 +116,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -132,11 +134,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

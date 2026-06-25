@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/comma_separated_missing_element_between_commas.py
 ---
 ## AST
 
@@ -48,11 +47,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

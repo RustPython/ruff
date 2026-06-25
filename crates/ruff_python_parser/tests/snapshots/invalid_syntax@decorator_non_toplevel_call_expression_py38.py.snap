@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/decorator_non_toplevel_call_expression_py38.py
 ---
 ## AST
 
@@ -44,6 +43,8 @@ Module(
                                                         node_index: NodeIndex(None),
                                                         args: [],
                                                         keywords: [],
+                                                        runtime_args: None,
+                                                        runtime_bases: None,
                                                     },
                                                 },
                                             ),
@@ -60,6 +61,8 @@ Module(
                                         node_index: NodeIndex(None),
                                         args: [],
                                         keywords: [],
+                                        runtime_args: None,
+                                        runtime_bases: None,
                                     },
                                 },
                             ),
@@ -79,6 +82,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -95,9 +99,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

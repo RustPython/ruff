@@ -47,6 +47,7 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -97,6 +98,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                             ctx: Store,
@@ -112,9 +114,11 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

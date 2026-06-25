@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/function_def_parameter_range.py
 ---
 ## AST
 
@@ -48,6 +47,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -72,6 +73,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -79,6 +82,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: Some(
                         Name(
@@ -104,9 +108,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

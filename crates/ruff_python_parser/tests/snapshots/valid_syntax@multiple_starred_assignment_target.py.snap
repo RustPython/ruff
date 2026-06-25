@@ -1,6 +1,5 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/ok/multiple_starred_assignment_target.py
 ---
 ## AST
 
@@ -46,6 +45,7 @@ Module(
                                 ],
                                 ctx: Store,
                                 parenthesized: true,
+                                runtime_elts: None,
                             },
                         ),
                     ],
@@ -75,8 +75,12 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -120,6 +124,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: true,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     Starred(
@@ -140,6 +145,7 @@ Module(
                                 ],
                                 ctx: Store,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ],
@@ -165,6 +171,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: true,
+                                        runtime_elts: None,
                                     },
                                 ),
                                 NumberLiteral(
@@ -178,11 +185,16 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

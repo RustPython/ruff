@@ -40,6 +40,7 @@ types_requiring_crate_prefix = {
     "Alias",
     "Singleton",
     "PatternArguments",
+    "ConstantValue",
 }
 
 
