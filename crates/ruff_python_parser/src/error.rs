@@ -419,6 +419,8 @@ pub enum LexicalErrorType {
     LineContinuationError,
     /// An unexpected end of file was encountered.
     Eof,
+    /// Parentheses, brackets, or braces nested past the lexer's nesting limit.
+    TooManyNestedParentheses,
     /// An unexpected error occurred.
     OtherError(Box<str>),
 }
@@ -457,6 +459,7 @@ impl std::fmt::Display for LexicalErrorType {
                 write!(f, "Expected a newline after line continuation character")
             }
             Self::Eof => write!(f, "unexpected EOF while parsing"),
+            Self::TooManyNestedParentheses => write!(f, "too many nested parentheses"),
             Self::OtherError(msg) => write!(f, "{msg}"),
             Self::UnclosedStringError => {
                 write!(f, "missing closing quote in string literal")

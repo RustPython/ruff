@@ -35,6 +35,10 @@ mod interpolated_string;
 
 const BOM: char = '\u{feff}';
 
+/// Maximum depth of nested parentheses, brackets, and braces.
+/// Mirrors CPython's `MAXLEVEL` (`Parser/lexer/state.h`).
+const MAX_LEVEL: u32 = 200;
+
 /// A lexer for Python source code.
 #[derive(Debug)]
 pub struct Lexer<'src> {
@@ -143,6 +147,20 @@ impl<'src> Lexer<'src> {
     /// default value which is [`TokenValue::None`].
     pub(crate) fn take_value(&mut self) -> TokenValue {
         std::mem::take(&mut self.current_value)
+    }
+
+    /// Returns an error if opening one more bracket would exceed [`MAX_LEVEL`].
+    ///
+    /// CPython rejects over-nested source in its tokenizer (`Parser/lexer/lexer.c`)
+    /// rather than in the parser, so the recursive descent never gets deep enough
+    /// to exhaust the native stack.
+    fn nesting_limit_error(&self) -> Option<LexicalError> {
+        (self.nesting >= MAX_LEVEL).then(|| {
+            LexicalError::new(
+                LexicalErrorType::TooManyNestedParentheses,
+                self.token_range(),
+            )
+        })
     }
 
     /// Helper function to push the given error, updating the current range with the error location
@@ -522,6 +540,9 @@ impl<'src> Lexer<'src> {
             }
             '~' => TokenKind::Tilde,
             '(' => {
+                if let Some(error) = self.nesting_limit_error() {
+                    return self.push_error(error);
+                }
                 self.nesting += 1;
                 TokenKind::Lpar
             }
@@ -530,6 +551,9 @@ impl<'src> Lexer<'src> {
                 TokenKind::Rpar
             }
             '[' => {
+                if let Some(error) = self.nesting_limit_error() {
+                    return self.push_error(error);
+                }
                 self.nesting += 1;
                 TokenKind::Lsqb
             }
@@ -538,6 +562,9 @@ impl<'src> Lexer<'src> {
                 TokenKind::Rsqb
             }
             '{' => {
+                if let Some(error) = self.nesting_limit_error() {
+                    return self.push_error(error);
+                }
                 self.nesting += 1;
                 TokenKind::Lbrace
             }
