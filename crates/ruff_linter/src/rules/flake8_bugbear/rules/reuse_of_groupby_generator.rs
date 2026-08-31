@@ -158,6 +158,7 @@ impl<'a> Visitor<'a> for GroupNameFinder<'a> {
                 elif_else_clauses,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 // base if plus branches
                 let mut if_stack = Vec::with_capacity(1 + elif_else_clauses.len());

@@ -4867,6 +4867,7 @@ impl<'db> Parameters<'db> {
             kwarg,
             range: _,
             node_index: _,
+            runtime_defaults: _,
         } = parameters;
 
         let index = semantic_index(db, definition.program_file(db));

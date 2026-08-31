@@ -102,7 +102,7 @@ for group, group_nodes in nodes_grouped.items():
         code = f"""
             use ruff_formatter::write;
             use ruff_python_ast::{node};
-            use crate::verbatim_text;
+            use crate::verbatim::verbatim_text;
             use crate::prelude::*;
 
             #[derive(Default)]

@@ -14,6 +14,7 @@ impl FormatNodeRule<ExprSet> for FormatExprSet {
             range: _,
             node_index: _,
             elts,
+            runtime_elts: _,
         } = item;
         // That would be a dict expression
         assert!(!elts.is_empty());

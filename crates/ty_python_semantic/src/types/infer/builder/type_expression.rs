@@ -1080,6 +1080,8 @@ impl<'db> TypeInferenceBuilder<'db, '_> {
                 Type::unknown()
             }
 
+            ast::Expr::Constant(_) => Type::unknown(),
+
             ast::Expr::Starred(starred) => self.infer_starred_type_expression(starred),
         }
     }

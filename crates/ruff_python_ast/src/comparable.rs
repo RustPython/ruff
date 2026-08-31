@@ -16,7 +16,7 @@
 //! have the same shape in that they evaluate to the same value.
 
 use crate as ast;
-use crate::{Expr, Number};
+use crate::{ConstantValue, Expr, Number};
 use std::borrow::Cow;
 use std::hash::Hash;
 
@@ -365,6 +365,44 @@ impl<'a> From<&'a ast::Number> for ComparableNumber<'a> {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum ComparableConstantValue<'a> {
+    None,
+    Boolean(bool),
+    Str(&'a str),
+    Bytes(Cow<'a, [u8]>),
+    Integer(&'a str),
+    Tuple(Vec<Self>),
+    Frozenset(Vec<Self>),
+    Float(u64),
+    Complex { real: u64, imag: u64 },
+    Ellipsis,
+}
+
+impl<'a> From<&'a ConstantValue> for ComparableConstantValue<'a> {
+    fn from(value: &'a ConstantValue) -> Self {
+        match value {
+            ConstantValue::None => Self::None,
+            ConstantValue::Boolean(value) => Self::Boolean(*value),
+            ConstantValue::Str(value) => Self::Str(value),
+            ConstantValue::Bytes(value) => Self::Bytes(Cow::from(value.as_ref())),
+            ConstantValue::Integer(value) => Self::Integer(value),
+            ConstantValue::Tuple(elements) => {
+                Self::Tuple(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Frozenset(elements) => {
+                Self::Frozenset(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Float(value) => Self::Float(value.to_bits()),
+            ConstantValue::Complex { real, imag } => Self::Complex {
+                real: real.to_bits(),
+                imag: imag.to_bits(),
+            },
+            ConstantValue::Ellipsis => Self::Ellipsis,
+        }
+    }
+}
+
 #[derive(Debug, Default, PartialEq, Eq, Hash)]
 pub struct ComparableArguments<'a> {
     args: Vec<ComparableExpr<'a>>,
@@ -575,8 +613,7 @@ impl<'a> From<&'a ast::InterpolatedElement> for InterpolatedElement<'a> {
             debug_text,
             conversion,
             format_spec,
-            range: _,
-            node_index: _,
+            ..
         } = interpolated_element;
 
         Self {
@@ -609,6 +646,7 @@ impl<'a> From<&'a ast::ElifElseClause> for ComparableElifElseClause<'a> {
             node_index: _,
             test,
             body,
+            ..
         } = elif_else_clause;
         Self {
             test: test.as_ref().map(Into::into),
@@ -986,6 +1024,11 @@ pub struct ExprNumberLiteral<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
+pub struct ExprConstant<'a> {
+    value: ComparableConstantValue<'a>,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct ExprBoolLiteral {
     value: bool,
 }
@@ -1061,6 +1104,7 @@ pub enum ComparableExpr<'a> {
     StringLiteral(ExprStringLiteral<'a>),
     BytesLiteral(ExprBytesLiteral<'a>),
     NumberLiteral(ExprNumberLiteral<'a>),
+    Constant(ExprConstant<'a>),
     BoolLiteral(ExprBoolLiteral),
     NoneLiteral,
     EllipsisLiteral,
@@ -1089,92 +1133,54 @@ impl<'a> From<&'a Box<ast::Expr>> for ComparableExpr<'a> {
 impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
     fn from(expr: &'a ast::Expr) -> Self {
         match expr {
-            ast::Expr::BoolOp(ast::ExprBoolOp {
-                op,
-                values,
-                range: _,
-                node_index: _,
-            }) => Self::BoolOp(ExprBoolOp {
+            ast::Expr::BoolOp(ast::ExprBoolOp { op, values, .. }) => Self::BoolOp(ExprBoolOp {
                 op: (*op).into(),
                 values: values.iter().map(Into::into).collect(),
             }),
-            ast::Expr::Named(ast::ExprNamed {
-                target,
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::NamedExpr(ExprNamed {
+            ast::Expr::Named(ast::ExprNamed { target, value, .. }) => Self::NamedExpr(ExprNamed {
                 target: target.into(),
                 value: value.into(),
             }),
             ast::Expr::BinOp(ast::ExprBinOp {
-                left,
-                op,
-                right,
-                range: _,
-                node_index: _,
+                left, op, right, ..
             }) => Self::BinOp(ExprBinOp {
                 left: left.into(),
                 op: (*op).into(),
                 right: right.into(),
             }),
-            ast::Expr::UnaryOp(ast::ExprUnaryOp {
-                op,
-                operand,
-                range: _,
-                node_index: _,
-            }) => Self::UnaryOp(ExprUnaryOp {
-                op: (*op).into(),
-                operand: operand.into(),
-            }),
+            ast::Expr::UnaryOp(ast::ExprUnaryOp { op, operand, .. }) => {
+                Self::UnaryOp(ExprUnaryOp {
+                    op: (*op).into(),
+                    operand: operand.into(),
+                })
+            }
             ast::Expr::Lambda(ast::ExprLambda {
-                parameters,
-                body,
-                range: _,
-                node_index: _,
+                parameters, body, ..
             }) => Self::Lambda(ExprLambda {
                 parameters: parameters.as_ref().map(Into::into),
                 body: body.into(),
             }),
             ast::Expr::If(ast::ExprIf {
-                test,
-                body,
-                orelse,
-                range: _,
-                node_index: _,
+                test, body, orelse, ..
             }) => Self::IfExp(ExprIf {
                 test: test.into(),
                 body: body.into(),
                 orelse: orelse.into(),
             }),
-            ast::Expr::Dict(ast::ExprDict {
-                items,
-                range: _,
-                node_index: _,
-            }) => Self::Dict(ExprDict {
+            ast::Expr::Dict(ast::ExprDict { items, .. }) => Self::Dict(ExprDict {
                 items: items.iter().map(ComparableDictItem::from).collect(),
             }),
-            ast::Expr::Set(ast::ExprSet {
-                elts,
-                range: _,
-                node_index: _,
-            }) => Self::Set(ExprSet {
+            ast::Expr::Set(ast::ExprSet { elts, .. }) => Self::Set(ExprSet {
                 elts: elts.iter().map(Into::into).collect(),
             }),
             ast::Expr::ListComp(ast::ExprListComp {
-                elt,
-                generators,
-                range: _,
-                node_index: _,
+                elt, generators, ..
             }) => Self::ListComp(ExprListComp {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
             }),
             ast::Expr::SetComp(ast::ExprSetComp {
-                elt,
-                generators,
-                range: _,
-                node_index: _,
+                elt, generators, ..
             }) => Self::SetComp(ExprSetComp {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
@@ -1183,173 +1189,110 @@ impl<'a> From<&'a ast::Expr> for ComparableExpr<'a> {
                 key,
                 value,
                 generators,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::DictComp(ExprDictComp {
                 key: key.as_ref().map(Into::into),
                 value: value.into(),
                 generators: generators.iter().map(Into::into).collect(),
             }),
             ast::Expr::Generator(ast::ExprGenerator {
-                elt,
-                generators,
-                range: _,
-                node_index: _,
-                parenthesized: _,
+                elt, generators, ..
             }) => Self::GeneratorExp(ExprGenerator {
                 elt: elt.into(),
                 generators: generators.iter().map(Into::into).collect(),
             }),
-            ast::Expr::Await(ast::ExprAwait {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::Await(ExprAwait {
+            ast::Expr::Await(ast::ExprAwait { value, .. }) => Self::Await(ExprAwait {
                 value: value.into(),
             }),
-            ast::Expr::Yield(ast::ExprYield {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::Yield(ExprYield {
+            ast::Expr::Yield(ast::ExprYield { value, .. }) => Self::Yield(ExprYield {
                 value: value.as_ref().map(Into::into),
             }),
-            ast::Expr::YieldFrom(ast::ExprYieldFrom {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::YieldFrom(ExprYieldFrom {
-                value: value.into(),
-            }),
+            ast::Expr::YieldFrom(ast::ExprYieldFrom { value, .. }) => {
+                Self::YieldFrom(ExprYieldFrom {
+                    value: value.into(),
+                })
+            }
             ast::Expr::Compare(ast::ExprCompare {
                 left,
                 ops,
                 comparators,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::Compare(ExprCompare {
                 left: left.into(),
                 ops: ops.iter().copied().map(Into::into).collect(),
                 comparators: comparators.iter().map(Into::into).collect(),
             }),
             ast::Expr::Call(ast::ExprCall {
-                func,
-                arguments,
-                range_start: _,
-                node_index: _,
+                func, arguments, ..
             }) => Self::Call(ExprCall {
                 func: func.into(),
                 arguments: arguments.into(),
             }),
-            ast::Expr::FString(ast::ExprFString {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::FString(ExprFString {
+            ast::Expr::FString(ast::ExprFString { value, .. }) => Self::FString(ExprFString {
                 value: value.into(),
             }),
-            ast::Expr::TString(ast::ExprTString {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::TString(ExprTString {
+            ast::Expr::TString(ast::ExprTString { value, .. }) => Self::TString(ExprTString {
                 value: value.into(),
             }),
-            ast::Expr::StringLiteral(ast::ExprStringLiteral {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::StringLiteral(ExprStringLiteral {
-                value: ComparableStringLiteral {
-                    value: value.to_str(),
-                },
-            }),
-            ast::Expr::BytesLiteral(ast::ExprBytesLiteral {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::BytesLiteral(ExprBytesLiteral {
-                value: ComparableBytesLiteral {
-                    value: Cow::from(value),
-                },
-            }),
-            ast::Expr::NumberLiteral(ast::ExprNumberLiteral {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::NumberLiteral(ExprNumberLiteral {
+            ast::Expr::StringLiteral(ast::ExprStringLiteral { value, .. }) => {
+                Self::StringLiteral(ExprStringLiteral {
+                    value: ComparableStringLiteral {
+                        value: value.to_str(),
+                    },
+                })
+            }
+            ast::Expr::BytesLiteral(ast::ExprBytesLiteral { value, .. }) => {
+                Self::BytesLiteral(ExprBytesLiteral {
+                    value: ComparableBytesLiteral {
+                        value: Cow::from(value),
+                    },
+                })
+            }
+            ast::Expr::NumberLiteral(ast::ExprNumberLiteral { value, .. }) => {
+                Self::NumberLiteral(ExprNumberLiteral {
+                    value: value.into(),
+                })
+            }
+            ast::Expr::Constant(ast::ExprConstant { value, .. }) => Self::Constant(ExprConstant {
                 value: value.into(),
             }),
-            ast::Expr::BooleanLiteral(ast::ExprBooleanLiteral {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::BoolLiteral(ExprBoolLiteral { value: *value }),
+            ast::Expr::BooleanLiteral(ast::ExprBooleanLiteral { value, .. }) => {
+                Self::BoolLiteral(ExprBoolLiteral { value: *value })
+            }
             ast::Expr::NoneLiteral(_) => Self::NoneLiteral,
             ast::Expr::EllipsisLiteral(_) => Self::EllipsisLiteral,
-            ast::Expr::Attribute(ast::ExprAttribute {
-                value,
-                attr,
-                ctx: _,
-                range: _,
-                node_index: _,
-            }) => Self::Attribute(ExprAttribute {
-                value: value.into(),
-                attr: attr.as_str(),
-            }),
-            ast::Expr::Subscript(ast::ExprSubscript {
-                value,
-                slice,
-                ctx: _,
-                range: _,
-                node_index: _,
-            }) => Self::Subscript(ExprSubscript {
-                value: value.into(),
-                slice: slice.into(),
-            }),
-            ast::Expr::Starred(ast::ExprStarred {
-                value,
-                ctx: _,
-                range: _,
-                node_index: _,
-            }) => Self::Starred(ExprStarred {
+            ast::Expr::Attribute(ast::ExprAttribute { value, attr, .. }) => {
+                Self::Attribute(ExprAttribute {
+                    value: value.into(),
+                    attr: attr.as_str(),
+                })
+            }
+            ast::Expr::Subscript(ast::ExprSubscript { value, slice, .. }) => {
+                Self::Subscript(ExprSubscript {
+                    value: value.into(),
+                    slice: slice.into(),
+                })
+            }
+            ast::Expr::Starred(ast::ExprStarred { value, .. }) => Self::Starred(ExprStarred {
                 value: value.into(),
             }),
             ast::Expr::Name(name) => name.into(),
-            ast::Expr::List(ast::ExprList {
-                elts,
-                ctx: _,
-                range: _,
-                node_index: _,
-            }) => Self::List(ExprList {
+            ast::Expr::List(ast::ExprList { elts, .. }) => Self::List(ExprList {
                 elts: elts.iter().map(Into::into).collect(),
             }),
-            ast::Expr::Tuple(ast::ExprTuple {
-                elts,
-                ctx: _,
-                range: _,
-                node_index: _,
-                parenthesized: _,
-            }) => Self::Tuple(ExprTuple {
+            ast::Expr::Tuple(ast::ExprTuple { elts, .. }) => Self::Tuple(ExprTuple {
                 elts: elts.iter().map(Into::into).collect(),
             }),
             ast::Expr::Slice(ast::ExprSlice {
-                lower,
-                upper,
-                step,
-                range: _,
-                node_index: _,
+                lower, upper, step, ..
             }) => Self::Slice(ExprSlice {
                 lower: lower.as_ref().map(Into::into),
                 upper: upper.as_ref().map(Into::into),
                 step: step.as_ref().map(Into::into),
             }),
-            ast::Expr::IpyEscapeCommand(ast::ExprIpyEscapeCommand {
-                kind,
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::IpyEscapeCommand(ExprIpyEscapeCommand { kind: *kind, value }),
+            ast::Expr::IpyEscapeCommand(ast::ExprIpyEscapeCommand { kind, value, .. }) => {
+                Self::IpyEscapeCommand(ExprIpyEscapeCommand { kind: *kind, value })
+            }
         }
     }
 }
@@ -1432,31 +1375,24 @@ impl<'a> From<&'a ast::TypeParam> for ComparableTypeParam<'a> {
                 name,
                 bound,
                 default,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::TypeVar(TypeParamTypeVar {
                 name: name.as_str(),
                 bound: bound.as_ref().map(Into::into),
                 default: default.as_ref().map(Into::into),
             }),
-            ast::TypeParam::TypeVarTuple(ast::TypeParamTypeVarTuple {
-                name,
-                default,
-                range: _,
-                node_index: _,
-            }) => Self::TypeVarTuple(TypeParamTypeVarTuple {
-                name: name.as_str(),
-                default: default.as_ref().map(Into::into),
-            }),
-            ast::TypeParam::ParamSpec(ast::TypeParamParamSpec {
-                name,
-                default,
-                range: _,
-                node_index: _,
-            }) => Self::ParamSpec(TypeParamParamSpec {
-                name: name.as_str(),
-                default: default.as_ref().map(Into::into),
-            }),
+            ast::TypeParam::TypeVarTuple(ast::TypeParamTypeVarTuple { name, default, .. }) => {
+                Self::TypeVarTuple(TypeParamTypeVarTuple {
+                    name: name.as_str(),
+                    default: default.as_ref().map(Into::into),
+                })
+            }
+            ast::TypeParam::ParamSpec(ast::TypeParamParamSpec { name, default, .. }) => {
+                Self::ParamSpec(TypeParamParamSpec {
+                    name: name.as_str(),
+                    default: default.as_ref().map(Into::into),
+                })
+            }
         }
     }
 }
@@ -1633,8 +1569,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 decorator_list,
                 returns,
                 type_params,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::FunctionDef(StmtFunctionDef {
                 is_async: *is_async,
                 name: name.as_str(),
@@ -1650,8 +1585,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 body,
                 decorator_list,
                 type_params,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::ClassDef(StmtClassDef {
                 name: name.as_str(),
                 arguments: arguments.as_ref().map(Into::into).unwrap_or_default(),
@@ -1659,18 +1593,10 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 decorator_list: decorator_list.iter().map(Into::into).collect(),
                 type_params: type_params.as_ref().map(Into::into),
             }),
-            ast::Stmt::Return(ast::StmtReturn {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::Return(StmtReturn {
+            ast::Stmt::Return(ast::StmtReturn { value, .. }) => Self::Return(StmtReturn {
                 value: value.as_ref().map(Into::into),
             }),
-            ast::Stmt::Delete(ast::StmtDelete {
-                targets,
-                range: _,
-                node_index: _,
-            }) => Self::Delete(StmtDelete {
+            ast::Stmt::Delete(ast::StmtDelete { targets, .. }) => Self::Delete(StmtDelete {
                 targets: targets.iter().map(Into::into).collect(),
             }),
             ast::Stmt::TypeAlias(ast::StmtTypeAlias {
@@ -1684,21 +1610,12 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 type_params: type_params.as_ref().map(Into::into),
                 value: value.into(),
             }),
-            ast::Stmt::Assign(ast::StmtAssign {
-                targets,
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::Assign(StmtAssign {
+            ast::Stmt::Assign(ast::StmtAssign { targets, value, .. }) => Self::Assign(StmtAssign {
                 targets: targets.iter().map(Into::into).collect(),
                 value: value.into(),
             }),
             ast::Stmt::AugAssign(ast::StmtAugAssign {
-                target,
-                op,
-                value,
-                range: _,
-                node_index: _,
+                target, op, value, ..
             }) => Self::AugAssign(StmtAugAssign {
                 target: target.into(),
                 op: (*op).into(),
@@ -1709,8 +1626,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 annotation,
                 value,
                 simple,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::AnnAssign(StmtAnnAssign {
                 target: target.into(),
                 annotation: annotation.into(),
@@ -1723,8 +1639,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 iter,
                 body,
                 orelse,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::For(StmtFor {
                 is_async: *is_async,
                 target: target.into(),
@@ -1733,11 +1648,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 orelse: orelse.iter().map(Into::into).collect(),
             }),
             ast::Stmt::While(ast::StmtWhile {
-                test,
-                body,
-                orelse,
-                range: _,
-                node_index: _,
+                test, body, orelse, ..
             }) => Self::While(StmtWhile {
                 test: test.into(),
                 body: body.iter().map(Into::into).collect(),
@@ -1747,8 +1658,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 test,
                 body,
                 elif_else_clauses,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::If(StmtIf {
                 test: test.into(),
                 body: body.iter().map(Into::into).collect(),
@@ -1758,28 +1668,17 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 is_async,
                 items,
                 body,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::With(StmtWith {
                 is_async: *is_async,
                 items: items.iter().map(Into::into).collect(),
                 body: body.iter().map(Into::into).collect(),
             }),
-            ast::Stmt::Match(ast::StmtMatch {
-                subject,
-                cases,
-                range: _,
-                node_index: _,
-            }) => Self::Match(StmtMatch {
+            ast::Stmt::Match(ast::StmtMatch { subject, cases, .. }) => Self::Match(StmtMatch {
                 subject: subject.into(),
                 cases: cases.iter().map(Into::into).collect(),
             }),
-            ast::Stmt::Raise(ast::StmtRaise {
-                exc,
-                cause,
-                range: _,
-                node_index: _,
-            }) => Self::Raise(StmtRaise {
+            ast::Stmt::Raise(ast::StmtRaise { exc, cause, .. }) => Self::Raise(StmtRaise {
                 exc: exc.as_ref().map(Into::into),
                 cause: cause.as_ref().map(Into::into),
             }),
@@ -1789,8 +1688,7 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 orelse,
                 finalbody,
                 is_star,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::Try(StmtTry {
                 body: body.iter().map(Into::into).collect(),
                 handlers: handlers.iter().map(Into::into).collect(),
@@ -1798,21 +1696,11 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 finalbody: finalbody.iter().map(Into::into).collect(),
                 is_star: *is_star,
             }),
-            ast::Stmt::Assert(ast::StmtAssert {
-                test,
-                msg,
-                range: _,
-                node_index: _,
-            }) => Self::Assert(StmtAssert {
+            ast::Stmt::Assert(ast::StmtAssert { test, msg, .. }) => Self::Assert(StmtAssert {
                 test: test.into(),
                 msg: msg.as_ref().map(Into::into),
             }),
-            ast::Stmt::Import(ast::StmtImport {
-                names,
-                is_lazy,
-                range: _,
-                node_index: _,
-            }) => Self::Import(StmtImport {
+            ast::Stmt::Import(ast::StmtImport { names, is_lazy, .. }) => Self::Import(StmtImport {
                 names: names.iter().map(Into::into).collect(),
                 is_lazy: *is_lazy,
             }),
@@ -1821,39 +1709,23 @@ impl<'a> From<&'a ast::Stmt> for ComparableStmt<'a> {
                 names,
                 level,
                 is_lazy,
-                range: _,
-                node_index: _,
+                ..
             }) => Self::ImportFrom(StmtImportFrom {
                 module: module.as_deref(),
                 names: names.iter().map(Into::into).collect(),
                 level: *level,
                 is_lazy: *is_lazy,
             }),
-            ast::Stmt::Global(ast::StmtGlobal {
-                names,
-                range: _,
-                node_index: _,
-            }) => Self::Global(StmtGlobal {
+            ast::Stmt::Global(ast::StmtGlobal { names, .. }) => Self::Global(StmtGlobal {
                 names: names.iter().map(ast::Identifier::as_str).collect(),
             }),
-            ast::Stmt::Nonlocal(ast::StmtNonlocal {
-                names,
-                range: _,
-                node_index: _,
-            }) => Self::Nonlocal(StmtNonlocal {
+            ast::Stmt::Nonlocal(ast::StmtNonlocal { names, .. }) => Self::Nonlocal(StmtNonlocal {
                 names: names.iter().map(ast::Identifier::as_str).collect(),
             }),
-            ast::Stmt::IpyEscapeCommand(ast::StmtIpyEscapeCommand {
-                kind,
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::IpyEscapeCommand(StmtIpyEscapeCommand { kind: *kind, value }),
-            ast::Stmt::Expr(ast::StmtExpr {
-                value,
-                range: _,
-                node_index: _,
-            }) => Self::Expr(StmtExpr {
+            ast::Stmt::IpyEscapeCommand(ast::StmtIpyEscapeCommand { kind, value, .. }) => {
+                Self::IpyEscapeCommand(StmtIpyEscapeCommand { kind: *kind, value })
+            }
+            ast::Stmt::Expr(ast::StmtExpr { value, .. }) => Self::Expr(StmtExpr {
                 value: value.into(),
             }),
             ast::Stmt::Pass(_) => Self::Pass,
@@ -2055,6 +1927,12 @@ impl<'a> From<&'a Expr> for HashableExpr<'a> {
                 Expr::BooleanLiteral(boolean) => Some(HashableNumber::real(HashableReal::Integer(
                     i128::from(u8::from(boolean.value)),
                 ))),
+                Expr::Constant(ast::ExprConstant {
+                    value: ConstantValue::Boolean(value),
+                    ..
+                }) => Some(HashableNumber::real(HashableReal::Integer(i128::from(
+                    u8::from(*value),
+                )))),
                 Expr::NumberLiteral(number) => match &number.value {
                     Number::Int(int) => HashableReal::from_int(int).map(HashableNumber::real),
                     Number::Float(float) => {

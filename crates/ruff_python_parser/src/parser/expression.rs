@@ -736,6 +736,8 @@ impl<'src> Parser<'src> {
                 node_index: AtomicNodeIndex::NONE,
                 args: Box::default(),
                 keywords: ThinVec::default(),
+                runtime_args: None,
+                runtime_bases: None,
             };
         }
 
@@ -873,6 +875,8 @@ impl<'src> Parser<'src> {
             node_index: AtomicNodeIndex::NONE,
             args: self.expr_scratch.take(args_snapshot),
             keywords,
+            runtime_args: None,
+            runtime_bases: None,
         };
 
         self.validate_arguments(&arguments, has_trailing_comma, context);
@@ -939,6 +943,7 @@ impl<'src> Parser<'src> {
                 range: self.node_range(slice_start),
                 parenthesized: false,
                 node_index: AtomicNodeIndex::NONE,
+                runtime_elts: None,
             });
         } else if slice.is_starred_expr() {
             // If the only slice element is a starred expression, that is represented
@@ -950,6 +955,7 @@ impl<'src> Parser<'src> {
                 range: self.node_range(slice_start),
                 parenthesized: false,
                 node_index: AtomicNodeIndex::NONE,
+                runtime_elts: None,
             });
         }
 
@@ -1195,6 +1201,7 @@ impl<'src> Parser<'src> {
             op,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_values: None,
         }
     }
 
@@ -1277,6 +1284,7 @@ impl<'src> Parser<'src> {
             comparators: self.expr_scratch.take(comparators_snapshot),
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_comparators: None,
         }
     }
 
@@ -1438,6 +1446,8 @@ impl<'src> Parser<'src> {
                     value: ast::TStringValue::concatenated(values),
                     range,
                     node_index: AtomicNodeIndex::NONE,
+                    runtime_template_str: None,
+                    runtime_values: None,
                 });
             }
         }
@@ -1500,6 +1510,8 @@ impl<'src> Parser<'src> {
             value: ast::FStringValue::concatenated(parts),
             range,
             node_index: AtomicNodeIndex::NONE,
+            runtime_joined_str: None,
+            runtime_values: None,
         })
     }
 
@@ -2025,6 +2037,9 @@ impl<'src> Parser<'src> {
             format_spec,
             range,
             node_index: AtomicNodeIndex::NONE,
+            runtime_str: None,
+            runtime_interpolation_format_spec: None,
+            runtime_formatted_value_format_spec: None,
         }
     }
 
@@ -2055,6 +2070,7 @@ impl<'src> Parser<'src> {
                 ctx: ExprContext::Load,
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_elts: None,
             });
         }
 
@@ -2146,6 +2162,7 @@ impl<'src> Parser<'src> {
                 items: vec![],
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_values: None,
             });
         }
 
@@ -2309,6 +2326,7 @@ impl<'src> Parser<'src> {
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
                 parenthesized: true,
+                runtime_elts: None,
             })
             .into();
         }
@@ -2403,6 +2421,7 @@ impl<'src> Parser<'src> {
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
             parenthesized: parenthesized.is_yes(),
+            runtime_elts: None,
         }
     }
 
@@ -2431,6 +2450,7 @@ impl<'src> Parser<'src> {
             ctx: ExprContext::Load,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_elts: None,
         }
     }
 
@@ -2482,6 +2502,7 @@ impl<'src> Parser<'src> {
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
             elts: self.expr_scratch.take(elts_snapshot),
+            runtime_elts: None,
         }
     }
 
@@ -2527,6 +2548,7 @@ impl<'src> Parser<'src> {
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
             items,
+            runtime_values: None,
         }
     }
 
@@ -2600,6 +2622,8 @@ impl<'src> Parser<'src> {
             iter: iter.expr,
             ifs: self.expr_scratch.take(ifs_snapshot),
             is_async,
+            runtime_ifs: None,
+            runtime_is_async: None,
         }
     }
 

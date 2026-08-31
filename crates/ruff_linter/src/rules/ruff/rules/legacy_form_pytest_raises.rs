@@ -266,6 +266,8 @@ fn generate_with_statement(
                 })
                 .as_slice()
                 .into(),
+            runtime_args: None,
+            runtime_bases: None,
         },
     };
 
@@ -278,6 +280,8 @@ fn generate_with_statement(
             range: TextRange::default(),
             args: func_args.into(),
             keywords: func_keywords.into(),
+            runtime_args: None,
+            runtime_bases: None,
         },
     };
 
@@ -287,6 +291,9 @@ fn generate_with_statement(
             range: TextRange::default(),
             targets: assign_targets.to_vec(),
             value: Box::new(func_call.into()),
+            runtime_targets: None,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
         })
     } else {
         Stmt::Expr(StmtExpr {
@@ -307,5 +314,8 @@ fn generate_with_statement(
             optional_vars: optional_vars.map(|var| Box::new(var.clone())),
         }],
         body: ast::Suite::from([body]),
+        runtime_body: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     })
 }

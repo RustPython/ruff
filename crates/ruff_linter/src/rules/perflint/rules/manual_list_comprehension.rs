@@ -146,6 +146,8 @@ pub(crate) fn manual_list_comprehension(checker: &Checker, for_stmt: &ast::StmtF
                 keywords,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         range_start: _,
         node_index: _,

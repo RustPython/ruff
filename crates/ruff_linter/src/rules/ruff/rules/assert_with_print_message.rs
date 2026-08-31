@@ -134,6 +134,9 @@ mod print_arguments {
                     format_spec: None,
                     range: TextRange::default(),
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                    runtime_formatted_value_format_spec: None,
+                    runtime_interpolation_format_spec: None,
+                    runtime_str: None,
                 },
             )],
         }
@@ -252,6 +255,8 @@ mod print_arguments {
             }),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_joined_str: None,
+            runtime_values: None,
         }))
     }
 

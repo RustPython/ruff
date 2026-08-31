@@ -1,7 +1,7 @@
 [package]
-name = "ruff_python_ast"
-version = "0.0.11"
-description = "This is an internal component crate of Ruff"
+description = "Unofficial fork for RustPython"
+name = "rustpython-ruff_python_ast"
+version = "0.16.5"
 authors = { workspace = true }
 edition = { workspace = true }
 rust-version = { workspace = true }
@@ -15,6 +15,7 @@ license = { workspace = true }
 ignored = ["ruff_cache"]
 
 [lib]
+name = "ruff_python_ast"
 
 [dependencies]
 ruff_cache = { workspace = true, optional = true }

@@ -124,6 +124,7 @@ fn generate_del_statement(obj: &Expr, attr_name: &str, generator: Generator) -> 
         })],
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_targets: None,
     });
     generator.stmt(&stmt)
 }

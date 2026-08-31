@@ -29,6 +29,7 @@ Module(
                     ],
                     level: 1,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -50,9 +51,11 @@ Module(
                     ],
                     level: 3,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

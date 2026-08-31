@@ -28,6 +28,8 @@ expression: suite
                             ),
                         ),
                     },
+                    runtime_joined_str: None,
+                    runtime_values: None,
                 },
             ),
         },

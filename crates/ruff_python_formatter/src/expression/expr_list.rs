@@ -18,6 +18,7 @@ impl FormatNodeRule<ExprList> for FormatExprList {
             node_index: _,
             elts,
             ctx: _,
+            runtime_elts: _,
         } = item;
 
         let comments = f.context().comments().clone();

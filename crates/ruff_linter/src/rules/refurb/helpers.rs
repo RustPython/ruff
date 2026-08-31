@@ -36,6 +36,8 @@ pub(super) fn generate_method_call(name: Name, method: &str, generator: Generato
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         },
         range_start: ruff_text_size::TextSize::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
@@ -71,6 +73,7 @@ pub(super) fn replace_with_identity_check(
         comparators: [ast::ExprNoneLiteral::default().into()].into(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_comparators: None,
     });
 
     let new_content = generator.expr(&new_expr);

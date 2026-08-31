@@ -15,6 +15,7 @@ impl ast::ElifElseClause {
             node_index: _,
             test,
             body,
+            ..
         } = self;
         if let Some(test) = test {
             visitor.visit_expr(test);
@@ -28,11 +29,7 @@ impl ast::ExprDict {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprDict {
-            items,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprDict { items, .. } = self;
 
         for ast::DictItem { key, value } in items {
             if let Some(key) = key {
@@ -48,12 +45,7 @@ impl ast::ExprBoolOp {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprBoolOp {
-            op,
-            values,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprBoolOp { op, values, .. } = self;
         match values.as_slice() {
             [left, rest @ ..] => {
                 visitor.visit_expr(left);
@@ -78,8 +70,7 @@ impl ast::ExprCompare {
             left,
             ops,
             comparators,
-            range: _,
-            node_index: _,
+            ..
         } = self;
 
         visitor.visit_expr(left);
@@ -140,11 +131,7 @@ impl ast::ExprFString {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprFString {
-            value,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprFString { value, .. } = self;
 
         for f_string_part in value {
             match f_string_part {
@@ -164,11 +151,7 @@ impl ast::ExprTString {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprTString {
-            value,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprTString { value, .. } = self;
 
         for t_string in value {
             visitor.visit_t_string(t_string);
@@ -181,11 +164,7 @@ impl ast::ExprStringLiteral {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprStringLiteral {
-            value,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprStringLiteral { value, .. } = self;
 
         for string_literal in value {
             visitor.visit_string_literal(string_literal);
@@ -198,11 +177,7 @@ impl ast::ExprBytesLiteral {
     where
         V: SourceOrderVisitor<'a> + ?Sized,
     {
-        let ast::ExprBytesLiteral {
-            value,
-            range: _,
-            node_index: _,
-        } = self;
+        let ast::ExprBytesLiteral { value, .. } = self;
 
         for bytes_literal in value {
             visitor.visit_bytes_literal(bytes_literal);
@@ -221,6 +196,7 @@ impl ast::ExceptHandlerExceptHandler {
             type_,
             name,
             body,
+            ..
         } = self;
         if let Some(expr) = type_ {
             visitor.visit_expr(expr);
@@ -243,8 +219,7 @@ impl ast::PatternMatchMapping {
             keys,
             patterns,
             rest,
-            range: _,
-            node_index: _,
+            ..
         } = self;
 
         let mut rest = rest.as_ref();
@@ -310,7 +285,7 @@ impl ast::Comprehension {
             target,
             iter,
             ifs,
-            is_async: _,
+            ..
         } = self;
         visitor.visit_expr(target);
         visitor.visit_expr(iter);
@@ -361,6 +336,7 @@ impl ast::Parameter {
             node_index: _,
             name,
             annotation,
+            ..
         } = self;
 
         visitor.visit_identifier(name);
@@ -457,6 +433,7 @@ impl ast::MatchCase {
             pattern,
             guard,
             body,
+            ..
         } = self;
 
         visitor.visit_pattern(pattern);
@@ -491,6 +468,7 @@ impl ast::TypeParams {
             range: _,
             node_index: _,
             type_params,
+            ..
         } = self;
 
         for type_param in type_params {

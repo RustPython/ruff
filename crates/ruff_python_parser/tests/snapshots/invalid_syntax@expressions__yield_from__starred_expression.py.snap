@@ -76,6 +76,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -83,6 +84,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

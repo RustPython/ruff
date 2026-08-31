@@ -268,6 +268,7 @@ fn find_runtime_varying_call<'a>(
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_)
+        | Expr::Constant(_)
         | Expr::IpyEscapeCommand(_) => None,
     }
 }

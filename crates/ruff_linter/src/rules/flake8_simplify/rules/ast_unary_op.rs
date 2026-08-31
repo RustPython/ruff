@@ -158,6 +158,7 @@ pub(crate) fn negation_with_equal_op(checker: &Checker, expr: &Expr, op: UnaryOp
         comparators,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = operand
     else {
         return;
@@ -191,6 +192,7 @@ pub(crate) fn negation_with_equal_op(checker: &Checker, expr: &Expr, op: UnaryOp
         comparators: comparators.clone(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_comparators: None,
     };
     diagnostic.set_fix(Fix::unsafe_edit(Edit::range_replacement(
         checker.generator().expr(&node.into()),
@@ -214,6 +216,7 @@ pub(crate) fn negation_with_not_equal_op(
         comparators,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = operand
     else {
         return;
@@ -247,6 +250,7 @@ pub(crate) fn negation_with_not_equal_op(
         comparators: comparators.clone(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_comparators: None,
     };
     diagnostic.set_fix(Fix::unsafe_edit(Edit::range_replacement(
         checker.generator().expr(&node.into()),
@@ -297,6 +301,8 @@ pub(crate) fn double_negation(checker: &Checker, expr: &Expr, op: UnaryOp, opera
                 keywords: std::iter::empty().collect(),
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                runtime_args: None,
+                runtime_bases: None,
             },
             range_start: ruff_text_size::TextSize::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,

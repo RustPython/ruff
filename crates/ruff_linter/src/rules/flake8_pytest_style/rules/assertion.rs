@@ -649,6 +649,7 @@ fn is_composite_condition(test: &Expr) -> CompositionKind {
                 values,
                 range: _,
                 node_index: _,
+                runtime_values: _,
             }) = operand.as_ref()
             {
                 // Only split cases without mixed `and` and `or`.

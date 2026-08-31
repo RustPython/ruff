@@ -105,6 +105,7 @@ pub(crate) fn if_else_block_instead_of_if_exp(checker: &Checker, stmt_if: &ast::
         elif_else_clauses,
         range: _,
         node_index: _,
+        runtime_body: _,
     } = stmt_if;
 
     // `test: None` to only match an `else` clause
@@ -280,6 +281,9 @@ fn assignment_ternary(
         value: Box::new(node.into()),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_targets: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     };
     node1.into()
 }
@@ -290,12 +294,16 @@ fn assignment_binary_and(target_var: &Expr, left_value: &Expr, right_value: &Exp
         values: vec![left_value.clone(), right_value.clone()],
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_values: None,
     };
     let node1 = ast::StmtAssign {
         targets: vec![target_var.clone()],
         value: Box::new(node.into()),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_targets: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     };
     node1.into()
 }
@@ -311,9 +319,13 @@ fn assignment_binary_or(target_var: &Expr, left_value: &Expr, right_value: &Expr
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                 op: BoolOp::Or,
                 values: vec![left_value.clone(), right_value.clone()],
+                runtime_values: None,
             })
             .into(),
         ),
+        runtime_targets: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     })
     .into()
 }

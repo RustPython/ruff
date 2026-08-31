@@ -81,6 +81,9 @@ fn assignment(obj: &Expr, name: &str, value: &Expr, generator: Generator) -> Str
         value: Box::new(value.clone()),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_targets: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     });
     generator.stmt(&stmt)
 }

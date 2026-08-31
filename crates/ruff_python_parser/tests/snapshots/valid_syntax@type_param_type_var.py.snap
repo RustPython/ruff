@@ -41,6 +41,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -93,6 +94,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -154,6 +156,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -217,6 +220,7 @@ Module(
                                                     ],
                                                     ctx: Load,
                                                     parenthesized: true,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
@@ -233,6 +237,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -327,6 +332,7 @@ Module(
                                                     ],
                                                     ctx: Load,
                                                     parenthesized: true,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
@@ -343,6 +349,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -356,6 +363,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

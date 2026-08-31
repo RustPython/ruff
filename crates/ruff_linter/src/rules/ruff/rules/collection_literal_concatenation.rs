@@ -169,6 +169,7 @@ fn concatenate_expressions(expr: &Expr) -> Option<(Expr, Type)> {
             ctx: ExprContext::Load,
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_elts: None,
         }
         .into(),
         Type::Tuple => ast::ExprTuple {
@@ -177,6 +178,7 @@ fn concatenate_expressions(expr: &Expr) -> Option<(Expr, Type)> {
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
             parenthesized: true,
+            runtime_elts: None,
         }
         .into(),
     };

@@ -54,11 +54,13 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

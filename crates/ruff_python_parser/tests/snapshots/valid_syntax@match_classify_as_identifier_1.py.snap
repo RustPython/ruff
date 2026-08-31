@@ -39,11 +39,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -101,6 +101,8 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -166,11 +168,14 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -148,6 +148,8 @@ Module(
                                                             node_index: NodeIndex(None),
                                                         },
                                                         annotation: None,
+                                                        runtime_type_comment: None,
+                                                        runtime_type_comment_bytes: None,
                                                     },
                                                     default: None,
                                                 },
@@ -155,6 +157,7 @@ Module(
                                             vararg: None,
                                             kwonlyargs: [],
                                             kwarg: None,
+                                            runtime_defaults: None,
                                         },
                                     ),
                                     body: Name(
@@ -280,6 +283,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

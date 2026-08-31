@@ -159,20 +159,12 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             }
             visitor.visit_body(body);
         }
-        Stmt::Return(ast::StmtReturn {
-            value,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Return(ast::StmtReturn { value, .. }) => {
             if let Some(expr) = value {
                 visitor.visit_expr(expr);
             }
         }
-        Stmt::Delete(ast::StmtDelete {
-            targets,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Delete(ast::StmtDelete { targets, .. }) => {
             for expr in targets {
                 visitor.visit_expr(expr);
             }
@@ -197,11 +189,7 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             }
         }
         Stmt::AugAssign(ast::StmtAugAssign {
-            target,
-            op,
-            value,
-            range: _,
-            node_index: _,
+            target, op, value, ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_operator(op);
@@ -232,11 +220,7 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             visitor.visit_body(orelse);
         }
         Stmt::While(ast::StmtWhile {
-            test,
-            body,
-            orelse,
-            range: _,
-            node_index: _,
+            test, body, orelse, ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_body(body);
@@ -246,8 +230,7 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             test,
             body,
             elif_else_clauses,
-            range: _,
-            node_index: _,
+            ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_body(body);
@@ -261,23 +244,13 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             }
             visitor.visit_body(body);
         }
-        Stmt::Match(ast::StmtMatch {
-            subject,
-            cases,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Match(ast::StmtMatch { subject, cases, .. }) => {
             visitor.visit_expr(subject);
             for match_case in cases {
                 visitor.visit_match_case(match_case);
             }
         }
-        Stmt::Raise(ast::StmtRaise {
-            exc,
-            cause,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Raise(ast::StmtRaise { exc, cause, .. }) => {
             if let Some(expr) = exc {
                 visitor.visit_expr(expr);
             }
@@ -290,9 +263,7 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             handlers,
             orelse,
             finalbody,
-            is_star: _,
-            range: _,
-            node_index: _,
+            ..
         }) => {
             visitor.visit_body(body);
             for except_handler in handlers {
@@ -301,23 +272,13 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
             visitor.visit_body(orelse);
             visitor.visit_body(finalbody);
         }
-        Stmt::Assert(ast::StmtAssert {
-            test,
-            msg,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Assert(ast::StmtAssert { test, msg, .. }) => {
             visitor.visit_expr(test);
             if let Some(expr) = msg {
                 visitor.visit_expr(expr);
             }
         }
-        Stmt::Import(ast::StmtImport {
-            names,
-            is_lazy: _,
-            range: _,
-            node_index: _,
-        }) => {
+        Stmt::Import(ast::StmtImport { names, .. }) => {
             for alias in names {
                 visitor.visit_alias(alias);
             }
@@ -329,11 +290,7 @@ pub fn walk_stmt<V: Transformer + ?Sized>(visitor: &V, stmt: &mut Stmt) {
         }
         Stmt::Global(_) => {}
         Stmt::Nonlocal(_) => {}
-        Stmt::Expr(ast::StmtExpr {
-            value,
-            range: _,
-            node_index: _,
-        }) => visitor.visit_expr(value),
+        Stmt::Expr(ast::StmtExpr { value, .. }) => visitor.visit_expr(value),
         Stmt::Pass(_) | Stmt::Break(_) | Stmt::Continue(_) | Stmt::IpyEscapeCommand(_) => {}
     }
 }
@@ -348,51 +305,29 @@ pub fn walk_decorator<V: Transformer + ?Sized>(visitor: &V, decorator: &mut Deco
 
 pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
     match expr {
-        Expr::BoolOp(ast::ExprBoolOp {
-            op,
-            values,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::BoolOp(ast::ExprBoolOp { op, values, .. }) => {
             visitor.visit_bool_op(op);
             for expr in values {
                 visitor.visit_expr(expr);
             }
         }
-        Expr::Named(ast::ExprNamed {
-            target,
-            value,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::Named(ast::ExprNamed { target, value, .. }) => {
             visitor.visit_expr(value);
             visitor.visit_expr(target);
         }
         Expr::BinOp(ast::ExprBinOp {
-            left,
-            op,
-            right,
-            range: _,
-            node_index: _,
+            left, op, right, ..
         }) => {
             visitor.visit_expr(left);
             visitor.visit_operator(op);
             visitor.visit_expr(right);
         }
-        Expr::UnaryOp(ast::ExprUnaryOp {
-            op,
-            operand,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::UnaryOp(ast::ExprUnaryOp { op, operand, .. }) => {
             visitor.visit_unary_op(op);
             visitor.visit_expr(operand);
         }
         Expr::Lambda(ast::ExprLambda {
-            parameters,
-            body,
-            range: _,
-            node_index: _,
+            parameters, body, ..
         }) => {
             if let Some(parameters) = parameters {
                 visitor.visit_parameters(parameters);
@@ -400,21 +335,13 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             visitor.visit_expr(body);
         }
         Expr::If(ast::ExprIf {
-            test,
-            body,
-            orelse,
-            range: _,
-            node_index: _,
+            test, body, orelse, ..
         }) => {
             visitor.visit_expr(test);
             visitor.visit_expr(body);
             visitor.visit_expr(orelse);
         }
-        Expr::Dict(ast::ExprDict {
-            items,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::Dict(ast::ExprDict { items, .. }) => {
             for ast::DictItem { key, value } in items {
                 if let Some(key) = key {
                     visitor.visit_expr(key);
@@ -422,20 +349,13 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
                 visitor.visit_expr(value);
             }
         }
-        Expr::Set(ast::ExprSet {
-            elts,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::Set(ast::ExprSet { elts, .. }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
             }
         }
         Expr::ListComp(ast::ExprListComp {
-            elt,
-            generators,
-            range: _,
-            node_index: _,
+            elt, generators, ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -443,10 +363,7 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             visitor.visit_expr(elt);
         }
         Expr::SetComp(ast::ExprSetComp {
-            elt,
-            generators,
-            range: _,
-            node_index: _,
+            elt, generators, ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -457,8 +374,7 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             key,
             value,
             generators,
-            range: _,
-            node_index: _,
+            ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
@@ -469,42 +385,25 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             visitor.visit_expr(value);
         }
         Expr::Generator(ast::ExprGenerator {
-            elt,
-            generators,
-            range: _,
-            node_index: _,
-            parenthesized: _,
+            elt, generators, ..
         }) => {
             for comprehension in generators {
                 visitor.visit_comprehension(comprehension);
             }
             visitor.visit_expr(elt);
         }
-        Expr::Await(ast::ExprAwait {
-            value,
-            range: _,
-            node_index: _,
-        }) => visitor.visit_expr(value),
-        Expr::Yield(ast::ExprYield {
-            value,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::Await(ast::ExprAwait { value, .. }) => visitor.visit_expr(value),
+        Expr::Yield(ast::ExprYield { value, .. }) => {
             if let Some(expr) = value {
                 visitor.visit_expr(expr);
             }
         }
-        Expr::YieldFrom(ast::ExprYieldFrom {
-            value,
-            range: _,
-            node_index: _,
-        }) => visitor.visit_expr(value),
+        Expr::YieldFrom(ast::ExprYieldFrom { value, .. }) => visitor.visit_expr(value),
         Expr::Compare(ast::ExprCompare {
             left,
             ops,
             comparators,
-            range: _,
-            node_index: _,
+            ..
         }) => {
             visitor.visit_expr(left);
             for cmp_op in &mut **ops {
@@ -515,10 +414,7 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             }
         }
         Expr::Call(ast::ExprCall {
-            func,
-            arguments,
-            range_start: _,
-            node_index: _,
+            func, arguments, ..
         }) => {
             visitor.visit_expr(func);
             visitor.visit_arguments(arguments);
@@ -551,6 +447,7 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             }
         }
         Expr::NumberLiteral(_)
+        | Expr::Constant(_)
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_) => {}
@@ -559,57 +456,33 @@ pub fn walk_expr<V: Transformer + ?Sized>(visitor: &V, expr: &mut Expr) {
             visitor.visit_expr_context(ctx);
         }
         Expr::Subscript(ast::ExprSubscript {
-            value,
-            slice,
-            ctx,
-            range: _,
-            node_index: _,
+            value, slice, ctx, ..
         }) => {
             visitor.visit_expr(value);
             visitor.visit_expr(slice);
             visitor.visit_expr_context(ctx);
         }
-        Expr::Starred(ast::ExprStarred {
-            value,
-            ctx,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::Starred(ast::ExprStarred { value, ctx, .. }) => {
             visitor.visit_expr(value);
             visitor.visit_expr_context(ctx);
         }
         Expr::Name(ast::ExprName { ctx, .. }) => {
             visitor.visit_expr_context(ctx);
         }
-        Expr::List(ast::ExprList {
-            elts,
-            ctx,
-            range: _,
-            node_index: _,
-        }) => {
+        Expr::List(ast::ExprList { elts, ctx, .. }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
             }
             visitor.visit_expr_context(ctx);
         }
-        Expr::Tuple(ast::ExprTuple {
-            elts,
-            ctx,
-            range: _,
-            node_index: _,
-            parenthesized: _,
-        }) => {
+        Expr::Tuple(ast::ExprTuple { elts, ctx, .. }) => {
             for expr in elts {
                 visitor.visit_expr(expr);
             }
             visitor.visit_expr_context(ctx);
         }
         Expr::Slice(ast::ExprSlice {
-            lower,
-            upper,
-            step,
-            range: _,
-            node_index: _,
+            lower, upper, step, ..
         }) => {
             if let Some(expr) = lower {
                 visitor.visit_expr(expr);
@@ -719,13 +592,7 @@ pub fn walk_type_params<V: Transformer + ?Sized>(visitor: &V, type_params: &mut 
 
 pub fn walk_type_param<V: Transformer + ?Sized>(visitor: &V, type_param: &mut TypeParam) {
     match type_param {
-        TypeParam::TypeVar(TypeParamTypeVar {
-            bound,
-            default,
-            name: _,
-            range: _,
-            node_index: _,
-        }) => {
+        TypeParam::TypeVar(TypeParamTypeVar { bound, default, .. }) => {
             if let Some(expr) = bound {
                 visitor.visit_expr(expr);
             }
@@ -733,22 +600,12 @@ pub fn walk_type_param<V: Transformer + ?Sized>(visitor: &V, type_param: &mut Ty
                 visitor.visit_expr(expr);
             }
         }
-        TypeParam::TypeVarTuple(TypeParamTypeVarTuple {
-            default,
-            name: _,
-            range: _,
-            node_index: _,
-        }) => {
+        TypeParam::TypeVarTuple(TypeParamTypeVarTuple { default, .. }) => {
             if let Some(expr) = default {
                 visitor.visit_expr(expr);
             }
         }
-        TypeParam::ParamSpec(TypeParamParamSpec {
-            default,
-            name: _,
-            range: _,
-            node_index: _,
-        }) => {
+        TypeParam::ParamSpec(TypeParamParamSpec { default, .. }) => {
             if let Some(expr) = default {
                 visitor.visit_expr(expr);
             }

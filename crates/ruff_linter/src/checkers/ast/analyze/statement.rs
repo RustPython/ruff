@@ -59,6 +59,10 @@ pub(crate) fn statement(stmt: &Stmt, checker: &mut Checker) {
                 type_params: _,
                 range: _,
                 node_index: _,
+                runtime_decorator_list: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
             },
         ) => {
             if checker.is_rule_enabled(Rule::DjangoNonLeadingReceiverDecorator) {
@@ -387,6 +391,8 @@ pub(crate) fn statement(stmt: &Stmt, checker: &mut Checker) {
                 body,
                 range: _,
                 node_index: _,
+                runtime_decorator_list: _,
+                runtime_body: _,
             },
         ) => {
             if checker.is_rule_enabled(Rule::NoClassmethodDecorator) {
@@ -715,6 +721,7 @@ pub(crate) fn statement(stmt: &Stmt, checker: &mut Checker) {
                 is_lazy: _,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             },
         ) => {
             let level = *level;
@@ -1255,6 +1262,10 @@ pub(crate) fn statement(stmt: &Stmt, checker: &mut Checker) {
                 is_async,
                 range: _,
                 node_index: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
+                runtime_orelse: _,
             },
         ) => {
             if checker.is_rule_enabled(Rule::TooManyNestedBlocks) {
@@ -1632,6 +1643,7 @@ pub(crate) fn statement(stmt: &Stmt, checker: &mut Checker) {
                 targets,
                 range: _,
                 node_index: _,
+                runtime_targets: _,
             },
         ) => {
             if checker.is_rule_enabled(Rule::GlobalStatement) {
