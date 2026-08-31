@@ -92,6 +92,7 @@ pub(crate) fn not_tests(checker: &Checker, unary_op: &ast::ExprUnaryOp) {
         comparators,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = unary_op.operand.as_ref()
     else {
         return;

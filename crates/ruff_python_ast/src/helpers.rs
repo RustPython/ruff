@@ -13,8 +13,8 @@ use crate::token::Tokens;
 use crate::token::parenthesized_range;
 use crate::visitor::Visitor;
 use crate::{
-    self as ast, Arguments, AtomicNodeIndex, CmpOp, DictItem, ExceptHandler, Expr, ExprNoneLiteral,
-    InterpolatedStringElement, MatchCase, Operator, Pattern, Stmt, TypeParam,
+    self as ast, Arguments, AtomicNodeIndex, CmpOp, ConstantValue, DictItem, ExceptHandler, Expr,
+    ExprNoneLiteral, InterpolatedStringElement, MatchCase, Operator, Pattern, Stmt, TypeParam,
 };
 use crate::{AnyNodeRef, ExprContext};
 
@@ -143,6 +143,7 @@ impl SideEffect {
             | Expr::StringLiteral(_)
             | Expr::BytesLiteral(_)
             | Expr::NumberLiteral(_)
+            | Expr::Constant(_)
             | Expr::BooleanLiteral(_)
             | Expr::NoneLiteral(_)
             | Expr::EllipsisLiteral(_) => Self::Absent,
@@ -155,6 +156,7 @@ const fn is_known_safe_binop_operand(expr: &Expr) -> bool {
         Expr::StringLiteral(_)
         | Expr::BytesLiteral(_)
         | Expr::NumberLiteral(_)
+        | Expr::Constant(_)
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_)
@@ -193,6 +195,7 @@ fn is_definitely_side_effect_free_interpolation_expr(expr: &Expr) -> bool {
     matches!(
         expr,
         Expr::NumberLiteral(_)
+            | Expr::Constant(_)
             | Expr::BooleanLiteral(_)
             | Expr::NoneLiteral(_)
             | Expr::EllipsisLiteral(_)
@@ -304,21 +307,15 @@ where
                     || any_over_expr(body, &mut *func)
                     || any_over_expr(orelse, &mut *func)
             }
-            Expr::Dict(ast::ExprDict {
-                items,
-                range: _,
-                node_index: _,
-            }) => items.iter().any(|ast::DictItem { key, value }| {
-                any_over_expr(value, &mut *func)
-                    || key
-                        .as_ref()
-                        .is_some_and(|key| any_over_expr(key, &mut *func))
-            }),
-            Expr::Set(ast::ExprSet {
-                elts,
-                range: _,
-                node_index: _,
-            })
+            Expr::Dict(ast::ExprDict { items, .. }) => {
+                items.iter().any(|ast::DictItem { key, value }| {
+                    any_over_expr(value, &mut *func)
+                        || key
+                            .as_ref()
+                            .is_some_and(|key| any_over_expr(key, &mut *func))
+                })
+            }
+            Expr::Set(ast::ExprSet { elts, .. })
             | Expr::List(ast::ExprList { elts, .. })
             | Expr::Tuple(ast::ExprTuple { elts, .. }) => {
                 elts.iter().any(|expr| any_over_expr(expr, &mut *func))
@@ -440,6 +437,7 @@ where
             | Expr::StringLiteral(_)
             | Expr::BytesLiteral(_)
             | Expr::NumberLiteral(_)
+            | Expr::Constant(_)
             | Expr::BooleanLiteral(_)
             | Expr::NoneLiteral(_)
             | Expr::EllipsisLiteral(_)
@@ -477,11 +475,7 @@ fn any_over_pattern(pattern: &Pattern, func: &mut dyn FnMut(&Expr) -> bool) -> b
             node_index: _,
         }) => any_over_expr(value, func),
         Pattern::MatchSingleton(_) => false,
-        Pattern::MatchSequence(ast::PatternMatchSequence {
-            patterns,
-            range: _,
-            node_index: _,
-        }) => patterns
+        Pattern::MatchSequence(ast::PatternMatchSequence { patterns, .. }) => patterns
             .iter()
             .any(|pattern| any_over_pattern(pattern, &mut *func)),
         Pattern::MatchMapping(ast::PatternMatchMapping { keys, patterns, .. }) => {
@@ -505,11 +499,7 @@ fn any_over_pattern(pattern: &Pattern, func: &mut dyn FnMut(&Expr) -> bool) -> b
         Pattern::MatchAs(ast::PatternMatchAs { pattern, .. }) => pattern
             .as_ref()
             .is_some_and(|pattern| any_over_pattern(pattern, func)),
-        Pattern::MatchOr(ast::PatternMatchOr {
-            patterns,
-            range: _,
-            node_index: _,
-        }) => patterns
+        Pattern::MatchOr(ast::PatternMatchOr { patterns, .. }) => patterns
             .iter()
             .any(|pattern| any_over_pattern(pattern, &mut *func)),
     }
@@ -603,11 +593,9 @@ where
             }) => value
                 .as_ref()
                 .is_some_and(|value| any_over_expr(value, func)),
-            Stmt::Delete(ast::StmtDelete {
-                targets,
-                range: _,
-                node_index: _,
-            }) => targets.iter().any(|expr| any_over_expr(expr, &mut *func)),
+            Stmt::Delete(ast::StmtDelete { targets, .. }) => {
+                targets.iter().any(|expr| any_over_expr(expr, &mut *func))
+            }
             Stmt::TypeAlias(ast::StmtTypeAlias {
                 name,
                 type_params,
@@ -654,11 +642,7 @@ where
                     || any_over_body(orelse, &mut *func)
             }
             Stmt::While(ast::StmtWhile {
-                test,
-                body,
-                orelse,
-                range: _,
-                node_index: _,
+                test, body, orelse, ..
             }) => {
                 any_over_expr(test, &mut *func)
                     || any_over_body(body, &mut *func)
@@ -668,8 +652,7 @@ where
                 test,
                 body,
                 elif_else_clauses,
-                range: _,
-                node_index: _,
+                ..
             }) => {
                 any_over_expr(test, &mut *func)
                     || any_over_body(body, &mut *func)
@@ -707,9 +690,7 @@ where
                 handlers,
                 orelse,
                 finalbody,
-                is_star: _,
-                range: _,
-                node_index: _,
+                ..
             }) => {
                 any_over_body(body, &mut *func)
                     || handlers.iter().any(|handler| {
@@ -749,8 +730,7 @@ where
                             pattern,
                             guard,
                             body,
-                            range: _,
-                            node_index: _,
+                            ..
                         } = case;
                         any_over_pattern(pattern, &mut *func)
                             || guard
@@ -822,7 +802,13 @@ pub fn is_assignment_to_a_dunder(stmt: &Stmt) -> bool {
 const fn is_singleton(expr: &Expr) -> bool {
     matches!(
         expr,
-        Expr::NoneLiteral(_) | Expr::BooleanLiteral(_) | Expr::EllipsisLiteral(_)
+        Expr::NoneLiteral(_)
+            | Expr::BooleanLiteral(_)
+            | Expr::EllipsisLiteral(_)
+            | Expr::Constant(ast::ExprConstant {
+                value: ConstantValue::None | ConstantValue::Boolean(_) | ConstantValue::Ellipsis,
+                ..
+            })
     )
 }
 
@@ -1565,6 +1551,7 @@ fn is_non_empty_f_string(expr: &ast::ExprFString) -> bool {
             Expr::SetComp(_) => true,
             Expr::DictComp(_) => true,
             Expr::NumberLiteral(_) => true,
+            Expr::Constant(_) => true,
             Expr::BooleanLiteral(_) => true,
             Expr::NoneLiteral(_) => true,
             Expr::EllipsisLiteral(_) => true,
@@ -1724,6 +1711,7 @@ pub fn pep_604_union(elts: &[Expr]) -> Expr {
             range: TextRange::default(),
             node_index: AtomicNodeIndex::NONE,
             parenthesized: true,
+            runtime_elts: None,
         }),
         [Expr::Tuple(ast::ExprTuple { elts, .. })] => pep_604_union(elts),
         [elt] => elt.clone(),
@@ -1771,6 +1759,7 @@ pub fn typing_union(elts: &[Expr], binding: Name) -> Expr {
             elts: elts.to_vec(),
             ctx: ExprContext::Load,
             parenthesized: false,
+            runtime_elts: None,
         })),
         ctx: ExprContext::Load,
         range: TextRange::default(),
@@ -1953,6 +1942,7 @@ mod tests {
                 type_params: vec![type_var_one, type_var_two],
                 range: TextRange::default(),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_type_params: None,
             })),
             value: Box::new(constant_three.clone()),
             range: TextRange::default(),

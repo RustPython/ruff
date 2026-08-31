@@ -44,6 +44,7 @@ types_requiring_crate_prefix = {
     "Alias",
     "Singleton",
     "PatternArguments",
+    "ConstantValue",
 }
 
 
@@ -276,10 +277,10 @@ class FieldType:
             rule = rule[:-1]
 
         self.sequence_kind, self.name = split_sequence_type(rule)
-        if self.optional and self.sequence_kind is not None:
+        if self.optional and self.sequence_kind is not None and "<" not in rule:
             raise ValueError(f"optional field cannot be sequence or slice: {self.rule}")
         if self.sequence_kind is not None and (
-            not self.name or any(ch in self.name for ch in "?*&[]<>")
+            not self.name or any(ch in self.name for ch in "?*&[]")
         ):
             raise ValueError(f"Invalid collection element type: {rule}")
 

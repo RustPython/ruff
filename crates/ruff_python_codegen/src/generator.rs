@@ -304,6 +304,8 @@ impl<'a> Generator<'a> {
                 type_params,
                 range: _,
                 node_index: _,
+                runtime_decorator_list: _,
+                runtime_body: _,
             }) => {
                 self.newlines(if self.indent_depth == 0 { 2 } else { 1 });
                 for decorator in decorator_list {
@@ -366,6 +368,7 @@ impl<'a> Generator<'a> {
                 targets,
                 range: _,
                 node_index: _,
+                runtime_targets: _,
             }) => {
                 statement!({
                     self.p("del ");
@@ -421,6 +424,7 @@ impl<'a> Generator<'a> {
                 simple,
                 range: _,
                 node_index: _,
+                runtime_simple: _,
             }) => {
                 statement!({
                     let need_parens = matches!(target.as_ref(), Expr::Name(_)) && !simple;
@@ -467,6 +471,8 @@ impl<'a> Generator<'a> {
                 orelse,
                 range: _,
                 node_index: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 statement!({
                     self.p("while ");
@@ -487,6 +493,7 @@ impl<'a> Generator<'a> {
                 elif_else_clauses,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 statement!({
                     self.p("if ");
@@ -592,6 +599,10 @@ impl<'a> Generator<'a> {
                 is_star,
                 range: _,
                 node_index: _,
+                runtime_body: _,
+                runtime_handlers: _,
+                runtime_orelse: _,
+                runtime_finalbody: _,
             }) => {
                 statement!({
                     self.p("try:");
@@ -657,6 +668,7 @@ impl<'a> Generator<'a> {
                 is_lazy,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             }) => {
                 statement!({
                     if *is_lazy {
@@ -747,6 +759,7 @@ impl<'a> Generator<'a> {
                 body,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 self.p("except");
                 if star {
@@ -786,6 +799,7 @@ impl<'a> Generator<'a> {
                 patterns,
                 range: _,
                 node_index: _,
+                runtime_patterns: _,
             }) => {
                 self.p("[");
                 let mut first = true;
@@ -801,6 +815,8 @@ impl<'a> Generator<'a> {
                 rest,
                 range: _,
                 node_index: _,
+                runtime_keys: _,
+                runtime_patterns: _,
             }) => {
                 self.p("{");
                 let mut first = true;
@@ -850,6 +866,7 @@ impl<'a> Generator<'a> {
                 patterns,
                 range: _,
                 node_index: _,
+                runtime_patterns: _,
             }) => {
                 let mut first = true;
                 for pattern in patterns {
@@ -947,6 +964,7 @@ impl<'a> Generator<'a> {
                 values,
                 range: _,
                 node_index: _,
+                runtime_values: _,
             }) => {
                 let (op, prec) = opprec!(bin, op, BoolOp, And("and", AND), Or("or", OR));
                 group_if!(prec, {
@@ -1172,6 +1190,7 @@ impl<'a> Generator<'a> {
                 comparators,
                 range: _,
                 node_index: _,
+                runtime_comparators: _,
             }) => {
                 group_if!(precedence::CMP, {
                     let new_lvl = precedence::CMP + 1;
@@ -1373,6 +1392,7 @@ impl<'a> Generator<'a> {
             Expr::IpyEscapeCommand(ast::ExprIpyEscapeCommand { kind, value, .. }) => {
                 self.p(&format!("{kind}{value}"));
             }
+            Expr::Constant(_) => unreachable!("RustPython-only AST node"),
         }
     }
 
@@ -1546,6 +1566,9 @@ impl<'a> Generator<'a> {
                 format_spec,
                 range: _,
                 node_index: _,
+                runtime_str: _,
+                runtime_interpolation_format_spec: _,
+                runtime_formatted_value_format_spec: _,
             }) => self.unparse_interpolated_element(
                 expression,
                 debug_text.as_ref(),

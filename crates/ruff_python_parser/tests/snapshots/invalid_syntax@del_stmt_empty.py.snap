@@ -15,9 +15,11 @@ Module(
                     node_index: NodeIndex(None),
                     range: 0..3,
                     targets: [],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

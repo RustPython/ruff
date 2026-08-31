@@ -314,6 +314,8 @@ fn isinstance_target<'a>(call: &'a Expr, semantic: &'a SemanticModel) -> Option<
                 keywords,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         range_start: _,
         node_index: _,
@@ -339,6 +341,7 @@ pub(crate) fn duplicate_isinstance_call(checker: &Checker, expr: &Expr) {
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return;
@@ -464,6 +467,7 @@ fn match_eq_target(expr: &Expr) -> Option<(&Name, &Expr)> {
         comparators,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = expr
     else {
         return None;
@@ -490,6 +494,7 @@ pub(crate) fn compare_with_tuple(checker: &Checker, expr: &Expr) {
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return;
@@ -537,6 +542,7 @@ pub(crate) fn compare_with_tuple(checker: &Checker, expr: &Expr) {
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
             parenthesized: true,
+            runtime_elts: None,
         };
         let node1 = ast::ExprName {
             id: id.clone(),
@@ -550,6 +556,7 @@ pub(crate) fn compare_with_tuple(checker: &Checker, expr: &Expr) {
             comparators: Box::from([node.into()]),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_comparators: None,
         };
         let in_expr = node2.into();
         let mut diagnostic = checker.report_diagnostic(
@@ -573,6 +580,7 @@ pub(crate) fn compare_with_tuple(checker: &Checker, expr: &Expr) {
                 values: iter::once(in_expr).chain(unmatched).collect(),
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                runtime_values: None,
             };
             node.into()
         };
@@ -590,6 +598,7 @@ pub(crate) fn expr_and_not_expr(checker: &Checker, expr: &Expr) {
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return;
@@ -648,6 +657,7 @@ pub(crate) fn expr_or_not_expr(checker: &Checker, expr: &Expr) {
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return;
@@ -735,6 +745,7 @@ fn is_short_circuit(
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return None;

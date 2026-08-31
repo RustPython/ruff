@@ -439,6 +439,7 @@ impl<'src> Parser<'src> {
             targets,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_targets: None,
         }
     }
 
@@ -764,6 +765,7 @@ impl<'src> Parser<'src> {
             is_lazy,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_level: None,
         }
     }
 
@@ -1284,6 +1286,9 @@ impl<'src> Parser<'src> {
             value: Box::new(value.expr),
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_targets: None,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
         }
     }
 
@@ -1364,6 +1369,7 @@ impl<'src> Parser<'src> {
             simple,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_simple: None,
         }
     }
 
@@ -1478,6 +1484,7 @@ impl<'src> Parser<'src> {
             elif_else_clauses: self.elif_else_scratch.take(elif_else_snapshot),
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
         }
     }
 
@@ -1522,6 +1529,8 @@ impl<'src> Parser<'src> {
             body,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
+            runtime_orelse: None,
         }
     }
 
@@ -1678,6 +1687,10 @@ impl<'src> Parser<'src> {
             is_star,
             range: self.node_range(try_start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
+            runtime_handlers: None,
+            runtime_orelse: None,
+            runtime_finalbody: None,
         }
     }
 
@@ -1828,6 +1841,7 @@ impl<'src> Parser<'src> {
                 body: except_body,
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_body: None,
             }),
             block_kind,
         )
@@ -1940,6 +1954,10 @@ impl<'src> Parser<'src> {
             orelse,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
+            runtime_body: None,
+            runtime_orelse: None,
         }
     }
 
@@ -1988,6 +2006,8 @@ impl<'src> Parser<'src> {
             orelse,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
+            runtime_orelse: None,
         }
     }
 
@@ -2118,6 +2138,10 @@ impl<'src> Parser<'src> {
             returns,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_decorator_list: None,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
+            runtime_body: None,
         }
     }
 
@@ -2193,6 +2217,8 @@ impl<'src> Parser<'src> {
             arguments,
             body,
             node_index: AtomicNodeIndex::NONE,
+            runtime_decorator_list: None,
+            runtime_body: None,
         }
     }
 
@@ -2222,6 +2248,9 @@ impl<'src> Parser<'src> {
             is_async: false,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
+            runtime_body: None,
         }
     }
 
@@ -2829,6 +2858,7 @@ impl<'src> Parser<'src> {
             body,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
         }
     }
 
@@ -3065,6 +3095,10 @@ impl<'src> Parser<'src> {
                     }),
                     returns: None,
                     body: Suite::new(),
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 }
                 .into()
             }
@@ -3237,6 +3271,8 @@ impl<'src> Parser<'src> {
             name,
             annotation,
             node_index: AtomicNodeIndex::NONE,
+            runtime_type_comment: None,
+            runtime_type_comment_bytes: None,
         }
     }
 
@@ -3626,6 +3662,7 @@ impl<'src> Parser<'src> {
             range: self.node_range(start),
             type_params,
             node_index: AtomicNodeIndex::NONE,
+            runtime_type_params: None,
         }
     }
 

@@ -30,6 +30,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -62,6 +65,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

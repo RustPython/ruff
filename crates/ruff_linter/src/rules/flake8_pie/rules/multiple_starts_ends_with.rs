@@ -75,6 +75,7 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
         values,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = expr
     else {
         return;
@@ -90,6 +91,8 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
                     keywords,
                     range: _,
                     node_index: _,
+                    runtime_args: _,
+                    runtime_bases: _,
                 },
             range_start: _,
             node_index: _,
@@ -151,6 +154,8 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
                                 keywords: _,
                                 range: _,
                                 node_index: _,
+                                runtime_args: _,
+                                runtime_bases: _,
                             },
                         range_start: _,
                         node_index: _,
@@ -182,6 +187,7 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                 parenthesized: true,
+                runtime_elts: None,
             });
             let node1 = Expr::Name(ast::ExprName {
                 id: arg_name.into(),
@@ -203,6 +209,8 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
                     keywords: std::iter::empty().collect(),
                     range: TextRange::default(),
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                    runtime_args: None,
+                    runtime_bases: None,
                 },
                 range_start: ruff_text_size::TextSize::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
@@ -226,6 +234,7 @@ pub(crate) fn multiple_starts_ends_with(checker: &Checker, expr: &Expr) {
                     .collect(),
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                runtime_values: None,
             });
             let bool_op = node;
             diagnostic.set_fix(Fix::unsafe_edit(Edit::range_replacement(

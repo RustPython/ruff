@@ -97,6 +97,7 @@ pub(crate) fn outdated_version_block(checker: &Checker, stmt_if: &StmtIf) {
             comparators,
             range: _,
             node_index: _,
+            runtime_comparators: _,
         }) = &branch.test
         else {
             continue;

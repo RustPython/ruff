@@ -182,6 +182,7 @@ where
             body,
             range: _,
             node_index: _,
+            runtime_body: _,
         }) => {
             visitor.visit_body(body);
         }

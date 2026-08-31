@@ -136,6 +136,7 @@ pub(crate) fn if_else_block_instead_of_dict_get(checker: &Checker, stmt_if: &ast
         comparators: test_dict,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = &**test
     else {
         return;
@@ -209,6 +210,8 @@ pub(crate) fn if_else_block_instead_of_dict_get(checker: &Checker, stmt_if: &ast
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         },
         range_start: ruff_text_size::TextSize::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
@@ -219,6 +222,9 @@ pub(crate) fn if_else_block_instead_of_dict_get(checker: &Checker, stmt_if: &ast
         value: Box::new(node3.into()),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_targets: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     };
     let contents = checker.generator().stmt(&node5.into());
 
@@ -264,6 +270,7 @@ pub(crate) fn if_exp_instead_of_dict_get(
         comparators: test_dict,
         range: _,
         node_index: _,
+        runtime_comparators: _,
     }) = test
     else {
         return;
@@ -318,6 +325,8 @@ pub(crate) fn if_exp_instead_of_dict_get(
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         },
         range_start: ruff_text_size::TextSize::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,

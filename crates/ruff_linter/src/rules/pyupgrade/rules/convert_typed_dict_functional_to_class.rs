@@ -163,6 +163,7 @@ fn create_field_assignment_stmt(field: &str, annotation: &Expr) -> Stmt {
         simple: true,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_simple: None,
     }
     .into()
 }
@@ -184,12 +185,16 @@ fn create_class_def_stmt(
             },
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         })),
         body,
         type_params: None,
         decorator_list: ast::DecoratorList::new(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_body: None,
+        runtime_decorator_list: None,
     }
     .into()
 }
@@ -272,6 +277,7 @@ fn match_fields_and_total(arguments: &Arguments) -> Option<(Suite, Option<&Keywo
                     items,
                     range: _,
                     node_index: _,
+                    runtime_values: _,
                 }) => Some((fields_from_dict_literal(items)?, total)),
                 Expr::Call(ast::ExprCall {
                     func,

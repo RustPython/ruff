@@ -24,9 +24,11 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

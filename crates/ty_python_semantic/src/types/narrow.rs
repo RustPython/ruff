@@ -3830,6 +3830,7 @@ impl<'db> NarrowingConstraintsBuilder<'db, '_> {
             left,
             ops,
             comparators,
+            runtime_comparators: _,
         } = expr_compare;
 
         // Performance optimization: early return if there are no potential narrowing targets.

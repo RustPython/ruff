@@ -147,6 +147,8 @@ impl<'db> Visitor<'db> for ExportFinder<'db> {
                 keys: _,
                 range: _,
                 node_index: _,
+                runtime_keys: _,
+                runtime_patterns: _,
             }) => {
                 for pattern in patterns {
                     self.visit_pattern(pattern);
@@ -183,6 +185,8 @@ impl<'db> Visitor<'db> for ExportFinder<'db> {
                 body: _,        // We don't want to visit the body of the class
                 range: _,
                 node_index: _,
+                runtime_decorator_list: _,
+                runtime_body: _,
             }) => {
                 self.possibly_add_export(&name.id, PossibleExportKind::Normal);
                 for decorator in decorator_list {
@@ -203,6 +207,10 @@ impl<'db> Visitor<'db> for ExportFinder<'db> {
                 range: _,
                 node_index: _,
                 is_async: _,
+                runtime_decorator_list: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
             }) => {
                 self.possibly_add_export(&name.id, PossibleExportKind::Normal);
                 for decorator in decorator_list {
@@ -221,6 +229,7 @@ impl<'db> Visitor<'db> for ExportFinder<'db> {
                 simple: _,
                 range: _,
                 node_index: _,
+                runtime_simple: _,
             }) => {
                 if value.is_some() || self.visiting_stub_file {
                     self.visit_expr(target);
@@ -323,6 +332,7 @@ impl<'db> Visitor<'db> for ExportFinder<'db> {
             | ast::Expr::BytesLiteral(_)
             | ast::Expr::EllipsisLiteral(_)
             | ast::Expr::StringLiteral(_) => {}
+            ast::Expr::Constant(_) => {}
 
             // Walrus definitions "leak" from comprehension scopes into the comprehension's
             // enclosing scope; they thus need special handling
@@ -377,6 +387,7 @@ impl<'db> Visitor<'db> for WalrusFinder<'_, 'db> {
             | ast::Expr::BytesLiteral(_)
             | ast::Expr::EllipsisLiteral(_)
             | ast::Expr::StringLiteral(_)
+            | ast::Expr::Constant(_)
             | ast::Expr::Name(_) => {}
 
             ast::Expr::Named(ast::ExprNamed {

@@ -468,6 +468,7 @@ impl<'a> Importer<'a> {
                 is_lazy: _,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             }) = stmt
             {
                 if *level == 0

@@ -206,12 +206,14 @@ pub(crate) fn expression(expr: &Expr, checker: &Checker) {
             range: _,
             node_index: _,
             parenthesized: _,
+            runtime_elts: _,
         })
         | Expr::List(ast::ExprList {
             elts,
             ctx,
             range: _,
             node_index: _,
+            runtime_elts: _,
         }) => {
             if checker.is_rule_enabled(Rule::ImplicitStringConcatenationInCollectionLiteral) {
                 flake8_implicit_str_concat::rules::implicit_string_concatenation_in_collection_literal(
@@ -538,6 +540,8 @@ pub(crate) fn expression(expr: &Expr, checker: &Checker) {
                         keywords,
                         range: _,
                         node_index: _,
+                        runtime_args: _,
+                        runtime_bases: _,
                     },
                 range_start: _,
                 node_index: _,
@@ -1651,6 +1655,7 @@ pub(crate) fn expression(expr: &Expr, checker: &Checker) {
                 comparators,
                 range: _,
                 node_index: _,
+                runtime_comparators: _,
             },
         ) => {
             if checker.any_rule_enabled(&[Rule::NoneComparison, Rule::TrueFalseComparison]) {

@@ -36,6 +36,9 @@ impl FormatNodeRule<StmtAssign> for FormatStmtAssign {
             node_index: _,
             targets,
             value,
+            runtime_targets: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
         } = item;
 
         let (first, rest) = targets.split_first().ok_or(FormatError::syntax_error(

@@ -45,6 +45,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             Expr(
@@ -113,6 +114,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             Expr(
@@ -147,6 +149,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

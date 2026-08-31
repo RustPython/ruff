@@ -146,6 +146,7 @@ fn tuple_diagnostic(checker: &Checker, tuple: &ast::ExprTuple, aliases: &[&Expr]
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                 parenthesized: true,
+                runtime_elts: None,
             };
             format!("({})", checker.generator().expr(&node.into()))
         };

@@ -156,6 +156,7 @@ impl<'a> From<&'a TypeVar<'a>> for TypeParam {
                             elts: constraints.iter().map(|expr| (*expr).clone()).collect(),
                             ctx: ast::ExprContext::Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         })))
                     }
                     Some(TypeVarRestriction::AnyStr) => {
@@ -178,6 +179,7 @@ impl<'a> From<&'a TypeVar<'a>> for TypeParam {
                             ],
                             ctx: ast::ExprContext::Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         })))
                     }
                     None => None,

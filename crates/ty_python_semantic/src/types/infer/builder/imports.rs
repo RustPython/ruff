@@ -237,6 +237,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             is_lazy: _,
             range: _,
             node_index: _,
+            runtime_level: _,
         } = import;
 
         let db = self.db();

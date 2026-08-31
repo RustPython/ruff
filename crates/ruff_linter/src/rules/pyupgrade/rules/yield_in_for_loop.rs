@@ -83,6 +83,10 @@ pub(crate) fn yield_in_for_loop(checker: &Checker, stmt_for: &ast::StmtFor) {
         is_async: _,
         range: _,
         node_index: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
+        runtime_orelse: _,
     } = stmt_for;
 
     // If there is an else statement, don't rewrite.

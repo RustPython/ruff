@@ -186,6 +186,7 @@ fn generate_fix(
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                 parenthesized: false,
+                runtime_elts: None,
             })),
             ctx: ruff_python_ast::ExprContext::Load,
             range: TextRange::default(),

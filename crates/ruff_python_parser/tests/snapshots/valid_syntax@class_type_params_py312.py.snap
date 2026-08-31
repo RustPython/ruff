@@ -59,6 +59,7 @@ Module(
                                                     ],
                                                     ctx: Load,
                                                     parenthesized: true,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
@@ -112,6 +113,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: None,
@@ -129,9 +131,12 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

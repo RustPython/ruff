@@ -30,6 +30,7 @@ pub(crate) mod expr_boolean_literal;
 pub(crate) mod expr_bytes_literal;
 pub(crate) mod expr_call;
 pub(crate) mod expr_compare;
+pub(crate) mod expr_constant;
 pub(crate) mod expr_dict;
 pub(crate) mod expr_dict_comp;
 pub(crate) mod expr_ellipsis_literal;
@@ -110,6 +111,7 @@ impl FormatRule<Expr, PyFormatContext<'_>> for FormatExpr {
             Expr::Tuple(expr) => expr.format().fmt(f),
             Expr::Slice(expr) => expr.format().fmt(f),
             Expr::IpyEscapeCommand(expr) => expr.format().fmt(f),
+            Expr::Constant(expr) => expr.format().fmt(f),
         });
         let parenthesize = match parentheses {
             Parentheses::Preserve => f.context().is_expression_parenthesized(expression.into()),
@@ -290,6 +292,7 @@ fn format_with_parentheses_comments(
         Expr::Tuple(expr) => FormatNodeRule::fmt_fields(expr.format().rule(), expr, f),
         Expr::Slice(expr) => FormatNodeRule::fmt_fields(expr.format().rule(), expr, f),
         Expr::IpyEscapeCommand(expr) => FormatNodeRule::fmt_fields(expr.format().rule(), expr, f),
+        Expr::Constant(_) => unreachable!("RustPython-only AST node"),
     });
 
     leading_comments(leading_outer).fmt(f)?;
@@ -486,6 +489,7 @@ impl NeedsParentheses for Expr {
             Expr::Tuple(expr) => expr.needs_parentheses(parent, context),
             Expr::Slice(expr) => expr.needs_parentheses(parent, context),
             Expr::IpyEscapeCommand(expr) => expr.needs_parentheses(parent, context),
+            Expr::Constant(_) => OptionalParentheses::Never,
         }
     }
 }
@@ -676,6 +680,7 @@ impl<'input> CanOmitOptionalParenthesesVisitor<'input> {
                 node_index: _,
                 op: _,
                 values,
+                runtime_values: _,
             }) => self.update_max_precedence_with_count(
                 OperatorPrecedence::BooleanOperation,
                 values.len().saturating_sub(1) as u32,
@@ -702,6 +707,7 @@ impl<'input> CanOmitOptionalParenthesesVisitor<'input> {
                 left: _,
                 ops,
                 comparators: _,
+                runtime_comparators: _,
             }) => {
                 self.update_max_precedence_with_count(
                     OperatorPrecedence::Comparator,
@@ -782,6 +788,7 @@ impl<'input> CanOmitOptionalParenthesesVisitor<'input> {
             | Expr::EllipsisLiteral(_)
             | Expr::Name(_)
             | Expr::Slice(_)
+            | Expr::Constant(_)
             | Expr::IpyEscapeCommand(_) => {
                 return;
             }
@@ -1301,6 +1308,7 @@ pub(crate) fn is_expression_huggable(expr: &Expr, context: &PyFormatContext) -> 
         | Expr::BytesLiteral(_)
         | Expr::FString(_)
         | Expr::TString(_)
+        | Expr::Constant(_)
         | Expr::EllipsisLiteral(_) => false,
     }
 }
@@ -1358,6 +1366,7 @@ pub(crate) fn is_splittable_expression(expr: &Expr, context: &PyFormatContext) -
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_)
+        | Expr::Constant(_)
         | Expr::Slice(_)
         | Expr::IpyEscapeCommand(_) => false,
 
@@ -1468,6 +1477,7 @@ pub(crate) fn left_most<'expr>(expression: &'expr Expr, trivia: &TriviaRanges) -
             | Expr::Lambda(_)
             | Expr::Named(_)
             | Expr::IpyEscapeCommand(_)
+            | Expr::Constant(_)
             | Expr::Generator(_) => None,
         };
 

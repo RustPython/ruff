@@ -21,6 +21,7 @@ impl FormatNodeRule<StmtAnnAssign> for FormatStmtAnnAssign {
             annotation,
             value,
             simple: _,
+            runtime_simple: _,
         } = item;
         let comments = f.context().comments().clone();
         let annotation_parentheses = annotation

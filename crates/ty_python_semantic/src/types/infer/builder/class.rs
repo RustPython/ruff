@@ -90,6 +90,8 @@ impl<'db> TypeInferenceBuilder<'db, '_> {
             decorator_list,
             arguments: _,
             body: _,
+            runtime_decorator_list: _,
+            runtime_body: _,
         } = class_node;
         let db = self.db();
 

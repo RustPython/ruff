@@ -74,7 +74,7 @@ jobs:
   plan:
     permissions:
       "contents": "read"
-    runs-on: "depot-ubuntu-24.04-4"
+    runs-on: ${{ github.repository == 'astral-sh/ruff' && 'depot-ubuntu-24.04-4' || 'ubuntu-latest' }}
     outputs:
       val: ${{ steps.plan.outputs.manifest }}
       tag: ${{ (inputs.tag != 'dry-run' && inputs.tag) || '' }}

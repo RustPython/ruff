@@ -82,6 +82,7 @@ fn includes_import(stmt: &Stmt, target: &NameImport) -> bool {
                 is_lazy: _,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             }) = &stmt
             else {
                 return false;

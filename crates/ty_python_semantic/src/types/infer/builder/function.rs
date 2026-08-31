@@ -416,6 +416,10 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             returns: _,
             body: _,
             decorator_list,
+            runtime_decorator_list: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
         } = function;
 
         let db = self.db();
@@ -838,6 +842,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             vararg,
             kwonlyargs: _,
             kwarg,
+            runtime_defaults: _,
         } = parameters;
 
         self.context.inference_flags |= InferenceFlags::IN_PARAMETER_ANNOTATION;
@@ -970,6 +975,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             node_index: _,
             name: _,
             annotation,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
         } = parameter;
 
         if let Some(annotation) = annotation.as_deref() {

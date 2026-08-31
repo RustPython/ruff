@@ -59,6 +59,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 33..55,
@@ -89,11 +91,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -32,6 +32,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -66,6 +67,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -107,6 +109,7 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -177,10 +180,12 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: true,
+                                runtime_elts: None,
                             },
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -236,6 +241,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -272,6 +278,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -279,6 +287,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Name(
@@ -303,9 +312,11 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

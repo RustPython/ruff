@@ -375,6 +375,7 @@ pub fn parse_cells_unchecked(
             node_index: AtomicNodeIndex::NONE,
             range: module_range.unwrap_or_default(),
             body,
+            runtime_body: None,
         },
         tokens: Tokens::new(tokens),
         errors,

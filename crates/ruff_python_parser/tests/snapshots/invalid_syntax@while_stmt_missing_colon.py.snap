@@ -40,6 +40,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     body: [
@@ -51,9 +52,12 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

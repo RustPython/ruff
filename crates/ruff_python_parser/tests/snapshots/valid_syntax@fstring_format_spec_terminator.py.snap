@@ -53,6 +53,9 @@ Module(
                                                                 elements: [],
                                                             },
                                                         ),
+                                                        runtime_str: None,
+                                                        runtime_interpolation_format_spec: None,
+                                                        runtime_formatted_value_format_spec: None,
                                                     },
                                                 ),
                                                 Literal(
@@ -73,6 +76,8 @@ Module(
                                     ),
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -128,6 +133,9 @@ Module(
                                                                 ],
                                                             },
                                                         ),
+                                                        runtime_str: None,
+                                                        runtime_interpolation_format_spec: None,
+                                                        runtime_formatted_value_format_spec: None,
                                                     },
                                                 ),
                                                 Literal(
@@ -148,11 +156,14 @@ Module(
                                     ),
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
