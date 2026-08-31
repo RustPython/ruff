@@ -46,6 +46,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -89,8 +90,12 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -143,6 +148,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

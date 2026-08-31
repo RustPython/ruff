@@ -1161,6 +1161,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                 is_lazy,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             }) => {
                 if self.semantic.at_top_level() {
                     self.importer.visit_import(stmt);
@@ -1621,6 +1622,9 @@ impl<'a> Visitor<'a> for Checker<'a> {
                 is_async: _,
                 range: _,
                 node_index: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
             }) => {
                 for item in items {
                     self.visit_with_item(item);
@@ -1635,6 +1639,8 @@ impl<'a> Visitor<'a> for Checker<'a> {
                 orelse,
                 range: _,
                 node_index: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 self.visit_boolean_test(test);
                 self.visit_body(body);
@@ -1651,6 +1657,10 @@ impl<'a> Visitor<'a> for Checker<'a> {
                 iter,
                 body,
                 orelse,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 self.visit_expr(iter);
                 self.visit_expr(target);
@@ -1667,6 +1677,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                     elif_else_clauses,
                     range: _,
                     node_index: _,
+                    runtime_body: _,
                 },
             ) => {
                 self.visit_boolean_test(test);
@@ -2136,6 +2147,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                                 items,
                                 range: _,
                                 node_index: _,
+                                runtime_values: _,
                             }) = arg
                             {
                                 for ast::DictItem { key, value } in items {
@@ -2277,6 +2289,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                                 range: _,
                                 node_index: _,
                                 parenthesized: _,
+                                runtime_elts: _,
                             }) = slice.as_ref()
                             {
                                 let mut iter = elts.iter();
@@ -2304,6 +2317,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                                 items,
                                 range: _,
                                 node_index: _,
+                                runtime_values: _,
                             }) = slice.as_ref()
                             {
                                 for item in items {
@@ -2395,6 +2409,7 @@ impl<'a> Visitor<'a> for Checker<'a> {
                 body: _,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 if let Some(name) = name {
                     // Store the existing binding, if any.

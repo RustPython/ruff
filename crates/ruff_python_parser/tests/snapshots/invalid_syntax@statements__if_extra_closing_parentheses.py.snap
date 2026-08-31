@@ -23,6 +23,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Pass(
@@ -32,6 +33,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -88,9 +88,11 @@ Module(
                                         ),
                                         value: None,
                                         simple: false,
+                                        runtime_simple: None,
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -102,6 +104,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

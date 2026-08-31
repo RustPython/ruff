@@ -65,6 +65,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Assign(
@@ -90,6 +91,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             If(
@@ -162,6 +166,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -233,6 +238,7 @@ Module(
                                     ),
                                 ],
                                 elif_else_clauses: [],
+                                runtime_body: None,
                             },
                         ),
                         Expr(
@@ -265,6 +271,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -365,6 +372,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -428,6 +436,8 @@ Module(
                                             node_index: NodeIndex(None),
                                             args: [],
                                             keywords: [],
+                                            runtime_args: None,
+                                            runtime_bases: None,
                                         },
                                     },
                                 ),
@@ -449,6 +459,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -507,9 +518,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

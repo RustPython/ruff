@@ -71,6 +71,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 38..53,
@@ -88,6 +89,8 @@ Module(
                                             node_index: NodeIndex(None),
                                         },
                                     ),
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -105,6 +108,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -132,9 +136,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

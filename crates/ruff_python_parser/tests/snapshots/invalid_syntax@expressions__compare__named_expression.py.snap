@@ -39,6 +39,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -73,6 +74,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -106,6 +108,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -126,6 +129,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

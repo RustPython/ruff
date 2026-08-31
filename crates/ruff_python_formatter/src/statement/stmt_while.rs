@@ -19,6 +19,8 @@ impl FormatNodeRule<StmtWhile> for FormatStmtWhile {
             test,
             body,
             orelse,
+            runtime_body: _,
+            runtime_orelse: _,
         } = item;
 
         let comments = f.context().comments().clone();

@@ -142,6 +142,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_values: None,
                                     },
                                 ),
                                 ctx: Load,
@@ -151,6 +152,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

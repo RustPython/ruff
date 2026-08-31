@@ -290,6 +290,7 @@ where
             Expr::StringLiteral(expr) => expr.visit_source_order(visitor),
             Expr::BytesLiteral(expr) => expr.visit_source_order(visitor),
             Expr::NumberLiteral(expr) => expr.visit_source_order(visitor),
+            Expr::Constant(expr) => expr.visit_source_order(visitor),
             Expr::BooleanLiteral(expr) => expr.visit_source_order(visitor),
             Expr::NoneLiteral(expr) => expr.visit_source_order(visitor),
             Expr::EllipsisLiteral(expr) => expr.visit_source_order(visitor),

@@ -157,6 +157,7 @@ pub(crate) fn bit_count(checker: &Checker, call: &ExprCall) {
         | Expr::Compare(_)
         | Expr::Tuple(_)
         | Expr::Generator(_)
+        | Expr::Constant(_)
         | Expr::IpyEscapeCommand(_) => true,
 
         Expr::Call(_)

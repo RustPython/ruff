@@ -44,6 +44,9 @@ Module(
                         },
                     ],
                     body: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             IpyEscapeCommand(
@@ -55,6 +58,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

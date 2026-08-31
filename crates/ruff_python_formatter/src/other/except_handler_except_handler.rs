@@ -47,6 +47,7 @@ impl FormatNodeRule<ExceptHandlerExceptHandler> for FormatExceptHandlerExceptHan
             type_,
             name,
             body,
+            runtime_body: _,
         } = item;
 
         let comments_info = f.context().comments().clone();

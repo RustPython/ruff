@@ -355,6 +355,7 @@ fn check_positional_args_for_overloaded_method(
             vararg: None,
             kwonlyargs,
             kwarg: None,
+            runtime_defaults: _,
         } = &**parameters
         else {
             return;

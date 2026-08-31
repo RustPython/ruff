@@ -68,6 +68,8 @@ pub(crate) fn unnecessary_list_call(checker: &Checker, expr: &Expr, call: &ExprC
         node_index: _,
         args,
         keywords: _,
+        runtime_args: _,
+        runtime_bases: _,
     } = arguments;
 
     let Some(argument) = helpers::first_argument_with_matching_function("list", func, args) else {

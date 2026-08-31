@@ -19,6 +19,7 @@ impl FormatNodeRule<StmtIf> for FormatStmtIf {
             test,
             body,
             elif_else_clauses,
+            runtime_body: _,
         } = item;
 
         let comments = f.context().comments().clone();
@@ -67,6 +68,8 @@ pub(crate) fn format_elif_else_clause(
         node_index: _,
         test,
         body,
+        runtime_body: _,
+        runtime_orelse: _,
     } = item;
 
     let comments = f.context().comments().clone();

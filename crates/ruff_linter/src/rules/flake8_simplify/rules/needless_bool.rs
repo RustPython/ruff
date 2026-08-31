@@ -135,12 +135,16 @@ pub(crate) fn needless_bool(checker: &Checker, stmt: &Stmt) {
                 test: Some(elif_test),
                 range: elif_range,
                 node_index: _,
+                runtime_body: _,
+                runtime_orelse: _,
             },
             ElifElseClause {
                 body: else_body,
                 test: None,
                 range: else_range,
                 node_index: _,
+                runtime_body: _,
+                runtime_orelse: _,
             },
         ] => (
             elif_test,
@@ -249,6 +253,7 @@ pub(crate) fn needless_bool(checker: &Checker, stmt: &Stmt) {
                         operands: operands.clone(),
                         range: TextRange::default(),
                         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                        runtime_comparators: None,
                     }))
                 }
 
@@ -278,6 +283,8 @@ pub(crate) fn needless_bool(checker: &Checker, stmt: &Stmt) {
                     keywords: std::iter::empty().collect(),
                     range: TextRange::default(),
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                    runtime_args: None,
+                    runtime_bases: None,
                 },
                 range_start: ruff_text_size::TextSize::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
