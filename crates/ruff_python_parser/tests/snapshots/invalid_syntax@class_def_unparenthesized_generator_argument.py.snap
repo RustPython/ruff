@@ -100,4 +100,4 @@ Module(
 
   |
 1 | class Foo(base for base in bases): ...
-  |           ^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: Unparenthesized generator expression cannot be used here
+  |           ^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: invalid syntax
