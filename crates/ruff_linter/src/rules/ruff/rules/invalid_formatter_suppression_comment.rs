@@ -322,6 +322,7 @@ const fn is_valid_enclosing_node(node: AnyNodeRef) -> bool {
         | AnyNodeRef::ExprList(_)
         | AnyNodeRef::ExprTuple(_)
         | AnyNodeRef::ExprSlice(_)
+        | AnyNodeRef::ExprConstant(_)
         | AnyNodeRef::ExprIpyEscapeCommand(_)
         | AnyNodeRef::PatternMatchValue(_)
         | AnyNodeRef::PatternMatchSingleton(_)

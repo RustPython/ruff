@@ -121,6 +121,7 @@ fn type_pattern(elts: Vec<&Expr>) -> Expr {
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
         parenthesized: true,
+        runtime_elts: None,
     }
     .into()
 }

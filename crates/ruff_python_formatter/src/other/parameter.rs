@@ -11,6 +11,8 @@ impl FormatNodeRule<Parameter> for FormatParameter {
             node_index: _,
             name,
             annotation,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
         } = item;
 
         name.format().fmt(f)?;

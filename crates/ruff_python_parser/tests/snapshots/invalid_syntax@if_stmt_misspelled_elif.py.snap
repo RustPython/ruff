@@ -30,6 +30,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             AnnAssign(
@@ -54,6 +55,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Pass(
@@ -69,6 +71,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

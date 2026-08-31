@@ -83,6 +83,7 @@ pub(crate) fn deprecated_c_element_tree(checker: &Checker, stmt: &Stmt) {
             is_lazy,
             range: _,
             node_index: _,
+            runtime_level: _,
         }) => {
             if *level > 0 {
                 // Ex) `import .xml.etree.cElementTree as ET`

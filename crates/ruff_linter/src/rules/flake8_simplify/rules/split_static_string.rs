@@ -190,6 +190,7 @@ fn construct_replacement(elts: &[&str], flags: StringLiteralFlags) -> Expr {
         ctx: ExprContext::Load,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_elts: None,
     })
 }
 

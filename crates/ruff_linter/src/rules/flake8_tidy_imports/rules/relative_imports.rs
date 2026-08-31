@@ -113,6 +113,7 @@ fn fix_banned_relative_import(
         is_lazy: *is_lazy,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_level: None,
     };
     let content = generator.stmt(&node.into());
     Some(Fix::unsafe_edit(Edit::range_replacement(

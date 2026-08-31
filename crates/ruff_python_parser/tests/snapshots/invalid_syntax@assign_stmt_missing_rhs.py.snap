@@ -32,6 +32,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -95,6 +98,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -158,6 +164,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -192,6 +201,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

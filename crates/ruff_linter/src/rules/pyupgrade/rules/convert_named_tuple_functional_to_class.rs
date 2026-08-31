@@ -178,6 +178,7 @@ fn create_field_assignment_stmt(field: Name, annotation: &Expr) -> Stmt {
         simple: true,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_simple: None,
     }
     .into()
 }
@@ -241,12 +242,16 @@ fn create_class_def_stmt(typename: &str, body: Suite, base_class: &Expr) -> Stmt
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         })),
         body,
         type_params: None,
         decorator_list: DecoratorList::new(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_body: None,
+        runtime_decorator_list: None,
     }
     .into()
 }

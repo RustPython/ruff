@@ -196,6 +196,8 @@ pub(crate) fn native_literals(
                 keywords,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         range_start: _,
         node_index: _,

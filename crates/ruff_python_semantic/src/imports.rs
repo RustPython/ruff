@@ -232,6 +232,7 @@ impl<'de> serde::de::Deserialize<'de> for NameImports {
                         is_lazy: _,
                         range: _,
                         node_index: _,
+                        runtime_level: _,
                     }) => names
                         .iter()
                         .map(|name| {

@@ -649,6 +649,10 @@ pub(crate) fn definition(
         parameters,
         returns,
         body,
+        runtime_decorator_list: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
     } = function;
 
     let is_method = definition.is_method();

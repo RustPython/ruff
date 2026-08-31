@@ -35,6 +35,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -56,6 +57,7 @@ Module(
                     ],
                     level: 1,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -105,6 +107,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -132,6 +135,7 @@ Module(
                     ],
                     level: 1,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -153,6 +157,7 @@ Module(
                     ],
                     level: 3,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -174,6 +179,7 @@ Module(
                     ],
                     level: 26,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -201,6 +207,7 @@ Module(
                     ],
                     level: 26,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -254,6 +261,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -281,9 +289,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

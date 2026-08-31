@@ -192,6 +192,7 @@ pub(crate) fn never_union(checker: &Checker, expr: &Expr) {
                                             range: TextRange::default(),
                                             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                                             parenthesized: true,
+                                            runtime_elts: None,
                                         })),
                                         ctx: ast::ExprContext::Load,
                                         range: TextRange::default(),

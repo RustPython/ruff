@@ -408,7 +408,7 @@ jobs:
     runs-on: ${{ github.repository == 'astral-sh/ruff' && 'depot-ubuntu-22.04-16' || 'ubuntu-latest' }}
     needs: determine_changes
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-test') && (needs.determine_changes.outputs.code == 'true' || github.ref == 'refs/heads/main') }}
-    timeout-minutes: 20
+    timeout-minutes: ${{ github.repository == 'astral-sh/ruff' && 20 || 40 }}
     env:
       # Line-tables-only debug info: faster builds, backtraces still work.
       CARGO_PROFILE_DEV_DEBUG: line-tables-only
@@ -526,7 +526,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     needs: determine_changes
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-test') && (needs.determine_changes.outputs.code == 'true' || github.ref == 'refs/heads/main') }}
-    timeout-minutes: 20
+    timeout-minutes: ${{ github.repository == 'astral-sh/ruff' && 20 || 40 }}
     env:
       # Line-tables-only debug info: faster builds, backtraces still work.
       CARGO_PROFILE_DEV_DEBUG: line-tables-only
@@ -754,7 +754,7 @@ jobs:
         needs.determine_changes.outputs.linter == 'true' ||
         needs.determine_changes.outputs.formatter == 'true'
       )
-    timeout-minutes: 20
+    timeout-minutes: ${{ github.repository == 'astral-sh/ruff' && 20 || 40 }}
     env:
       # Line-tables-only debug info: faster builds, backtraces still work.
       CARGO_PROFILE_DEV_DEBUG: line-tables-only

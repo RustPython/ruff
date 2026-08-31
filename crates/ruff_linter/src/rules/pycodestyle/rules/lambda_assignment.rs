@@ -247,6 +247,10 @@ fn function(
                 type_params: None,
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                runtime_body: None,
+                runtime_decorator_list: None,
+                runtime_type_comment: None,
+                runtime_type_comment_bytes: None,
             });
             let generated = checker.generator().stmt(&func);
 
@@ -263,6 +267,10 @@ fn function(
         type_params: None,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_body: None,
+        runtime_decorator_list: None,
+        runtime_type_comment: None,
+        runtime_type_comment_bytes: None,
     });
     let generated = checker.generator().stmt(&function);
 

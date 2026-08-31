@@ -32,6 +32,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Expr(
@@ -62,6 +63,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -88,6 +90,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Expr(
@@ -118,11 +121,13 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: false,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

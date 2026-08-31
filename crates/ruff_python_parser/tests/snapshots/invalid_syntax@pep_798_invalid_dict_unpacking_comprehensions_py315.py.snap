@@ -71,6 +71,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -83,6 +84,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -150,6 +153,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -162,6 +166,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -222,6 +228,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -234,6 +241,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -294,6 +303,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -306,6 +316,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -313,6 +325,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

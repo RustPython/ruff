@@ -383,6 +383,7 @@ pub fn parse_cells_unchecked(
             node_index: AtomicNodeIndex::NONE,
             range: TextRange::up_to(source.text_len()),
             body,
+            runtime_body: None,
         },
         tokens: Tokens::new(tokens),
         errors,

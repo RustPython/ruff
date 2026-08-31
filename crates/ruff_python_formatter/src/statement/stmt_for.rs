@@ -37,6 +37,10 @@ impl FormatNodeRule<StmtFor> for FormatStmtFor {
             orelse,
             range: _,
             node_index: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
+            runtime_orelse: _,
         } = item;
 
         let comments = f.context().comments().clone();

@@ -418,6 +418,10 @@ impl SourceOrderVisitor<'_> for NarrowRange<'_> {
                 is_star: _,
                 range: _,
                 node_index: _,
+                runtime_body: _,
+                runtime_handlers: _,
+                runtime_orelse: _,
+                runtime_finalbody: _,
             }) => {
                 self.visit_body(body);
                 if let Some(except_handler_saved) =
@@ -703,6 +707,7 @@ impl Format<PyFormatContext<'_>> for FormatEnclosingNode<'_> {
             | AnyNodeRef::ExprTuple(_)
             | AnyNodeRef::ExprSlice(_)
             | AnyNodeRef::ExprIpyEscapeCommand(_)
+            | AnyNodeRef::ExprConstant(_)
             | AnyNodeRef::FString(_)
             | AnyNodeRef::StringLiteral(_)
             | AnyNodeRef::TString(_)

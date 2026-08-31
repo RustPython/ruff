@@ -19,6 +19,7 @@ impl FormatNodeRule<StmtImportFrom> for FormatStmtImportFrom {
             is_lazy,
             range: _,
             node_index: _,
+            runtime_level: _,
         } = item;
 
         if *is_lazy {

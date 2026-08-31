@@ -311,6 +311,7 @@ fn is_valid_default_value_with_annotation(
             elts,
             range: _,
             node_index: _,
+            runtime_elts: _,
         }) => {
             return allow_container
                 && elts.len() <= 10

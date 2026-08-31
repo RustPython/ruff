@@ -155,6 +155,7 @@ pub(crate) fn convert_for_loop_to_any_all(checker: &Checker, stmt: &Stmt) {
                         operands: compare.operands.clone(),
                         range: TextRange::default(),
                         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                        runtime_comparators: None,
                     };
                     node.into()
                 } else {
@@ -264,6 +265,7 @@ fn match_loop(stmt: &Stmt) -> Option<Loop<'_>> {
             elif_else_clauses: nested_elif_else_clauses,
             range: _,
             node_index: _,
+            runtime_body: _,
         }),
     ] = body.as_slice()
     else {
@@ -387,6 +389,8 @@ fn return_stmt(id: Name, test: &Expr, target: &Expr, iter: &Expr, generator: Gen
             is_async: false,
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_ifs: None,
+            runtime_is_async: None,
         }],
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
@@ -405,6 +409,8 @@ fn return_stmt(id: Name, test: &Expr, target: &Expr, iter: &Expr, generator: Gen
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         },
         range_start: ruff_text_size::TextSize::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,

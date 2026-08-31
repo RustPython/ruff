@@ -65,6 +65,9 @@ Module(
                                                     ],
                                                     keywords: [],
                                                 },
+                                                runtime_patterns: None,
+                                                runtime_kwd_attrs: None,
+                                                runtime_kwd_patterns: None,
                                             },
                                         ),
                                         MatchSequence(
@@ -87,6 +90,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_patterns: None,
                                             },
                                         ),
                                         MatchAs(
@@ -104,6 +108,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -121,11 +126,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

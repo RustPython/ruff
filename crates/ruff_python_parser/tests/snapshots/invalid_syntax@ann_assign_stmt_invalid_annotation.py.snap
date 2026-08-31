@@ -49,6 +49,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -91,6 +92,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -131,6 +133,7 @@ Module(
                         ),
                     ),
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             AnnAssign(
@@ -155,6 +158,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Assign(
@@ -180,9 +184,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

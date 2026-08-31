@@ -243,7 +243,8 @@ impl RedundantConditionContext {
             | ast::Expr::List(_)
             | ast::Expr::ListComp(_)
             | ast::Expr::TString(_)
-            | ast::Expr::NoneLiteral(_) => false,
+            | ast::Expr::NoneLiteral(_)
+            | ast::Expr::Constant(_) => false,
 
             // These expressions can contain subexpressions that are defined in terms of `sys.version_info`,
             // `sys.platform`, `os.name`, or `typing.TYPE_CHECKING`. We need to recurse into them to check for

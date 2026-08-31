@@ -346,6 +346,7 @@ fn make_suggestion(group: &AppendGroup, generator: Generator) -> String {
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
         parenthesized: true,
+        runtime_elts: None,
     };
     // Make `var.extend`.
     // NOTE: receiver is the same for all appends and that's why we can take the first.
@@ -364,6 +365,8 @@ fn make_suggestion(group: &AppendGroup, generator: Generator) -> String {
             keywords: std::iter::empty().collect(),
             range: TextRange::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+            runtime_args: None,
+            runtime_bases: None,
         },
         range_start: ruff_text_size::TextSize::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,

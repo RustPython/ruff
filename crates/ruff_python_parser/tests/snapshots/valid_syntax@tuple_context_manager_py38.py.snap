@@ -51,6 +51,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                             optional_vars: Some(
@@ -79,9 +80,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -3857,6 +3857,10 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                     is_async: _,
                     range: _,
                     node_index: _,
+                    runtime_decorator_list: _,
+                    runtime_type_comment: _,
+                    runtime_type_comment_bytes: _,
+                    runtime_body: _,
                 } = function_def;
                 for decorator in decorator_list {
                     self.visit_decorator(decorator);
@@ -4597,6 +4601,8 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                     orelse,
                     range: _,
                     node_index: _,
+                    runtime_body: _,
+                    runtime_orelse: _,
                 },
             ) => {
                 // Pre-walk the loop to collect all the bound places, then create a loop header
@@ -4775,6 +4781,10 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                     iter,
                     body,
                     orelse,
+                    runtime_type_comment: _,
+                    runtime_type_comment_bytes: _,
+                    runtime_body: _,
+                    runtime_orelse: _,
                 },
             ) => {
                 debug_assert_eq!(&self.current_assignments, &[]);
@@ -5059,6 +5069,10 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                 is_star,
                 range: _,
                 node_index: _,
+                runtime_body: _,
+                runtime_handlers: _,
+                runtime_orelse: _,
+                runtime_finalbody: _,
             }) => {
                 let was_in_try_statement = std::mem::replace(&mut self.in_try_statement, true);
                 self.record_ambiguous_reachability();
@@ -5120,6 +5134,7 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                             body: handler_body,
                             range: _,
                             node_index: _,
+                            runtime_body: _,
                         } = except_handler;
 
                         if let Some(handled_exceptions) = handled_exceptions {
@@ -5451,6 +5466,7 @@ impl<'db, 'ast> SemanticIndexBuilder<'db, 'ast> {
                 targets,
                 range: _,
                 node_index: _,
+                runtime_targets: _,
             }) => {
                 // We will check the target expressions and then delete them.
                 walk_stmt(self, stmt);
@@ -6120,6 +6136,8 @@ fn dunder_all_extend_argument(value: &ast::Expr) -> Option<&ast::Expr> {
                 keywords,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         ..
     } = value.as_call_expr()?;

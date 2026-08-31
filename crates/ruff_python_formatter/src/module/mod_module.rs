@@ -15,6 +15,7 @@ impl FormatNodeRule<ModModule> for FormatModModule {
             range,
             body,
             node_index: _,
+            runtime_body: _,
         } = item;
 
         if body.is_empty() {

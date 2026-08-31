@@ -326,6 +326,7 @@ fn is_allowed_value(expr: &Expr) -> bool {
         | Expr::BooleanLiteral(_)
         | Expr::NoneLiteral(_)
         | Expr::EllipsisLiteral(_)
+        | Expr::Constant(_)
         | Expr::Attribute(_)
         | Expr::Subscript(_)
         | Expr::Name(_)

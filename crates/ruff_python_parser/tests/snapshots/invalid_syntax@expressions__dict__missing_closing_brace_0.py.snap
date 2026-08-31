@@ -58,6 +58,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                     args: [],
                                                     keywords: [],
+                                                    runtime_args: None,
+                                                    runtime_bases: None,
                                                 },
                                             },
                                         ),
@@ -72,11 +74,13 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

@@ -82,6 +82,8 @@ impl<'db> TypeInferenceBuilder<'db, '_> {
             keywords,
             range: _,
             node_index: _,
+            runtime_args: _,
+            runtime_bases: _,
         } = &call_expr.arguments;
 
         let starred_arguments: SmallVec<[&ast::Expr; 1]> =
@@ -336,6 +338,7 @@ impl<'db> TypeInferenceBuilder<'db, '_> {
             range: _,
             node_index: _,
             items,
+            runtime_values: _,
         } = dict;
 
         let key_tcx =
