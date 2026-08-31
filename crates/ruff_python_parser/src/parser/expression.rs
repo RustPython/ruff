@@ -3045,7 +3045,15 @@ impl<'src> Parser<'src> {
                     // sum(x for x in range(10), 5)
                     // total(1, 2, x for x in range(5), 6)
                     // sum(x for x in range(10),)
-                    self.add_error(ParseErrorType::UnparenthesizedGeneratorExpression, range);
+                    let error = match context {
+                        ArgumentsContext::Call => {
+                            ParseErrorType::UnparenthesizedGeneratorExpression
+                        }
+                        ArgumentsContext::ClassDefinition => {
+                            ParseErrorType::OtherError("invalid syntax".to_owned())
+                        }
+                    };
+                    self.add_error(error, range);
                 }
             }
         }
