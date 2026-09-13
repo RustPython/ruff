@@ -18,8 +18,9 @@ ignored = ["ruff_cache"]
 name = "ruff_python_ast"
 
 [dependencies]
-ruff_cache = { workspace = true, optional = true }
-ruff_macros = { workspace = true, optional = true }
+# Not published: RustPython does not use the cache and salsa features.
+# ruff_cache = { workspace = true, optional = true }
+# ruff_macros = { workspace = true, optional = true }
 ruff_python_trivia = { workspace = true }
 ruff_source_file = { workspace = true }
 ruff_text_size = { workspace = true }
@@ -33,7 +34,7 @@ get-size2 = { workspace = true, optional = true }
 is-macro = { workspace = true }
 memchr = { workspace = true }
 rustc-hash = { workspace = true }
-salsa = { workspace = true, optional = true }
+# salsa = { workspace = true, optional = true }
 schemars = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
@@ -42,17 +43,16 @@ thin-vec = { workspace = true }
 
 [features]
 schemars = ["dep:schemars", "dep:serde_json"]
-cache = ["dep:ruff_cache", "dep:ruff_macros"]
+# cache = ["dep:ruff_cache", "dep:ruff_macros"]
 serde = [
     "dep:serde",
     "ruff_text_size/serde",
-    "dep:ruff_cache",
     "char_str/serde",
     "compact_str/serde",
     "thin-vec/serde",
 ]
 get-size = ["dep:get-size2", "char_str/get-size", "ruff_text_size/get-size"]
-salsa = ["dep:salsa"]
+# salsa = ["dep:salsa"]
 
 [lints]
 workspace = true
