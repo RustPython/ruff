@@ -409,7 +409,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |         ^ Syntax Error: f-string: expecting `}`
+  |         ^ Syntax Error: f-string: expecting '}'
 7 |
 8 | f'middle {'string':\\
   |
@@ -418,7 +418,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |          ^^^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |          ^^^^^^ Syntax Error: invalid syntax
 7 |
 8 | f'middle {'string':\\
   |
@@ -427,7 +427,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |                 ^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |                 ^^^^ Syntax Error: invalid syntax
 7 |
 8 | f'middle {'string':\\
   |
@@ -455,7 +455,7 @@ Module(
  6 |         'format spec'}
  7 |
  8 | f'middle {'string':\\
-   |                      ^ Syntax Error: f-string: expecting `}`
+   |                      ^ Syntax Error: f-string: expecting '}'
  9 |         'format spec'}
 10 |
 11 | f'middle {'string':\\\
@@ -465,7 +465,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   | ^^^^^^^^ Syntax Error: Unexpected indentation
+   | ^^^^^^^^ Syntax Error: unexpected indentation
 10 |
 11 | f'middle {'string':\\\
    |
@@ -474,7 +474,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   |                      ^ Syntax Error: Expected a statement
+   |                      ^ Syntax Error: invalid syntax
 10 |
 11 | f'middle {'string':\\\
    |
@@ -483,7 +483,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   |                       ^ Syntax Error: Expected a statement
+   |                       ^ Syntax Error: invalid syntax
 10 |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
@@ -493,19 +493,19 @@ Module(
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |         ^ Syntax Error: f-string: expecting `}`
+   |         ^ Syntax Error: f-string: expecting '}'
 
 
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |          ^^^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+   |          ^^^^^^ Syntax Error: invalid syntax
 
 
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |                 ^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+   |                 ^^^^ Syntax Error: invalid syntax
 
 
    |

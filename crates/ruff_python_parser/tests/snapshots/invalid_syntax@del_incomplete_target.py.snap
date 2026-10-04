@@ -129,7 +129,7 @@ Module(
 
   |
 1 | del x, y.
-  |          ^ Syntax Error: Expected an identifier
+  |          ^ Syntax Error: invalid syntax
 2 | z
 3 | del x, y[
 4 | z

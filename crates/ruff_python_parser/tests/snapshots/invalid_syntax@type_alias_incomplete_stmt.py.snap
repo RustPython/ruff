@@ -85,7 +85,7 @@ Module(
   |
 1 | type
 2 | type x
-  |      ^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |      ^ Syntax Error: invalid syntax
 3 | type x =
   |
 
@@ -94,4 +94,4 @@ Module(
 1 | type
 2 | type x
 3 | type x =
-  |         ^ Syntax Error: Expected an expression
+  |         ^ Syntax Error: invalid syntax

@@ -112,7 +112,7 @@ Module(
 
   |
 1 | 1 + 2 - 3 *
-  |            ^ Syntax Error: Expected an expression
+  |            ^ Syntax Error: invalid syntax
 2 |
 3 | 4 + 5
   |

@@ -118,7 +118,7 @@ Module(
 
   |
 1 | type X[*Ts =] = int
-  |             ^ Syntax Error: Expected an expression
+  |             ^ Syntax Error: invalid syntax
 2 | type X[*Ts =, T2] = int
   |
 
@@ -126,4 +126,4 @@ Module(
   |
 1 | type X[*Ts =] = int
 2 | type X[*Ts =, T2] = int
-  |             ^ Syntax Error: Expected an expression
+  |             ^ Syntax Error: invalid syntax

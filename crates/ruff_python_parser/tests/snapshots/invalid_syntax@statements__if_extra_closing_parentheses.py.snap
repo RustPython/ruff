@@ -42,7 +42,7 @@ Module(
   |
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
-  |        ^ Syntax Error: Expected `:`, found `)`
+  |        ^ Syntax Error: invalid syntax
 3 |     pass
   |
 
@@ -50,7 +50,7 @@ Module(
   |
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
-  |         ^ Syntax Error: Expected a statement
+  |         ^ Syntax Error: invalid syntax
 3 |     pass
   |
 
@@ -58,7 +58,7 @@ Module(
   |
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
-  |          ^ Syntax Error: Expected a statement
+  |          ^ Syntax Error: invalid syntax
 3 |     pass
   |
 
@@ -66,7 +66,7 @@ Module(
   |
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
-  |           ^ Syntax Error: Expected a statement
+  |           ^ Syntax Error: invalid syntax
 3 |     pass
   |
 
@@ -75,4 +75,4 @@ Module(
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
 3 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation

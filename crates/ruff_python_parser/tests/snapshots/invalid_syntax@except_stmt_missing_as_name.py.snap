@@ -96,7 +96,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except Exception as:
-  |                    ^ Syntax Error: Expected name after `as`
+  |                    ^ Syntax Error: expected name after `as`
 4 |     pass
 5 | except Exception as
   |
@@ -106,6 +106,6 @@ Module(
 3 | except Exception as:
 4 |     pass
 5 | except Exception as
-  |                    ^ Syntax Error: Expected name after `as`
+  |                    ^ Syntax Error: expected name after `as`
 6 |     pass
   |

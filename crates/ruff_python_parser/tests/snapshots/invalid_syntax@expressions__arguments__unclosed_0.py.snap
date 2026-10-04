@@ -84,7 +84,7 @@ Module(
 
   |
 1 | call(
-  |      ^ Syntax Error: Expected `)`, found newline
+  |      ^ Syntax Error: invalid syntax
 2 |
 3 | def foo():
 4 |     pass

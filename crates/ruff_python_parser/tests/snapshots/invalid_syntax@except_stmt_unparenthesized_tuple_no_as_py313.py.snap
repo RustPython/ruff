@@ -157,7 +157,7 @@ Module(
 2 | try:
 3 |     pass
 4 | except x, y:
-  |        ^^^^ Syntax Error: Multiple exception types must be parenthesized on Python 3.13 (syntax was added in Python 3.14)
+  |        ^^^^ Syntax Error: multiple exception types must be parenthesized on Python 3.13 (syntax was added in Python 3.14)
 5 |     pass
 6 | try:
   |
@@ -167,6 +167,6 @@ Module(
 6 | try:
 7 |     pass
 8 | except* x, y:
-  |         ^^^^ Syntax Error: Multiple exception types must be parenthesized on Python 3.13 (syntax was added in Python 3.14)
+  |         ^^^^ Syntax Error: multiple exception types must be parenthesized on Python 3.13 (syntax was added in Python 3.14)
 9 |     pass
   |

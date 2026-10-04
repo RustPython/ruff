@@ -291,7 +291,7 @@ Module(
 
   |
 1 | x[x := 1:]
-  |   ^^^^^^ Syntax Error: Unparenthesized named expression cannot be used here
+  |   ^^^^^^ Syntax Error: unparenthesized named expression cannot be used here
 2 |
 3 | # Starred expression
   |
@@ -300,7 +300,7 @@ Module(
   |
 3 | # Starred expression
 4 | x[*x:]
-  |   ^^ Syntax Error: Starred expression cannot be used here
+  |   ^^ Syntax Error: invalid syntax
 5 | x[:*x]
 6 | x[::*x]
   |
@@ -310,7 +310,7 @@ Module(
 3 | # Starred expression
 4 | x[*x:]
 5 | x[:*x]
-  |    ^^ Syntax Error: Starred expression cannot be used here
+  |    ^^ Syntax Error: invalid syntax
 6 | x[::*x]
   |
 
@@ -319,7 +319,7 @@ Module(
 4 | x[*x:]
 5 | x[:*x]
 6 | x[::*x]
-  |     ^^ Syntax Error: Starred expression cannot be used here
+  |     ^^ Syntax Error: invalid syntax
 7 |
 8 | # Empty slice
   |
@@ -328,7 +328,7 @@ Module(
    |
  8 | # Empty slice
  9 | x[]
-   |   ^ Syntax Error: Expected index or slice expression
+   |   ^ Syntax Error: expected index or slice expression
 10 |
 11 | # Mixed starred expression and named expression
    |
@@ -337,4 +337,4 @@ Module(
    |
 11 | # Mixed starred expression and named expression
 12 | x[*x := 1]
-   |   ^^ Syntax Error: Assignment expression target must be an identifier
+   |   ^^ Syntax Error: assignment expression target must be an identifier

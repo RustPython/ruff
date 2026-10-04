@@ -128,19 +128,19 @@ Module(
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                 ^ Syntax Error: Parameter with `*` or `**` cannot have default value
+  |                 ^ Syntax Error: var-positional argument cannot have default value
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                  ^ Syntax Error: Expected `)`, found `(`
+  |                  ^ Syntax Error: invalid syntax
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                        ^ Syntax Error: Expected newline, found `)`
+  |                        ^ Syntax Error: invalid syntax
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                         ^ Syntax Error: Expected a statement
+  |                         ^ Syntax Error: invalid syntax

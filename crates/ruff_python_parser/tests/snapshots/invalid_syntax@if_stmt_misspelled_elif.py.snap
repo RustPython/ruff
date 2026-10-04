@@ -81,7 +81,7 @@ Module(
 1 | if True:
 2 |     pass
 3 | elf:
-  |     ^ Syntax Error: Expected an expression
+  |     ^ Syntax Error: invalid syntax
 4 |     pass
 5 | else:
 6 |     pass
@@ -92,7 +92,7 @@ Module(
 2 |     pass
 3 | elf:
 4 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation
 5 | else:
 6 |     pass
   |
@@ -102,7 +102,7 @@ Module(
 3 | elf:
 4 |     pass
 5 | else:
-  | ^^^^ Syntax Error: Expected a statement
+  | ^^^^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -111,7 +111,7 @@ Module(
 3 | elf:
 4 |     pass
 5 | else:
-  |     ^ Syntax Error: Expected a statement
+  |     ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -120,7 +120,7 @@ Module(
 3 | elf:
 4 |     pass
 5 | else:
-  |      ^ Syntax Error: Expected a statement
+  |      ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -129,4 +129,4 @@ Module(
 4 |     pass
 5 | else:
 6 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation

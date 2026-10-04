@@ -292,7 +292,7 @@ Module(
   |
 4 | # Nested await
 5 | await await x
-  |       ^^^^^^^ Syntax Error: Await expression cannot be used here
+  |       ^^^^^^^ Syntax Error: await expression cannot be used here
 6 |
 7 | # Starred expressions
   |
@@ -301,7 +301,7 @@ Module(
   |
 7 | # Starred expressions
 8 | await *x
-  |       ^^ Syntax Error: Starred expression cannot be used here
+  |       ^^ Syntax Error: invalid syntax
 9 | await (*x)
   |
 
@@ -310,7 +310,7 @@ Module(
  7 | # Starred expressions
  8 | await *x
  9 | await (*x)
-   |        ^^ Syntax Error: Starred expression cannot be used here
+   |        ^^ Syntax Error: invalid syntax
 10 |
 11 | # Invalid expression as per precedence
    |
@@ -319,7 +319,7 @@ Module(
    |
 11 | # Invalid expression as per precedence
 12 | await yield x
-   |       ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |       ^^^^^^^ Syntax Error: yield expression cannot be used here
 13 | await lambda x: x
 14 | await +x
    |
@@ -329,7 +329,7 @@ Module(
 11 | # Invalid expression as per precedence
 12 | await yield x
 13 | await lambda x: x
-   |       ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |       ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 14 | await +x
 15 | await -x
    |
@@ -339,7 +339,7 @@ Module(
 12 | await yield x
 13 | await lambda x: x
 14 | await +x
-   |       ^^ Syntax Error: Unary '+' expression cannot be used here
+   |       ^^ Syntax Error: unary '+' expression cannot be used here
 15 | await -x
 16 | await ~x
    |
@@ -349,7 +349,7 @@ Module(
 13 | await lambda x: x
 14 | await +x
 15 | await -x
-   |       ^^ Syntax Error: Unary '-' expression cannot be used here
+   |       ^^ Syntax Error: unary '-' expression cannot be used here
 16 | await ~x
 17 | await not x
    |
@@ -359,7 +359,7 @@ Module(
 14 | await +x
 15 | await -x
 16 | await ~x
-   |       ^^ Syntax Error: Unary '~' expression cannot be used here
+   |       ^^ Syntax Error: unary '~' expression cannot be used here
 17 | await not x
    |
 
@@ -368,4 +368,4 @@ Module(
 15 | await -x
 16 | await ~x
 17 | await not x
-   |       ^^^^^ Syntax Error: Boolean 'not' expression cannot be used here
+   |       ^^^^^ Syntax Error: 'not' after an operator must be parenthesized

@@ -49,4 +49,4 @@ Module(
 
   |
 1 | if : ...
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax

@@ -69,7 +69,7 @@ Module(
   |
 1 | # No expression after `await`, an expression on another line
 2 | await
-  |      ^ Syntax Error: Expected an expression
+  |      ^ Syntax Error: invalid syntax
 3 |
 4 | x + y
   |

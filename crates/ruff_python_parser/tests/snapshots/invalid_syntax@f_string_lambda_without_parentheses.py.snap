@@ -112,7 +112,7 @@ Module(
 
   |
 1 | f"{lambda x: x}"
-  |             ^^ Syntax Error: Expected an expression
+  |             ^^ Syntax Error: invalid syntax
 
 
   |
@@ -122,9 +122,9 @@ Module(
 
   |
 1 | f"{lambda x: x}"
-  |             ^^ Syntax Error: f-string: expecting `}`
+  |             ^^ Syntax Error: f-string: expecting '}'
 
 
   |
 1 | f"{lambda x: x}"
-  |               ^ Syntax Error: Expected an element of or the end of the f-string
+  |               ^ Syntax Error: expected an element of or the end of the f-string

@@ -91,7 +91,7 @@ Module(
   |
 1 | class Foo:
 2 | class Foo():
-  | ^^^^^ Syntax Error: Expected an indented block after `class` definition
+  | ^^^^^ Syntax Error: expected an indented block after `class` definition
 3 | x = 42
   |
 
@@ -100,4 +100,4 @@ Module(
 1 | class Foo:
 2 | class Foo():
 3 | x = 42
-  | ^ Syntax Error: Expected an indented block after `class` definition
+  | ^ Syntax Error: expected an indented block after `class` definition

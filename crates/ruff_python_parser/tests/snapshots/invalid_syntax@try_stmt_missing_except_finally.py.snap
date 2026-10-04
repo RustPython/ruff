@@ -72,7 +72,7 @@ Module(
 1 | try:
 2 |     pass
 3 | try:
-  | ^^^ Syntax Error: Expected `except` or `finally` after `try` block
+  | ^^^ Syntax Error: expected 'except' or 'finally' block
 4 |     pass
 5 | else:
   |
@@ -81,4 +81,4 @@ Module(
   |
 5 | else:
 6 |     pass
-  |         ^ Syntax Error: Expected `except` or `finally` after `try` block
+  |         ^ Syntax Error: expected 'except' or 'finally' block

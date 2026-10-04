@@ -35,11 +35,11 @@ Module(
 1 | # There are no parentheses, so this isn't parsed as named expression.
 2 |
 3 | x :=
-  |   ^^ Syntax Error: Expected a statement
+  |   ^^ Syntax Error: invalid syntax
 
 
   |
 1 | # There are no parentheses, so this isn't parsed as named expression.
 2 |
 3 | x :=
-  |     ^ Syntax Error: Expected a statement
+  |     ^ Syntax Error: invalid syntax

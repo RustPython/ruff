@@ -14,7 +14,7 @@ expression: "lex_invalid(source, Mode::Module)"
 [
     LexicalError {
         error: OtherError(
-            "Invalid decimal integer literal",
+            "invalid decimal integer literal",
         ),
         location: 0..3,
     },

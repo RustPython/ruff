@@ -103,7 +103,7 @@ Module(
 3 |     #            class pattern
 4 |     #            v
 5 |     case (x as y)(a, b):
-  |           ^^^^^^ Syntax Error: Invalid value for a class pattern
+  |           ^^^^^^ Syntax Error: invalid value for a class pattern
 6 |     #     ^^^^^^
 7 |     #    as-pattern
   |

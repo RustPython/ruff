@@ -123,7 +123,7 @@ Module(
 
   |
 1 | def foo(/): ...
-  |         ^ Syntax Error: Position-only parameter separator not allowed as first parameter
+  |         ^ Syntax Error: at least one argument must precede /
 2 | def foo(/, a): ...
   |
 
@@ -131,4 +131,4 @@ Module(
   |
 1 | def foo(/): ...
 2 | def foo(/, a): ...
-  |         ^ Syntax Error: Position-only parameter separator not allowed as first parameter
+  |         ^ Syntax Error: at least one argument must precede /

@@ -71,6 +71,6 @@ Module(
 
   |
 1 | match yield foo:
-  |       ^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |       ^^^^^^^^^ Syntax Error: yield expression cannot be used here
 2 |     case _: ...
   |

@@ -88,7 +88,7 @@ Module(
 3 | (x :=
 4 |
 5 | def foo():
-  | ^^^ Syntax Error: Expected an identifier, but found a keyword `def` that cannot be used here
+  | ^^^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -97,7 +97,7 @@ Module(
 3 | (x :=
 4 |
 5 | def foo():
-  |     ^^^ Syntax Error: Expected `)`, found identifier
+  |     ^^^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -105,7 +105,7 @@ Module(
   |
 5 | def foo():
 6 |     pass
-  |     ^^^^ Syntax Error: Expected an identifier, but found a keyword `pass` that cannot be used here
+  |     ^^^^ Syntax Error: invalid syntax
 
 
   |

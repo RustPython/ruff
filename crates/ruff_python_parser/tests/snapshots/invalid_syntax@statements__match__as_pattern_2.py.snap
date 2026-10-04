@@ -114,7 +114,7 @@ Module(
 2 |     # This `as` pattern is unparenthesied so the parser never takes the path
 3 |     # where it might be confused as a complex literal pattern.
 4 |     case x as y + 1j:
-  |                 ^ Syntax Error: Expected `:`, found `+`
+  |                 ^ Syntax Error: invalid syntax
 5 |         pass
   |
 
@@ -123,7 +123,7 @@ Module(
 2 |     # This `as` pattern is unparenthesied so the parser never takes the path
 3 |     # where it might be confused as a complex literal pattern.
 4 |     case x as y + 1j:
-  |                      ^ Syntax Error: Expected an expression
+  |                      ^ Syntax Error: invalid syntax
 5 |         pass
   |
 
@@ -132,10 +132,10 @@ Module(
 3 |     # where it might be confused as a complex literal pattern.
 4 |     case x as y + 1j:
 5 |         pass
-  | ^^^^^^^^ Syntax Error: Expected dedent, found indent
+  | ^^^^^^^^ Syntax Error: invalid syntax
 
 
   |
 4 |     case x as y + 1j:
 5 |         pass
-  |             ^ Syntax Error: Expected a statement
+  |             ^ Syntax Error: invalid syntax

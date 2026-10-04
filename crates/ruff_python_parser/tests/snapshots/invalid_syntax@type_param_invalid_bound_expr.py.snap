@@ -265,7 +265,7 @@ Module(
 
   |
 1 | type X[T: *int] = int
-  |           ^^^^ Syntax Error: Starred expression cannot be used here
+  |           ^^^^ Syntax Error: invalid syntax
 2 | type X[T: yield x] = int
 3 | type X[T: yield from x] = int
   |
@@ -274,7 +274,7 @@ Module(
   |
 1 | type X[T: *int] = int
 2 | type X[T: yield x] = int
-  |           ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | type X[T: yield from x] = int
 4 | type X[T: x := int] = int
   |
@@ -284,7 +284,7 @@ Module(
 1 | type X[T: *int] = int
 2 | type X[T: yield x] = int
 3 | type X[T: yield from x] = int
-  |           ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 4 | type X[T: x := int] = int
   |
 
@@ -293,7 +293,7 @@ Module(
 2 | type X[T: yield x] = int
 3 | type X[T: yield from x] = int
 4 | type X[T: x := int] = int
-  |             ^^ Syntax Error: Expected `,`, found `:=`
+  |             ^^ Syntax Error: invalid syntax
 
 
 ## Semantic Syntax Errors

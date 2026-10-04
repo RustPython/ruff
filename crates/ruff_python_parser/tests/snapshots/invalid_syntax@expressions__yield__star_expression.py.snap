@@ -115,7 +115,7 @@ Module(
   |
 1 | # Cannot use starred expression here
 2 | yield (*x)
-  |        ^^ Syntax Error: Starred expression cannot be used here
+  |        ^^ Syntax Error: invalid syntax
 3 |
 4 | yield *x and y, z
   |
@@ -125,7 +125,7 @@ Module(
 2 | yield (*x)
 3 |
 4 | yield *x and y, z
-  |        ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |        ^^^^^^^ Syntax Error: boolean expression cannot be used here
 
 
 ## Semantic Syntax Errors

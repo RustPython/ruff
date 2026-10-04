@@ -88,14 +88,14 @@ Module(
 
   |
 1 | (x := 1, for x in y)
-  |          ^^^ Syntax Error: Expected `)`, found `for`
+  |          ^^^ Syntax Error: invalid syntax
 
 
   |
 1 | (x := 1, for x in y)
-  |                    ^ Syntax Error: Expected `:`, found `)`
+  |                    ^ Syntax Error: invalid syntax
 
 
   |
 1 | (x := 1, for x in y)
-  |                     ^ Syntax Error: Expected a statement
+  |                     ^ Syntax Error: invalid syntax

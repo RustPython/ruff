@@ -229,7 +229,7 @@ Module(
   |
 1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
 2 | lst[x:=1:-1]
-  |     ^^^^ Syntax Error: Unparenthesized named expression cannot be used here
+  |     ^^^^ Syntax Error: unparenthesized named expression cannot be used here
 3 | lst[1:x:=1]
 4 | lst[1:3:x:=1]
   |
@@ -239,7 +239,7 @@ Module(
 1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
-  |        ^^ Syntax Error: Expected `]`, found `:=`
+  |        ^^ Syntax Error: invalid syntax
 4 | lst[1:3:x:=1]
   |
 
@@ -248,7 +248,7 @@ Module(
 1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
-  |           ^ Syntax Error: Expected a statement
+  |           ^ Syntax Error: invalid syntax
 4 | lst[1:3:x:=1]
   |
 
@@ -257,7 +257,7 @@ Module(
 1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
-  |            ^ Syntax Error: Expected a statement
+  |            ^ Syntax Error: invalid syntax
 4 | lst[1:3:x:=1]
   |
 
@@ -266,18 +266,18 @@ Module(
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
 4 | lst[1:3:x:=1]
-  |          ^^ Syntax Error: Expected `]`, found `:=`
+  |          ^^ Syntax Error: invalid syntax
 
 
   |
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
 4 | lst[1:3:x:=1]
-  |             ^ Syntax Error: Expected a statement
+  |             ^ Syntax Error: invalid syntax
 
 
   |
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
 4 | lst[1:3:x:=1]
-  |              ^ Syntax Error: Expected a statement
+  |              ^ Syntax Error: invalid syntax

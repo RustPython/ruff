@@ -114,7 +114,7 @@ Module(
 
   |
 1 | def (): ...
-  |     ^ Syntax Error: Expected an identifier
+  |     ^ Syntax Error: invalid syntax
 2 | def () -> int: ...
   |
 
@@ -122,4 +122,4 @@ Module(
   |
 1 | def (): ...
 2 | def () -> int: ...
-  |     ^ Syntax Error: Expected an identifier
+  |     ^ Syntax Error: invalid syntax

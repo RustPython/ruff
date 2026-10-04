@@ -173,7 +173,7 @@ Module(
   |
 1 | @foo
 2 | async with x: ...
-  | ^^^^^ Syntax Error: Expected class, function definition or async function definition after decorator
+  | ^^^^^ Syntax Error: expected class, function definition or async function definition after decorator
 3 | @foo
 4 | x = 1
   |
@@ -183,4 +183,4 @@ Module(
 2 | async with x: ...
 3 | @foo
 4 | x = 1
-  | ^ Syntax Error: Expected class, function definition or async function definition after decorator
+  | ^ Syntax Error: expected class, function definition or async function definition after decorator

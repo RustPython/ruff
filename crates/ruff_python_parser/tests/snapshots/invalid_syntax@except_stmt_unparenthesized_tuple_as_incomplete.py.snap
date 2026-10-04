@@ -188,7 +188,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except x, y as (exc):
-  |                ^ Syntax Error: Expected name after `as`
+  |                ^ Syntax Error: expected name after `as`
 4 |     pass
 5 | try:
   |
@@ -198,7 +198,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except x, y as (exc):
-  |                      ^ Syntax Error: Expected an expression
+  |                      ^ Syntax Error: invalid syntax
 4 |     pass
 5 | try:
 6 |     pass
@@ -209,7 +209,7 @@ Module(
 2 |     pass
 3 | except x, y as (exc):
 4 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation
 5 | try:
 6 |     pass
   |
@@ -219,6 +219,6 @@ Module(
 5 | try:
 6 |     pass
 7 | except x, y as exc
-  |                   ^ Syntax Error: Expected `:`, found newline
+  |                   ^ Syntax Error: expected ':'
 8 |     pass
   |

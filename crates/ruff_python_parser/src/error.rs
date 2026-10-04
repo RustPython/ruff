@@ -79,9 +79,9 @@ pub enum InterpolatedStringErrorType {
 impl std::fmt::Display for InterpolatedStringErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::UnclosedLbrace => write!(f, "expecting `}}`"),
+            Self::UnclosedLbrace => f.write_str("expecting '}'"),
             Self::InvalidConversionFlag => write!(f, "invalid conversion character"),
-            Self::SingleRbrace => write!(f, "single `}}` is not allowed"),
+            Self::SingleRbrace => f.write_str("single '}' is not allowed"),
             Self::UnterminatedString => write!(f, "unterminated string"),
             Self::UnterminatedTripleQuotedString => write!(f, "unterminated triple-quoted string"),
             Self::LambdaWithoutParentheses => {
@@ -98,6 +98,22 @@ impl std::fmt::Display for InterpolatedStringErrorType {
                 )
             }
         }
+    }
+}
+
+fn write_interpolated_string_error(
+    f: &mut std::fmt::Formatter,
+    kind: InterpolatedStringKind,
+    error: &InterpolatedStringErrorType,
+) -> std::fmt::Result {
+    match error {
+        InterpolatedStringErrorType::UnterminatedString => {
+            write!(f, "unterminated {kind} literal")
+        }
+        InterpolatedStringErrorType::UnterminatedTripleQuotedString => {
+            write!(f, "unterminated triple-quoted {kind} literal")
+        }
+        _ => write!(f, "{kind}: {error}"),
     }
 }
 
@@ -223,113 +239,110 @@ impl std::fmt::Display for ParseErrorType {
         match self {
             ParseErrorType::OtherError(msg) => f.write_str(msg),
             ParseErrorType::StringAnnotationError(msg) => f.write_str(msg),
-            ParseErrorType::ExpectedToken { found, expected } => {
-                write!(f, "Expected {expected}, found {found}")
-            }
+            ParseErrorType::ExpectedToken { found, expected } => match (*expected, *found) {
+                (TokenKind::Colon, TokenKind::Newline) => f.write_str("expected ':'"),
+                (TokenKind::Lpar, _) => f.write_str("expected '('"),
+                (TokenKind::Else, found) if found != TokenKind::Colon => {
+                    f.write_str("expected 'else' after 'if' expression")
+                }
+                _ => f.write_str("invalid syntax"),
+            },
             ParseErrorType::Lexical(lex_error) => write!(f, "{lex_error}"),
-            ParseErrorType::SimpleStatementsOnSameLine => {
-                f.write_str("Simple statements must be separated by newlines or semicolons")
-            }
-            ParseErrorType::SimpleAndCompoundStatementOnSameLine => f.write_str(
-                "Compound statements are not allowed on the same line as simple statements",
-            ),
+            ParseErrorType::SimpleStatementsOnSameLine => f.write_str("invalid syntax"),
+            ParseErrorType::SimpleAndCompoundStatementOnSameLine => f.write_str("invalid syntax"),
             ParseErrorType::UnexpectedTokenAfterAsync(kind) => {
                 write!(
                     f,
-                    "Expected `def`, `with` or `for` to follow `async`, found {kind}",
+                    "expected `def`, `with` or `for` to follow `async`, found {kind}",
                 )
             }
             ParseErrorType::InvalidArgumentUnpackingOrder => {
-                f.write_str("Iterable argument unpacking cannot follow keyword argument unpacking")
+                f.write_str("iterable argument unpacking follows keyword argument unpacking")
             }
             ParseErrorType::IterableUnpackingInComprehension => {
-                f.write_str("Iterable unpacking cannot be used in a comprehension")
+                f.write_str("iterable unpacking cannot be used in a comprehension")
             }
             ParseErrorType::UnparenthesizedNamedExpression => {
-                f.write_str("Unparenthesized named expression cannot be used here")
+                f.write_str("unparenthesized named expression cannot be used here")
             }
             ParseErrorType::UnparenthesizedTupleExpression => {
-                f.write_str("Unparenthesized tuple expression cannot be used here")
+                f.write_str("unparenthesized tuple expression cannot be used here")
             }
             ParseErrorType::UnparenthesizedGeneratorExpression => {
-                f.write_str("Unparenthesized generator expression cannot be used here")
+                f.write_str("Generator expression must be parenthesized")
             }
             ParseErrorType::InvalidYieldExpressionUsage => {
-                f.write_str("Yield expression cannot be used here")
+                f.write_str("yield expression cannot be used here")
             }
             ParseErrorType::InvalidLambdaExpressionUsage => {
-                f.write_str("Lambda expression cannot be used here")
+                f.write_str("lambda expression cannot be used here")
             }
-            ParseErrorType::InvalidStarredExpressionUsage => {
-                f.write_str("Starred expression cannot be used here")
-            }
+            ParseErrorType::InvalidStarredExpressionUsage => f.write_str("invalid syntax"),
             ParseErrorType::PositionalAfterKeywordArgument => {
-                f.write_str("Positional argument cannot follow keyword argument")
+                f.write_str("positional argument follows keyword argument")
             }
             ParseErrorType::PositionalAfterKeywordUnpacking => {
-                f.write_str("Positional argument cannot follow keyword argument unpacking")
+                f.write_str("positional argument follows keyword argument unpacking")
             }
-            ParseErrorType::EmptySlice => f.write_str("Expected index or slice expression"),
+            ParseErrorType::EmptySlice => f.write_str("expected index or slice expression"),
             ParseErrorType::EmptyGlobalNames => {
-                f.write_str("Global statement must have at least one name")
+                f.write_str("global statement must have at least one name")
             }
             ParseErrorType::EmptyNonlocalNames => {
-                f.write_str("Nonlocal statement must have at least one name")
+                f.write_str("nonlocal statement must have at least one name")
             }
             ParseErrorType::EmptyDeleteTargets => {
-                f.write_str("Delete statement must have at least one target")
+                f.write_str("delete statement must have at least one target")
             }
             ParseErrorType::EmptyImportNames => {
-                f.write_str("Expected one or more symbol names after import")
+                f.write_str("Expected one or more names after 'import'")
             }
             ParseErrorType::EmptyTypeParams => f.write_str("Type parameter list cannot be empty"),
             ParseErrorType::ParamAfterVarKeywordParam => {
-                f.write_str("Parameter cannot follow var-keyword parameter")
+                f.write_str("arguments cannot follow var-keyword argument")
             }
             ParseErrorType::NonDefaultParamAfterDefaultParam => {
-                f.write_str("Parameter without a default cannot follow a parameter with a default")
+                f.write_str("parameter without a default follows parameter with a default")
             }
             ParseErrorType::ExpectedKeywordParam => {
-                f.write_str("Expected one or more keyword parameter after `*` separator")
+                f.write_str("named arguments must follow bare *")
             }
             ParseErrorType::VarParameterWithDefault => {
-                f.write_str("Parameter with `*` or `**` cannot have default value")
+                f.write_str("var-positional argument cannot have default value")
             }
             ParseErrorType::InvalidStarPatternUsage => {
-                f.write_str("Star pattern cannot be used here")
+                f.write_str("cannot use starred expression here")
             }
             ParseErrorType::InvalidMatchPatternTarget => f.write_str("cannot use '_' as a target"),
             ParseErrorType::ExpectedRealNumber => {
-                f.write_str("Expected a real number in complex literal pattern")
+                f.write_str("expected a real number in complex literal pattern")
             }
             ParseErrorType::ExpectedImaginaryNumber => {
-                f.write_str("Expected an imaginary number in complex literal pattern")
+                f.write_str("expected an imaginary number in complex literal pattern")
             }
-            ParseErrorType::ExpectedExpression => f.write_str("Expected an expression"),
-            ParseErrorType::UnexpectedIndentation => f.write_str("Unexpected indentation"),
-            ParseErrorType::InvalidAssignmentTarget => f.write_str("Invalid assignment target"),
+            ParseErrorType::ExpectedExpression => f.write_str("invalid syntax"),
+            ParseErrorType::UnexpectedIndentation => f.write_str("unexpected indentation"),
+            ParseErrorType::InvalidAssignmentTarget => f.write_str("invalid assignment target"),
             ParseErrorType::InvalidAnnotatedAssignmentTarget => {
-                f.write_str("Invalid annotated assignment target")
+                f.write_str("illegal target for annotation")
             }
             ParseErrorType::InvalidNamedAssignmentTarget => {
-                f.write_str("Assignment expression target must be an identifier")
+                f.write_str("assignment expression target must be an identifier")
             }
             ParseErrorType::InvalidAugmentedAssignmentTarget => {
-                f.write_str("Invalid augmented assignment target")
+                f.write_str("invalid augmented assignment target")
             }
-            ParseErrorType::InvalidDeleteTarget => f.write_str("Invalid delete target"),
+            ParseErrorType::InvalidDeleteTarget => f.write_str("invalid syntax"),
             ParseErrorType::UnexpectedIpythonEscapeCommand => {
                 f.write_str("IPython escape commands are only allowed in `Mode::Ipython`")
             }
-            ParseErrorType::FStringError(fstring_error) => {
-                write!(f, "f-string: {fstring_error}")
+            ParseErrorType::FStringError(error) => {
+                write_interpolated_string_error(f, InterpolatedStringKind::FString, error)
             }
-            ParseErrorType::TStringError(tstring_error) => {
-                write!(f, "t-string: {tstring_error}")
+            ParseErrorType::TStringError(error) => {
+                write_interpolated_string_error(f, InterpolatedStringKind::TString, error)
             }
-            ParseErrorType::UnexpectedExpressionToken => {
-                write!(f, "Unexpected token at the end of an expression")
-            }
+            ParseErrorType::UnexpectedExpressionToken => f.write_str("invalid syntax"),
         }
     }
 }
@@ -441,21 +454,23 @@ impl LexicalErrorType {
 impl std::fmt::Display for LexicalErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::StringError => write!(f, "Got unexpected string"),
-            Self::FStringError(error) => write!(f, "f-string: {error}"),
-            Self::TStringError(error) => write!(f, "t-string: {error}"),
+            Self::StringError => write!(f, "got unexpected string"),
+            Self::FStringError(error) => {
+                write_interpolated_string_error(f, InterpolatedStringKind::FString, error)
+            }
+            Self::TStringError(error) => {
+                write_interpolated_string_error(f, InterpolatedStringKind::TString, error)
+            }
             Self::InvalidByteLiteral => {
                 write!(f, "bytes can only contain ASCII literal characters")
             }
-            Self::UnicodeError => write!(f, "Got unexpected unicode"),
+            Self::UnicodeError => write!(f, "got unexpected unicode"),
             Self::IndentationError => {
                 write!(f, "unindent does not match any outer indentation level")
             }
-            Self::UnrecognizedToken { tok } => {
-                write!(f, "Got unexpected token {tok}")
-            }
+            Self::UnrecognizedToken { .. } => f.write_str("invalid syntax"),
             Self::LineContinuationError => {
-                write!(f, "Expected a newline after line continuation character")
+                write!(f, "unexpected character after line continuation character")
             }
             Self::Eof => write!(f, "unexpected EOF while parsing"),
             Self::OtherError(msg) => write!(f, "{msg}"),
@@ -463,10 +478,10 @@ impl std::fmt::Display for LexicalErrorType {
                 write!(f, "missing closing quote in string literal")
             }
             Self::MissingUnicodeLbrace => {
-                write!(f, "Missing `{{` in Unicode escape sequence")
+                write!(f, "missing `{{` in Unicode escape sequence")
             }
             Self::MissingUnicodeRbrace => {
-                write!(f, "Missing `}}` in Unicode escape sequence")
+                write!(f, "missing `}}` in Unicode escape sequence")
             }
         }
     }
@@ -964,35 +979,35 @@ pub enum UnsupportedSyntaxErrorKind {
 impl Display for UnsupportedSyntaxError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let kind = match self.kind {
-            UnsupportedSyntaxErrorKind::Match => "Cannot use `match` statement",
-            UnsupportedSyntaxErrorKind::Walrus => "Cannot use named assignment expression (`:=`)",
-            UnsupportedSyntaxErrorKind::ExceptStar => "Cannot use `except*`",
+            UnsupportedSyntaxErrorKind::Match => "cannot use `match` statement",
+            UnsupportedSyntaxErrorKind::Walrus => "cannot use named assignment expression (`:=`)",
+            UnsupportedSyntaxErrorKind::ExceptStar => "cannot use `except*`",
             UnsupportedSyntaxErrorKind::UnparenthesizedNamedExpr(
                 UnparenthesizedNamedExprKind::SequenceIndex,
-            ) => "Cannot use unparenthesized assignment expression in a sequence index",
+            ) => "cannot use unparenthesized assignment expression in a sequence index",
             UnsupportedSyntaxErrorKind::UnparenthesizedNamedExpr(
                 UnparenthesizedNamedExprKind::SetLiteral,
-            ) => "Cannot use unparenthesized assignment expression as an element in a set literal",
+            ) => "cannot use unparenthesized assignment expression as an element in a set literal",
             UnsupportedSyntaxErrorKind::UnparenthesizedNamedExpr(
                 UnparenthesizedNamedExprKind::SetComprehension,
             ) => {
-                "Cannot use unparenthesized assignment expression as an element in a set comprehension"
+                "cannot use unparenthesized assignment expression as an element in a set comprehension"
             }
             UnsupportedSyntaxErrorKind::ParenthesizedKeywordArgumentName => {
-                "Cannot use parenthesized keyword argument name"
+                "cannot use parenthesized keyword argument name"
             }
             UnsupportedSyntaxErrorKind::StarTuple(StarTupleKind::Return) => {
-                "Cannot use iterable unpacking in return statements"
+                "cannot use iterable unpacking in return statements"
             }
             UnsupportedSyntaxErrorKind::StarTuple(StarTupleKind::Yield) => {
-                "Cannot use iterable unpacking in yield expressions"
+                "cannot use iterable unpacking in yield expressions"
             }
             UnsupportedSyntaxErrorKind::RelaxedDecorator(relaxed_decorator_error) => {
                 return match relaxed_decorator_error {
                     RelaxedDecoratorError::CallExpression => {
                         write!(
                             f,
-                            "Cannot use a call expression in a decorator on Python {} \
+                            "cannot use a call expression in a decorator on Python {} \
                             unless it is the top-level expression or it occurs \
                             in the argument list of a top-level call expression \
                             (relaxed decorator syntax was {changed})",
@@ -1002,7 +1017,7 @@ impl Display for UnsupportedSyntaxError {
                     }
                     RelaxedDecoratorError::Other(description) => write!(
                         f,
-                        "Cannot use {description} outside function call arguments in a decorator on Python {} \
+                        "cannot use {description} outside function call arguments in a decorator on Python {} \
                         (syntax was {changed})",
                         self.target_version,
                         changed = self.kind.changed_version(),
@@ -1010,54 +1025,54 @@ impl Display for UnsupportedSyntaxError {
                 };
             }
             UnsupportedSyntaxErrorKind::PositionalOnlyParameter => {
-                "Cannot use positional-only parameter separator"
+                "cannot use positional-only parameter separator"
             }
-            UnsupportedSyntaxErrorKind::TypeParameterList => "Cannot use type parameter lists",
-            UnsupportedSyntaxErrorKind::LazyImportStatement => "Cannot use `lazy` import statement",
-            UnsupportedSyntaxErrorKind::TypeAliasStatement => "Cannot use `type` alias statement",
+            UnsupportedSyntaxErrorKind::TypeParameterList => "cannot use type parameter lists",
+            UnsupportedSyntaxErrorKind::LazyImportStatement => "cannot use `lazy` import statement",
+            UnsupportedSyntaxErrorKind::TypeAliasStatement => "cannot use `type` alias statement",
             UnsupportedSyntaxErrorKind::TypeParamDefault => {
-                "Cannot set default type for a type parameter"
+                "cannot set default type for a type parameter"
             }
             UnsupportedSyntaxErrorKind::Pep701FString(FStringKind::Backslash) => {
-                "Cannot use an escape sequence (backslash) in f-strings"
+                "cannot use an escape sequence (backslash) in f-strings"
             }
             UnsupportedSyntaxErrorKind::Pep701FString(FStringKind::Comment) => {
-                "Cannot use comments in f-strings"
+                "cannot use comments in f-strings"
             }
             UnsupportedSyntaxErrorKind::Pep701FString(FStringKind::LineBreak) => {
-                "Cannot use line breaks in non-triple-quoted f-string replacement fields"
+                "cannot use line breaks in non-triple-quoted f-string replacement fields"
             }
             UnsupportedSyntaxErrorKind::Pep701FString(FStringKind::NestedQuote) => {
-                "Cannot reuse outer quote character in f-strings"
+                "cannot reuse outer quote character in f-strings"
             }
             UnsupportedSyntaxErrorKind::ParenthesizedContextManager => {
-                "Cannot use parentheses within a `with` statement"
+                "cannot use parentheses within a `with` statement"
             }
             UnsupportedSyntaxErrorKind::StarExpressionInIndex => {
-                "Cannot use star expression in index"
+                "cannot use star expression in index"
             }
-            UnsupportedSyntaxErrorKind::StarAnnotation => "Cannot use star annotation",
+            UnsupportedSyntaxErrorKind::StarAnnotation => "cannot use star annotation",
             UnsupportedSyntaxErrorKind::UnpackingInComprehension(
                 ComprehensionUnpackingKind::IterableInList,
-            ) => "Cannot use iterable unpacking in a list comprehension",
+            ) => "cannot use iterable unpacking in a list comprehension",
             UnsupportedSyntaxErrorKind::UnpackingInComprehension(
                 ComprehensionUnpackingKind::IterableInSet,
-            ) => "Cannot use iterable unpacking in a set comprehension",
+            ) => "cannot use iterable unpacking in a set comprehension",
             UnsupportedSyntaxErrorKind::UnpackingInComprehension(
                 ComprehensionUnpackingKind::IterableInGenerator,
-            ) => "Cannot use iterable unpacking in a generator expression",
+            ) => "cannot use iterable unpacking in a generator expression",
             UnsupportedSyntaxErrorKind::UnpackingInComprehension(
                 ComprehensionUnpackingKind::DictInDict,
-            ) => "Cannot use dictionary unpacking in a dict comprehension",
+            ) => "cannot use dictionary unpacking in a dict comprehension",
             UnsupportedSyntaxErrorKind::UnparenthesizedUnpackInFor => {
-                "Cannot use iterable unpacking in `for` statements"
+                "cannot use iterable unpacking in `for` statements"
             }
             UnsupportedSyntaxErrorKind::UnparenthesizedExceptionTypes => {
-                "Multiple exception types must be parenthesized"
+                "multiple exception types must be parenthesized"
             }
-            UnsupportedSyntaxErrorKind::TemplateStrings => "Cannot use t-strings",
+            UnsupportedSyntaxErrorKind::TemplateStrings => "cannot use t-strings",
             UnsupportedSyntaxErrorKind::UnaryPlusMatchPattern => {
-                "Unary '+' is not allowed in a literal pattern"
+                "unary '+' is not allowed in a literal pattern"
             }
         };
 

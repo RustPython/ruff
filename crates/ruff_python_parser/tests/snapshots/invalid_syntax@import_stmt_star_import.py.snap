@@ -107,14 +107,14 @@ Module(
 
   |
 1 | import *
-  |        ^ Syntax Error: Expected one or more symbol names after import
+  |        ^ Syntax Error: Expected one or more names after 'import'
 2 | import x, *, y
   |
 
 
   |
 1 | import *
-  |         ^ Syntax Error: Expected an expression
+  |         ^ Syntax Error: invalid syntax
 2 | import x, *, y
   |
 
@@ -122,16 +122,16 @@ Module(
   |
 1 | import *
 2 | import x, *, y
-  |         ^ Syntax Error: Trailing comma not allowed
+  |         ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 
 
   |
 1 | import *
 2 | import x, *, y
-  |           ^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |           ^ Syntax Error: invalid syntax
 
 
   |
 1 | import *
 2 | import x, *, y
-  |            ^ Syntax Error: Expected an expression
+  |            ^ Syntax Error: invalid syntax

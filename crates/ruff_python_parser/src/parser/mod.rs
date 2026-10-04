@@ -917,7 +917,9 @@ impl<'src> Parser<'src> {
         if let Some(trailing_comma_range) = trailing_comma_range {
             if !recovery_context_kind.allow_trailing_comma() {
                 self.add_error(
-                    ParseErrorType::OtherError("Trailing comma not allowed".to_string()),
+                    ParseErrorType::OtherError(
+                        "trailing comma not allowed without surrounding parentheses".to_string(),
+                    ),
                     trailing_comma_range,
                 );
             }
@@ -1497,91 +1499,37 @@ impl RecoveryContextKind {
                 if p.at(TokenKind::Indent) {
                     ParseErrorType::UnexpectedIndentation
                 } else {
-                    ParseErrorType::OtherError("Expected a statement".to_string())
+                    ParseErrorType::OtherError("invalid syntax".to_string())
                 }
             }
-            RecoveryContextKind::Elif => ParseErrorType::OtherError(
-                "Expected an `elif` or `else` clause, or the end of the `if` statement."
-                    .to_string(),
-            ),
-            RecoveryContextKind::Except => ParseErrorType::OtherError(
-                "Expected an `except` or `finally` clause or the end of the `try` statement."
-                    .to_string(),
-            ),
-            RecoveryContextKind::AssignmentTargets => {
-                if p.current_token_kind().is_keyword() {
-                    ParseErrorType::OtherError(
-                        "The keyword is not allowed as a variable declaration name".to_string(),
-                    )
-                } else {
-                    ParseErrorType::OtherError("Expected an assignment target".to_string())
-                }
+            RecoveryContextKind::Elif
+            | RecoveryContextKind::Except
+            | RecoveryContextKind::AssignmentTargets
+            | RecoveryContextKind::TypeParams
+            | RecoveryContextKind::ImportFromAsNames(_)
+            | RecoveryContextKind::ImportNames
+            | RecoveryContextKind::Slices
+            | RecoveryContextKind::ListElements
+            | RecoveryContextKind::SetElements
+            | RecoveryContextKind::DictElements
+            | RecoveryContextKind::TupleElements(_)
+            | RecoveryContextKind::SequenceMatchPattern(_)
+            | RecoveryContextKind::MatchPatternMapping
+            | RecoveryContextKind::MatchPatternClassArguments
+            | RecoveryContextKind::Arguments
+            | RecoveryContextKind::DeleteTargets
+            | RecoveryContextKind::Identifiers
+            | RecoveryContextKind::Parameters(_)
+            | RecoveryContextKind::WithItems(_) => {
+                ParseErrorType::OtherError("invalid syntax".to_string())
             }
-            RecoveryContextKind::TypeParams => ParseErrorType::OtherError(
-                "Expected a type parameter or the end of the type parameter list".to_string(),
-            ),
-            RecoveryContextKind::ImportFromAsNames(parenthesized) => {
-                if parenthesized.is_yes() {
-                    ParseErrorType::OtherError("Expected an import name or a ')'".to_string())
-                } else {
-                    ParseErrorType::OtherError("Expected an import name".to_string())
-                }
-            }
-            RecoveryContextKind::ImportNames => {
-                ParseErrorType::OtherError("Expected an import name".to_string())
-            }
-            RecoveryContextKind::Slices => ParseErrorType::OtherError(
-                "Expected an expression or the end of the slice list".to_string(),
-            ),
-            RecoveryContextKind::ListElements => {
-                ParseErrorType::OtherError("Expected an expression or a ']'".to_string())
-            }
-            RecoveryContextKind::SetElements | RecoveryContextKind::DictElements => {
-                ParseErrorType::OtherError("Expected an expression or a '}'".to_string())
-            }
-            RecoveryContextKind::TupleElements(parenthesized) => {
-                if parenthesized.is_yes() {
-                    ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-                } else {
-                    ParseErrorType::OtherError("Expected an expression".to_string())
-                }
-            }
-            RecoveryContextKind::SequenceMatchPattern(_) => ParseErrorType::OtherError(
-                "Expected a pattern or the end of the sequence pattern".to_string(),
-            ),
-            RecoveryContextKind::MatchPatternMapping => ParseErrorType::OtherError(
-                "Expected a mapping pattern or the end of the mapping pattern".to_string(),
-            ),
-            RecoveryContextKind::MatchPatternClassArguments => {
-                ParseErrorType::OtherError("Expected a pattern or a ')'".to_string())
-            }
-            RecoveryContextKind::Arguments => {
-                ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-            }
-            RecoveryContextKind::DeleteTargets => {
-                ParseErrorType::OtherError("Expected a delete target".to_string())
-            }
-            RecoveryContextKind::Identifiers => {
-                ParseErrorType::OtherError("Expected an identifier".to_string())
-            }
-            RecoveryContextKind::Parameters(_) => ParseErrorType::OtherError(
-                "Expected a parameter or the end of the parameter list".to_string(),
-            ),
-            RecoveryContextKind::WithItems(with_item_kind) => match with_item_kind {
-                WithItemKind::Parenthesized => {
-                    ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-                }
-                _ => ParseErrorType::OtherError(
-                    "Expected an expression or the end of the with item list".to_string(),
-                ),
-            },
             RecoveryContextKind::InterpolatedStringElements(kind) => match kind {
                 InterpolatedStringElementsKind::Regular(string_kind) => ParseErrorType::OtherError(
-                    format!("Expected an element of or the end of the {string_kind}"),
+                    format!("expected an element of or the end of the {string_kind}"),
                 ),
                 InterpolatedStringElementsKind::FormatSpec(string_kind) => {
                     ParseErrorType::OtherError(format!(
-                        "Expected an {string_kind} element or a '}}'"
+                        "expected an {string_kind} element or a '}}'"
                     ))
                 }
             },

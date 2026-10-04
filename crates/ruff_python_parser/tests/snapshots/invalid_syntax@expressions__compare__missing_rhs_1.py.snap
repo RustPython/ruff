@@ -86,7 +86,7 @@ Module(
   |
 1 | # Without the `in`, this is considered to be a unary `not`
 2 | x not
-  |   ^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |   ^^^ Syntax Error: invalid syntax
 3 |
 4 | 1 + 2
   |
@@ -95,7 +95,7 @@ Module(
   |
 1 | # Without the `in`, this is considered to be a unary `not`
 2 | x not
-  |      ^ Syntax Error: Expected an expression
+  |      ^ Syntax Error: invalid syntax
 3 |
 4 | 1 + 2
   |

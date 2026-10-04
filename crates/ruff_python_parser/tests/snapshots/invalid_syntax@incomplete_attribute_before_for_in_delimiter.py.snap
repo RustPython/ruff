@@ -364,7 +364,7 @@ Module(
 
   |
 1 | [item. for item in xs]
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
   |
@@ -373,7 +373,7 @@ Module(
   |
 1 | [item. for item in xs]
 2 | [item. async for item in xs]
-  |        ^^^^^ Syntax Error: Expected an identifier
+  |        ^^^^^ Syntax Error: invalid syntax
 3 | {item. for item in xs}
 4 | (item. for item in xs)
   |
@@ -383,7 +383,7 @@ Module(
 1 | [item. for item in xs]
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 4 | (item. for item in xs)
 5 | [item for item. in xs]
   |
@@ -393,7 +393,7 @@ Module(
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
 4 | (item. for item in xs)
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 5 | [item for item. in xs]
 6 | for item. in xs: ...
   |
@@ -403,7 +403,7 @@ Module(
 3 | {item. for item in xs}
 4 | (item. for item in xs)
 5 | [item for item. in xs]
-  |                 ^^ Syntax Error: Expected an identifier
+  |                 ^^ Syntax Error: invalid syntax
 6 | for item. in xs: ...
   |
 
@@ -412,4 +412,4 @@ Module(
 4 | (item. for item in xs)
 5 | [item for item. in xs]
 6 | for item. in xs: ...
-  |           ^^ Syntax Error: Expected an identifier
+  |           ^^ Syntax Error: invalid syntax

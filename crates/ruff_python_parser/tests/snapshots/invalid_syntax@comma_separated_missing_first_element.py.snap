@@ -57,4 +57,4 @@ Module(
 
   |
 1 | call(= 1)
-  |      ^ Syntax Error: Expected an expression or a ')'
+  |      ^ Syntax Error: invalid syntax

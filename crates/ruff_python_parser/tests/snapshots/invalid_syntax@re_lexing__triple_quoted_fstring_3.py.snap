@@ -117,7 +117,7 @@ Module(
   |
 5 | if call(f'''{x:.3f
 6 | '''
-  | ^^^ Syntax Error: f-string: expecting `}`
+  | ^^^ Syntax Error: f-string: expecting '}'
 7 |     pass
   |
 
@@ -125,6 +125,6 @@ Module(
   |
 5 | if call(f'''{x:.3f
 6 | '''
-  |    ^ Syntax Error: Expected `)`, found newline
+  |    ^ Syntax Error: invalid syntax
 7 |     pass
   |

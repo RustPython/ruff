@@ -103,7 +103,7 @@ Module(
 
   |
 1 | for a b: ...
-  |       ^ Syntax Error: Expected `in`, found identifier
+  |       ^ Syntax Error: invalid syntax
 2 | for a: ...
   |
 
@@ -111,4 +111,4 @@ Module(
   |
 1 | for a b: ...
 2 | for a: ...
-  |      ^ Syntax Error: Expected `in`, found `:`
+  |      ^ Syntax Error: invalid syntax

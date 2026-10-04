@@ -84,7 +84,7 @@ Module(
 
   |
 1 | x >
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 2 |
 3 | 1 + 2
   |

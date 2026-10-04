@@ -887,7 +887,7 @@ Module(
   |
 1 | # Invalid target
 2 | {x: y for 1 in y}
-  |           ^ Syntax Error: Invalid assignment target
+  |           ^ Syntax Error: invalid assignment target
 3 | {x: y for 'a' in y}
 4 | {x: y for call() in y}
   |
@@ -897,7 +897,7 @@ Module(
 1 | # Invalid target
 2 | {x: y for 1 in y}
 3 | {x: y for 'a' in y}
-  |           ^^^ Syntax Error: Invalid assignment target
+  |           ^^^ Syntax Error: invalid assignment target
 4 | {x: y for call() in y}
 5 | {x: y for {a, b} in y}
   |
@@ -907,7 +907,7 @@ Module(
 2 | {x: y for 1 in y}
 3 | {x: y for 'a' in y}
 4 | {x: y for call() in y}
-  |           ^^^^^^ Syntax Error: Invalid assignment target
+  |           ^^^^^^ Syntax Error: invalid assignment target
 5 | {x: y for {a, b} in y}
   |
 
@@ -916,7 +916,7 @@ Module(
 3 | {x: y for 'a' in y}
 4 | {x: y for call() in y}
 5 | {x: y for {a, b} in y}
-  |           ^^^^^^ Syntax Error: Invalid assignment target
+  |           ^^^^^^ Syntax Error: invalid assignment target
 6 |
 7 | # Invalid iter
   |
@@ -925,7 +925,7 @@ Module(
    |
  7 | # Invalid iter
  8 | {x: y for x in *y}
-   |                ^^ Syntax Error: Starred expression cannot be used here
+   |                ^^ Syntax Error: invalid syntax
  9 | {x: y for x in yield y}
 10 | {x: y for x in yield from y}
    |
@@ -935,7 +935,7 @@ Module(
  7 | # Invalid iter
  8 | {x: y for x in *y}
  9 | {x: y for x in yield y}
-   |                ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                ^^^^^^^ Syntax Error: yield expression cannot be used here
 10 | {x: y for x in yield from y}
 11 | {x: y for x in lambda y: y}
    |
@@ -945,7 +945,7 @@ Module(
  8 | {x: y for x in *y}
  9 | {x: y for x in yield y}
 10 | {x: y for x in yield from y}
-   |                ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 11 | {x: y for x in lambda y: y}
    |
 
@@ -954,7 +954,7 @@ Module(
  9 | {x: y for x in yield y}
 10 | {x: y for x in yield from y}
 11 | {x: y for x in lambda y: y}
-   |                ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |                ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 12 |
 13 | # Invalid if
    |
@@ -963,7 +963,7 @@ Module(
    |
 13 | # Invalid if
 14 | {x: y for x in data if *y}
-   |                        ^^ Syntax Error: Starred expression cannot be used here
+   |                        ^^ Syntax Error: invalid syntax
 15 | {x: y for x in data if yield y}
 16 | {x: y for x in data if yield from y}
    |
@@ -973,7 +973,7 @@ Module(
 13 | # Invalid if
 14 | {x: y for x in data if *y}
 15 | {x: y for x in data if yield y}
-   |                        ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                        ^^^^^^^ Syntax Error: yield expression cannot be used here
 16 | {x: y for x in data if yield from y}
 17 | {x: y for x in data if lambda y: y}
    |
@@ -983,7 +983,7 @@ Module(
 14 | {x: y for x in data if *y}
 15 | {x: y for x in data if yield y}
 16 | {x: y for x in data if yield from y}
-   |                        ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                        ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 17 | {x: y for x in data if lambda y: y}
    |
 
@@ -992,4 +992,4 @@ Module(
 15 | {x: y for x in data if yield y}
 16 | {x: y for x in data if yield from y}
 17 | {x: y for x in data if lambda y: y}
-   |                        ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |                        ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here

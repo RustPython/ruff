@@ -198,7 +198,7 @@ impl Parser<'_> {
                 if rest.is_some() {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Only one double star pattern is allowed".to_string(),
+                            "only one double star pattern is allowed".to_string(),
                         ),
                         parser.node_range(mapping_item_start),
                     );
@@ -232,7 +232,7 @@ impl Parser<'_> {
                     },
                     pattern => {
                         parser.add_error(
-                            ParseErrorType::OtherError("Invalid mapping pattern key".to_string()),
+                            ParseErrorType::OtherError("invalid mapping pattern key".to_string()),
                             &pattern,
                         );
                         recovery::pattern_to_expr(pattern)
@@ -247,7 +247,7 @@ impl Parser<'_> {
                 if rest.is_some() {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Pattern cannot follow a double star pattern".to_string(),
+                            "pattern cannot follow a double star pattern".to_string(),
                         ),
                         parser.node_range(mapping_item_start),
                     );
@@ -331,7 +331,7 @@ impl Parser<'_> {
             // parenthesis, it'll consider `case` an identifier token instead.
             self.add_error(
                 ParseErrorType::OtherError(format!(
-                    "Missing '{closing}'",
+                    "missing '{closing}'",
                     closing = if parentheses.is_list() { "]" } else { ")" }
                 )),
                 self.current_token_range(),
@@ -509,7 +509,7 @@ impl Parser<'_> {
                         if !unary_expr.operand.is_number_literal_expr() {
                             self.add_error(
                                 ParseErrorType::OtherError(
-                                    "Expected a numeric literal after unary operator".to_string(),
+                                    "expected a numeric literal after unary operator".to_string(),
                                 ),
                                 unary_expr.operand.range(),
                             );
@@ -585,7 +585,7 @@ impl Parser<'_> {
                     // Upon encountering an unexpected token, return a `Pattern::MatchValue` containing
                     // an empty `Expr::Name`.
                     self.add_error(
-                        ParseErrorType::OtherError("Expected a pattern".to_string()),
+                        ParseErrorType::OtherError("expected a pattern".to_string()),
                         self.current_token_range(),
                     );
                     let invalid_node = Expr::Name(ast::ExprName {
@@ -718,7 +718,7 @@ impl Parser<'_> {
             }
             pattern => {
                 self.add_error(
-                    ParseErrorType::OtherError("Invalid value for a class pattern".to_string()),
+                    ParseErrorType::OtherError("invalid value for a class pattern".to_string()),
                     &pattern,
                 );
                 Box::new(recovery::pattern_to_expr(pattern))
@@ -751,9 +751,7 @@ impl Parser<'_> {
                         name
                     } else {
                         parser.add_error(
-                            ParseErrorType::OtherError(
-                                "Expected an identifier for the keyword pattern".to_string(),
-                            ),
+                            ParseErrorType::OtherError("invalid syntax".to_string()),
                             &pattern,
                         );
                         ast::Identifier {
@@ -779,7 +777,7 @@ impl Parser<'_> {
                 if has_seen_keyword_pattern && has_seen_pattern {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Positional patterns cannot follow keyword patterns".to_string(),
+                            "positional patterns follow keyword patterns".to_string(),
                         ),
                         parser.node_range(pattern_start),
                     );

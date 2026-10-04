@@ -194,7 +194,7 @@ Module(
 
   |
 1 | def foo(a, /, /, b): ...
-  |               ^ Syntax Error: Only one '/' separator allowed
+  |               ^ Syntax Error: / may appear only once
 2 | def foo(a, /, b, c, /): ...
   |
 
@@ -202,4 +202,4 @@ Module(
   |
 1 | def foo(a, /, /, b): ...
 2 | def foo(a, /, b, c, /): ...
-  |                     ^ Syntax Error: Only one '/' separator allowed
+  |                     ^ Syntax Error: / may appear only once
