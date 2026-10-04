@@ -1710,6 +1710,7 @@ impl<'src> Parser<'src> {
             ExceptClauseKind::Normal
         };
 
+        let mut unparenthesized_types_start = None;
         let type_ = if self.at_expr() {
             // test_err except_stmt_invalid_expression
             // try:
@@ -1738,13 +1739,7 @@ impl<'src> Parser<'src> {
                     //     pass
                     // except* x, y as eg:
                     //     pass
-                    self.add_error(
-                        ParseErrorType::OtherError(
-                            "Multiple exception types must be parenthesized when using `as`"
-                                .to_string(),
-                        ),
-                        &parsed_expr,
-                    );
+                    unparenthesized_types_start = Some(parsed_expr.start());
                 } else {
                     // test_err except_stmt_unparenthesized_tuple_no_as_py313
                     // # parse_options: {"target-version": "3.13"}
@@ -1823,6 +1818,30 @@ impl<'src> Parser<'src> {
         } else {
             None
         };
+
+        // The error is raised only once the whole `as NAME :` part has matched, and covers
+        // the exception types through `as NAME`, stopping just before the `:`.
+
+        // test_err except_stmt_unparenthesized_tuple_as_incomplete
+        // try:
+        //     pass
+        // except x, y as (exc):
+        //     pass
+        // try:
+        //     pass
+        // except x, y as exc
+        //     pass
+        if let Some(types_start) = unparenthesized_types_start
+            && name.is_some()
+            && self.at(TokenKind::Colon)
+        {
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "Multiple exception types must be parenthesized when using `as`".to_string(),
+                ),
+                TextRange::new(types_start, self.current_token_range().start()),
+            );
+        }
 
         // test_err except_stmt_missing_exception_and_as_name
         // try:
