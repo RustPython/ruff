@@ -577,3 +577,47 @@ fn unclosed_bracket_in_place_of_earlier_error_is_complete() {
 fn unclosed_bracket_after_same_line_error() {
     assert_eq!(first_error("def f(:\n").to_string(), "invalid syntax");
 }
+
+#[test]
+fn number_literal_errors() {
+    for (source, message) in [
+        ("0x\n", "invalid hexadecimal literal"),
+        ("0o9\n", "invalid digit '9' in octal literal"),
+        ("0b1_2\n", "invalid digit '2' in binary literal"),
+        ("1_\n", "invalid decimal literal"),
+        ("1e+x\n", "invalid decimal literal"),
+        ("1abc\n", "invalid decimal literal"),
+        ("1jx\n", "invalid imaginary literal"),
+        (
+            "0012\n",
+            "leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers",
+        ),
+    ] {
+        assert_eq!(first_error(source).to_string(), message, "{source:?}");
+    }
+}
+
+#[test]
+fn number_literal_before_keyword() {
+    assert!(parse_unchecked("1if x else 2\n", ParseOptions::from(Mode::Module)).has_valid_syntax());
+}
+
+#[test]
+fn incompatible_string_prefixes() {
+    assert_eq!(
+        first_error("x = bu''\n"),
+        ParseErrorType::Lexical(LexicalErrorType::IncompatibleStringPrefixes {
+            first: 'u',
+            second: 'b',
+        })
+    );
+    assert!(parse_unchecked("ub = 1\n", ParseOptions::from(Mode::Module)).has_valid_syntax());
+}
+
+#[test]
+fn non_printable_character() {
+    assert_eq!(
+        first_error("x = \u{a0}\n").to_string(),
+        "invalid non-printable character U+00A0"
+    );
+}

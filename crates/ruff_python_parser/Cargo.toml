@@ -23,6 +23,7 @@ bstr = { workspace = true }
 drop_bomb = { workspace = true }
 get-size2 = { workspace = true }
 hashbrown = { workspace = true }
+icu_properties = { workspace = true }
 memchr = { workspace = true }
 rustc-hash = { workspace = true }
 static_assertions = { workspace = true }

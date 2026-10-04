@@ -3840,6 +3840,7 @@ dependencies = [
  "drop_bomb",
  "get-size2",
  "hashbrown 0.17.1",
+ "icu_properties",
  "insta",
  "itertools 0.15.0",
  "memchr",
