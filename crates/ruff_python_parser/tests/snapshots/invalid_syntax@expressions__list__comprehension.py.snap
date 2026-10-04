@@ -1146,7 +1146,7 @@ Module(
   |
 1 | # Invalid target
 2 | [x for 1 in y]
-  |        ^ Syntax Error: invalid assignment target
+  |        ^ Syntax Error: cannot assign to literal
 3 | [x for 'a' in y]
 4 | [x for call() in y]
   |
@@ -1156,7 +1156,7 @@ Module(
 1 | # Invalid target
 2 | [x for 1 in y]
 3 | [x for 'a' in y]
-  |        ^^^ Syntax Error: invalid assignment target
+  |        ^^^ Syntax Error: cannot assign to literal
 4 | [x for call() in y]
 5 | [x for {a, b} in y]
   |
@@ -1166,7 +1166,7 @@ Module(
 2 | [x for 1 in y]
 3 | [x for 'a' in y]
 4 | [x for call() in y]
-  |        ^^^^^^ Syntax Error: invalid assignment target
+  |        ^^^^^^ Syntax Error: cannot assign to function call
 5 | [x for {a, b} in y]
   |
 
@@ -1175,7 +1175,7 @@ Module(
 3 | [x for 'a' in y]
 4 | [x for call() in y]
 5 | [x for {a, b} in y]
-  |        ^^^^^^ Syntax Error: invalid assignment target
+  |        ^^^^^^ Syntax Error: cannot assign to set display
 6 |
 7 | # Invalid iter
   |

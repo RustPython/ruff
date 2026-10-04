@@ -23,7 +23,7 @@ use crate::string::{
 };
 use crate::token_set::TokenSet;
 use crate::{
-    InterpolatedStringErrorType, Mode, ParseErrorType, UnsupportedSyntaxError,
+    ExpressionKind, InterpolatedStringErrorType, Mode, ParseErrorType, UnsupportedSyntaxError,
     UnsupportedSyntaxErrorKind,
 };
 
@@ -2593,7 +2593,7 @@ impl<'src> Parser<'src> {
             self.parse_expression_list(ExpressionContext::starred_conditional().with_in_excluded());
 
         helpers::set_expr_ctx(&mut target.expr, ExprContext::Store);
-        self.validate_assignment_target(&target.expr);
+        self.validate_for_target(&target.expr);
 
         self.expect(TokenKind::In);
         let iter = self.parse_simple_expression(ExpressionContext::default());
@@ -2875,7 +2875,10 @@ impl<'src> Parser<'src> {
         self.bump(TokenKind::ColonEqual);
 
         if !target.is_name_expr() {
-            self.add_error(ParseErrorType::InvalidNamedAssignmentTarget, target.range());
+            self.add_error(
+                ParseErrorType::InvalidNamedAssignmentTarget(ExpressionKind::of(&target)),
+                target.range(),
+            );
         }
         helpers::set_expr_ctx(&mut target, ExprContext::Store);
 

@@ -122,7 +122,7 @@ Module(
   |
 1 | # This is not JavaScript
 2 | x === y
-  | ^^^^ Syntax Error: invalid assignment target
+  | ^^^^ Syntax Error: cannot assign to comparison
 3 | x !== y
   |
 
@@ -138,4 +138,4 @@ Module(
 1 | # This is not JavaScript
 2 | x === y
 3 | x !== y
-  | ^^^^ Syntax Error: invalid assignment target
+  | ^^^^ Syntax Error: cannot assign to comparison

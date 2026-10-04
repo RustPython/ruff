@@ -9,9 +9,10 @@ use ruff_text_size::{Ranged, TextSize};
 use crate::parser::progress::ParserProgress;
 use crate::parser::{Parser, RecoveryContextKind, SequenceMatchPatternParentheses, recovery};
 use crate::token_set::TokenSet;
-use crate::{ParseErrorType, UnsupportedSyntaxErrorKind};
+use crate::{ExpressionKind, ParseErrorType, UnsupportedSyntaxErrorKind};
 
 use super::expression::ExpressionContext;
+use super::statement::invalid_target_identifier;
 
 /// The set of tokens that can start a literal pattern.
 const LITERAL_PATTERN_START_SET: TokenSet = TokenSet::new([
@@ -126,7 +127,26 @@ impl Parser<'_> {
                 self.add_error(ParseErrorType::InvalidStarPatternUsage, &lhs);
             }
 
-            let ident = self.parse_match_pattern_target();
+            let ident = if self.at_expr()
+                && !(self.at_identifier_or_soft_keyword()
+                    && (self.src_text(self.current_token_range()) == "_"
+                        || !matches!(
+                            self.peek(),
+                            TokenKind::Dot | TokenKind::Lpar | TokenKind::Equal
+                        ))) {
+                // test_err match_as_pattern_invalid_target
+                // match x:
+                //     case y as z.w: ...
+                //     case y as f(): ...
+                let target = self.parse_conditional_expression_or_higher();
+                self.add_error(
+                    ParseErrorType::InvalidPatternTarget(ExpressionKind::of(&target.expr)),
+                    &target,
+                );
+                invalid_target_identifier(&target.expr)
+            } else {
+                self.parse_match_pattern_target()
+            };
             lhs = Pattern::MatchAs(ast::PatternMatchAs {
                 range: self.node_range(start),
                 name: Some(ident),

@@ -1,7 +1,7 @@
 use std::fmt::{self, Display};
 
-use ruff_python_ast::PythonVersion;
 use ruff_python_ast::token::TokenKind;
+use ruff_python_ast::{ConstantValue, Expr, PythonVersion};
 use ruff_text_size::{Ranged, TextRange};
 
 use crate::string::InterpolatedStringKind;
@@ -172,16 +172,30 @@ pub enum ParseErrorType {
     /// A default value was found for a `*` or `**` parameter.
     VarParameterWithDefault,
 
-    /// An invalid expression was found in the assignment target.
-    InvalidAssignmentTarget,
+    /// An invalid expression was found in the assignment target. `maybe_comparison` is set when
+    /// the `=` after it may have been meant as `==`.
+    InvalidAssignmentTarget {
+        kind: ExpressionKind,
+        maybe_comparison: bool,
+    },
+    /// A name is assigned to where `==` or `:=` may have been meant.
+    AssignmentInsteadOfComparison,
+    /// A `yield` expression is assigned to.
+    AssignmentToYield,
     /// An invalid expression was found in the named assignment target.
-    InvalidNamedAssignmentTarget,
+    InvalidNamedAssignmentTarget(ExpressionKind),
     /// An invalid expression was found in the annotated assignment target.
     InvalidAnnotatedAssignmentTarget,
     /// An invalid expression was found in the augmented assignment target.
-    InvalidAugmentedAssignmentTarget,
+    InvalidAugmentedAssignmentTarget(ExpressionKind),
     /// An invalid expression was found in the delete target.
-    InvalidDeleteTarget,
+    InvalidDeleteTarget(ExpressionKind),
+    /// An invalid expression was found after `as` in an import.
+    InvalidImportTarget(ExpressionKind),
+    /// An invalid expression was found after `as` in a pattern.
+    InvalidPatternTarget(ExpressionKind),
+    /// An invalid expression was found after `as` in an `except` or `except*` clause.
+    InvalidExceptTarget { kind: ExpressionKind, star: bool },
 
     /// A positional argument was found after a keyword argument.
     PositionalAfterKeywordArgument,
@@ -229,6 +243,119 @@ pub enum ParseErrorType {
     TStringError(InterpolatedStringErrorType),
     /// Parser encountered an error during lexing.
     Lexical(LexicalErrorType),
+}
+
+/// The kind of an expression, as syntax errors name it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, get_size2::GetSize)]
+pub enum ExpressionKind {
+    Attribute,
+    Subscript,
+    Starred,
+    Name,
+    List,
+    Tuple,
+    Lambda,
+    FunctionCall,
+    Expression,
+    GeneratorExpression,
+    YieldExpression,
+    AwaitExpression,
+    ListComprehension,
+    SetComprehension,
+    DictComprehension,
+    DictLiteral,
+    SetDisplay,
+    FStringExpression,
+    TStringExpression,
+    None,
+    False,
+    True,
+    Ellipsis,
+    Literal,
+    Comparison,
+    ConditionalExpression,
+    NamedExpression,
+}
+
+impl ExpressionKind {
+    pub fn of(expr: &Expr) -> Self {
+        match expr {
+            Expr::Attribute(_) => Self::Attribute,
+            Expr::Subscript(_) => Self::Subscript,
+            Expr::Starred(_) => Self::Starred,
+            Expr::Name(_) => Self::Name,
+            Expr::List(_) => Self::List,
+            Expr::Tuple(_) => Self::Tuple,
+            Expr::Lambda(_) => Self::Lambda,
+            Expr::Call(_) => Self::FunctionCall,
+            Expr::BoolOp(_)
+            | Expr::BinOp(_)
+            | Expr::UnaryOp(_)
+            | Expr::Slice(_)
+            | Expr::IpyEscapeCommand(_) => Self::Expression,
+            Expr::Generator(_) => Self::GeneratorExpression,
+            Expr::Yield(_) | Expr::YieldFrom(_) => Self::YieldExpression,
+            Expr::Await(_) => Self::AwaitExpression,
+            Expr::ListComp(_) => Self::ListComprehension,
+            Expr::SetComp(_) => Self::SetComprehension,
+            Expr::DictComp(_) => Self::DictComprehension,
+            Expr::Dict(_) => Self::DictLiteral,
+            Expr::Set(_) => Self::SetDisplay,
+            Expr::FString(_) => Self::FStringExpression,
+            Expr::TString(_) => Self::TStringExpression,
+            Expr::NoneLiteral(_) => Self::None,
+            Expr::BooleanLiteral(literal) if literal.value => Self::True,
+            Expr::BooleanLiteral(_) => Self::False,
+            Expr::EllipsisLiteral(_) => Self::Ellipsis,
+            Expr::StringLiteral(_) | Expr::BytesLiteral(_) | Expr::NumberLiteral(_) => {
+                Self::Literal
+            }
+            Expr::Compare(_) => Self::Comparison,
+            Expr::If(_) => Self::ConditionalExpression,
+            Expr::Named(_) => Self::NamedExpression,
+            Expr::Constant(constant) => match constant.value {
+                ConstantValue::None => Self::None,
+                ConstantValue::Boolean(true) => Self::True,
+                ConstantValue::Boolean(false) => Self::False,
+                ConstantValue::Ellipsis => Self::Ellipsis,
+                _ => Self::Literal,
+            },
+        }
+    }
+}
+
+impl std::fmt::Display for ExpressionKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::Attribute => "attribute",
+            Self::Subscript => "subscript",
+            Self::Starred => "starred",
+            Self::Name => "name",
+            Self::List => "list",
+            Self::Tuple => "tuple",
+            Self::Lambda => "lambda",
+            Self::FunctionCall => "function call",
+            Self::Expression => "expression",
+            Self::GeneratorExpression => "generator expression",
+            Self::YieldExpression => "yield expression",
+            Self::AwaitExpression => "await expression",
+            Self::ListComprehension => "list comprehension",
+            Self::SetComprehension => "set comprehension",
+            Self::DictComprehension => "dict comprehension",
+            Self::DictLiteral => "dict literal",
+            Self::SetDisplay => "set display",
+            Self::FStringExpression => "f-string expression",
+            Self::TStringExpression => "t-string expression",
+            Self::None => "None",
+            Self::False => "False",
+            Self::True => "True",
+            Self::Ellipsis => "ellipsis",
+            Self::Literal => "literal",
+            Self::Comparison => "comparison",
+            Self::ConditionalExpression => "conditional expression",
+            Self::NamedExpression => "named expression",
+        })
+    }
 }
 
 /// The compound statement clause whose header precedes an indented block.
@@ -379,17 +506,46 @@ impl std::fmt::Display for ParseErrorType {
             }
             ParseErrorType::ExpectedExpression => f.write_str("invalid syntax"),
             ParseErrorType::UnexpectedIndentation => f.write_str("unexpected indent"),
-            ParseErrorType::InvalidAssignmentTarget => f.write_str("invalid assignment target"),
+            ParseErrorType::InvalidAssignmentTarget {
+                kind,
+                maybe_comparison: false,
+            } => write!(f, "cannot assign to {kind}"),
+            ParseErrorType::InvalidAssignmentTarget {
+                kind,
+                maybe_comparison: true,
+            } => write!(
+                f,
+                "cannot assign to {kind} here. Maybe you meant '==' instead of '='?"
+            ),
+            ParseErrorType::AssignmentInsteadOfComparison => {
+                f.write_str("invalid syntax. Maybe you meant '==' or ':=' instead of '='?")
+            }
+            ParseErrorType::AssignmentToYield => {
+                f.write_str("assignment to yield expression not possible")
+            }
             ParseErrorType::InvalidAnnotatedAssignmentTarget => {
                 f.write_str("illegal target for annotation")
             }
-            ParseErrorType::InvalidNamedAssignmentTarget => {
-                f.write_str("assignment expression target must be an identifier")
+            ParseErrorType::InvalidNamedAssignmentTarget(kind) => {
+                write!(f, "cannot use assignment expressions with {kind}")
             }
-            ParseErrorType::InvalidAugmentedAssignmentTarget => {
-                f.write_str("invalid augmented assignment target")
+            ParseErrorType::InvalidAugmentedAssignmentTarget(kind) => {
+                write!(
+                    f,
+                    "'{kind}' is an illegal expression for augmented assignment"
+                )
             }
-            ParseErrorType::InvalidDeleteTarget => f.write_str("invalid syntax"),
+            ParseErrorType::InvalidDeleteTarget(kind) => write!(f, "cannot delete {kind}"),
+            ParseErrorType::InvalidImportTarget(kind) => {
+                write!(f, "cannot use {kind} as import target")
+            }
+            ParseErrorType::InvalidPatternTarget(kind) => {
+                write!(f, "cannot use {kind} as pattern target")
+            }
+            ParseErrorType::InvalidExceptTarget { kind, star } => {
+                let clause = if *star { "except*" } else { "except" };
+                write!(f, "cannot use {clause} statement with {kind}")
+            }
             ParseErrorType::UnexpectedIpythonEscapeCommand => {
                 f.write_str("IPython escape commands are only allowed in `Mode::Ipython`")
             }

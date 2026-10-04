@@ -334,6 +334,52 @@ impl<'src> Parser<'src> {
         line_number(self.source, offset)
     }
 
+    /// Returns `true` if the already parsed expression at `range` is enclosed in parentheses of
+    /// its own.
+    fn is_parenthesized(&self, range: TextRange) -> bool {
+        self.enclosing_parentheses(range).is_some()
+    }
+
+    /// Returns the end of the already parsed expression at `range`, including the parentheses
+    /// that enclose only it.
+    fn parenthesized_end(&self, mut range: TextRange) -> TextSize {
+        while let Some(parenthesized) = self.enclosing_parentheses(range) {
+            range = parenthesized;
+        }
+        range.end()
+    }
+
+    /// Returns the range from the `(` directly before `range` to the `)` directly after it, if
+    /// both exist.
+    fn enclosing_parentheses(&self, range: TextRange) -> Option<TextRange> {
+        let tokens = self.tokens.bumped();
+        let before = tokens[..tokens.partition_point(|token| token.start() < range.start())]
+            .iter()
+            .rev()
+            .find(|token| !token.kind().is_trivia())
+            .filter(|token| token.kind() == TokenKind::Lpar)?;
+        let (after_kind, after_range) = self.token_after(range.end());
+        (after_kind == TokenKind::Rpar).then(|| TextRange::new(before.start(), after_range.end()))
+    }
+
+    /// Returns the kind of the first non-trivia token that starts at or after `offset`.
+    fn token_kind_after(&self, offset: TextSize) -> TokenKind {
+        self.token_after(offset).0
+    }
+
+    /// Returns the kind and range of the first non-trivia token that starts at or after
+    /// `offset`.
+    fn token_after(&self, offset: TextSize) -> (TokenKind, TextRange) {
+        let tokens = self.tokens.bumped();
+        tokens[tokens.partition_point(|token| token.start() < offset)..]
+            .iter()
+            .find(|token| !token.kind().is_trivia())
+            .map_or_else(
+                || (self.current_token_kind(), self.current_token_range()),
+                |token| (token.kind(), token.range()),
+            )
+    }
+
     fn node_range(&self, start: TextSize) -> TextRange {
         // It's possible during error recovery that the parsing didn't consume any tokens. In that
         // case, `last_token_end` still points to the end of the previous token but `start` is the
@@ -1404,7 +1450,13 @@ impl RecoveryContextKind {
                 if parenthesized.is_yes() {
                     p.at(TokenKind::Rpar).then_some(ListTerminatorKind::Regular)
                 } else {
-                    p.at_sequence_end().then_some(ListTerminatorKind::Regular)
+                    // test_err aug_assign_stmt_unparenthesized_tuple_target
+                    // a, b += 1
+                    (p.at_sequence_end()
+                        || p.current_token_kind()
+                            .as_augmented_assign_operator()
+                            .is_some())
+                    .then_some(ListTerminatorKind::Regular)
                 }
             }
             RecoveryContextKind::SequenceMatchPattern(parentheses) => match parentheses {

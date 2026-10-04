@@ -203,6 +203,11 @@ impl<'src> TokenSource<'src> {
         self.tokens.truncate(tokens_position);
     }
 
+    /// Returns the tokens bumped so far, including the trivia tokens.
+    pub(crate) fn bumped(&self) -> &[Token] {
+        &self.tokens
+    }
+
     /// Returns a slice of [`Token`] that are within the given `range`.
     pub(crate) fn in_range(&self, range: TextRange) -> &[Token] {
         let start = self
