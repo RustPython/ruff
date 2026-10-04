@@ -211,6 +211,9 @@ pub enum ParseErrorType {
         found: TokenKind,
     },
 
+    /// A compound statement header is not followed by an indented block. `line` is the line of
+    /// the header's keyword.
+    ExpectedIndentedBlock { clause: BlockClause, line: u32 },
     /// An unexpected indentation was found during parsing.
     UnexpectedIndentation,
     /// The statement being parsed cannot be `async`.
@@ -226,6 +229,46 @@ pub enum ParseErrorType {
     TStringError(InterpolatedStringErrorType),
     /// Parser encountered an error during lexing.
     Lexical(LexicalErrorType),
+}
+
+/// The compound statement clause whose header precedes an indented block.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, get_size2::GetSize)]
+pub enum BlockClause {
+    If,
+    Elif,
+    Else,
+    For,
+    With,
+    While,
+    Try,
+    Except,
+    ExceptStar,
+    Finally,
+    Match,
+    Case,
+    Class,
+    FunctionDef,
+}
+
+impl std::fmt::Display for BlockClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::If => "'if' statement",
+            Self::Elif => "'elif' statement",
+            Self::Else => "'else' statement",
+            Self::For => "'for' statement",
+            Self::With => "'with' statement",
+            Self::While => "'while' statement",
+            Self::Try => "'try' statement",
+            Self::Except => "'except' statement",
+            Self::ExceptStar => "'except*' statement",
+            Self::Finally => "'finally' statement",
+            Self::Match => "'match' statement",
+            Self::Case => "'case' statement",
+            Self::Class => "class definition",
+            Self::FunctionDef => "function definition",
+        })
+    }
 }
 
 impl ParseErrorType {
@@ -246,6 +289,12 @@ impl std::fmt::Display for ParseErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ParseErrorType::OtherError(msg) => f.write_str(msg),
+            ParseErrorType::ExpectedIndentedBlock { clause, line } => {
+                write!(
+                    f,
+                    "expected an indented block after {clause} on line {line}"
+                )
+            }
             ParseErrorType::StringAnnotationError(msg) => f.write_str(msg),
             ParseErrorType::ExpectedToken { found, expected } => match (*expected, *found) {
                 (TokenKind::Colon, TokenKind::Newline) => f.write_str("expected ':'"),

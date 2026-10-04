@@ -1,4 +1,4 @@
-use std::fmt::{Display, Write};
+use std::fmt::Write;
 
 use ruff_python_ast::name::Name;
 use ruff_python_ast::token::TokenKind;
@@ -16,7 +16,7 @@ use crate::parser::{
     helpers,
 };
 use crate::token_set::TokenSet;
-use crate::{Mode, ParseErrorType, UnsupportedSyntaxErrorKind};
+use crate::{BlockClause, Mode, ParseErrorType, UnsupportedSyntaxErrorKind};
 
 use super::Parenthesized;
 use super::expression::ExpressionContext;
@@ -1458,7 +1458,7 @@ impl<'src> Parser<'src> {
         // test_err if_stmt_empty_body
         // if True:
         // 1 + 1
-        let body = self.parse_body(Clause::If);
+        let body = self.parse_body(BlockClause::If, start);
 
         // test_err if_stmt_misspelled_elif
         // if True:
@@ -1522,7 +1522,7 @@ impl<'src> Parser<'src> {
         //     pass
         self.expect(TokenKind::Colon);
 
-        let body = self.parse_body(kind.as_clause());
+        let body = self.parse_body(kind.as_block_clause(), start);
 
         ast::ElifElseClause {
             test,
@@ -1548,7 +1548,7 @@ impl<'src> Parser<'src> {
 
         let mut is_star: Option<bool> = None;
 
-        let try_body = self.parse_body(Clause::Try);
+        let try_body = self.parse_body(BlockClause::Try, try_start);
 
         let has_except = self.at(TokenKind::Except);
 
@@ -1621,16 +1621,20 @@ impl<'src> Parser<'src> {
         //     pass
         // b = 1
 
-        let orelse = if self.eat(TokenKind::Else) {
+        let orelse = if self.at(TokenKind::Else) {
+            let else_start = self.current_token_range().start();
+            self.bump(TokenKind::Else);
             self.expect(TokenKind::Colon);
-            self.parse_body(Clause::Else)
+            self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
         };
 
-        let (finalbody, has_finally) = if self.eat(TokenKind::Finally) {
+        let (finalbody, has_finally) = if self.at(TokenKind::Finally) {
+            let finally_start = self.current_token_range().start();
+            self.bump(TokenKind::Finally);
             self.expect(TokenKind::Colon);
-            (self.parse_body(Clause::Finally), true)
+            (self.parse_body(BlockClause::Finally, finally_start), true)
         } else {
             (Suite::new(), false)
         };
@@ -1849,7 +1853,12 @@ impl<'src> Parser<'src> {
 
         self.expect(TokenKind::Colon);
 
-        let except_body = self.parse_body(Clause::Except);
+        let except_clause = if block_kind.is_star() {
+            BlockClause::ExceptStar
+        } else {
+            BlockClause::Except
+        };
+        let except_body = self.parse_body(except_clause, start);
 
         (
             ExceptHandler::ExceptHandler(ast::ExceptHandlerExceptHandler {
@@ -1875,6 +1884,7 @@ impl<'src> Parser<'src> {
     ///
     /// See: <https://docs.python.org/3/reference/compound_stmts.html#the-for-statement>
     fn parse_for_statement(&mut self, start: TextSize) -> ast::StmtFor {
+        let for_start = self.current_token_range().start();
         self.bump(TokenKind::For);
 
         // test_err for_stmt_missing_target
@@ -1954,11 +1964,13 @@ impl<'src> Parser<'src> {
 
         self.expect(TokenKind::Colon);
 
-        let body = self.parse_body(Clause::For);
+        let body = self.parse_body(BlockClause::For, for_start);
 
-        let orelse = if self.eat(TokenKind::Else) {
+        let orelse = if self.at(TokenKind::Else) {
+            let else_start = self.current_token_range().start();
+            self.bump(TokenKind::Else);
             self.expect(TokenKind::Colon);
-            self.parse_body(Clause::Else)
+            self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
         };
@@ -2008,11 +2020,13 @@ impl<'src> Parser<'src> {
         //     pass
         self.expect(TokenKind::Colon);
 
-        let body = self.parse_body(Clause::While);
+        let body = self.parse_body(BlockClause::While, start);
 
-        let orelse = if self.eat(TokenKind::Else) {
+        let orelse = if self.at(TokenKind::Else) {
+            let else_start = self.current_token_range().start();
+            self.bump(TokenKind::Else);
             self.expect(TokenKind::Colon);
-            self.parse_body(Clause::Else)
+            self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
         };
@@ -2045,6 +2059,7 @@ impl<'src> Parser<'src> {
         decorator_list: DecoratorList,
         start: TextSize,
     ) -> ast::StmtFunctionDef {
+        let def_start = self.current_token_range().start();
         self.bump(TokenKind::Def);
 
         // test_err function_def_missing_identifier
@@ -2143,7 +2158,7 @@ impl<'src> Parser<'src> {
         // def foo():
         // def foo() -> int:
         // x = 42
-        let body = self.parse_body(Clause::FunctionDef);
+        let body = self.parse_body(BlockClause::FunctionDef, def_start);
 
         ast::StmtFunctionDef {
             name,
@@ -2177,6 +2192,7 @@ impl<'src> Parser<'src> {
         decorator_list: DecoratorList,
         start: TextSize,
     ) -> ast::StmtClassDef {
+        let class_start = self.current_token_range().start();
         self.bump(TokenKind::Class);
 
         // test_err class_def_missing_name
@@ -2224,7 +2240,7 @@ impl<'src> Parser<'src> {
         // class Foo:
         // class Foo():
         // x = 42
-        let body = self.parse_body(Clause::Class);
+        let body = self.parse_body(BlockClause::Class, class_start);
 
         ast::StmtClassDef {
             range: self.node_range(start),
@@ -2250,6 +2266,7 @@ impl<'src> Parser<'src> {
     ///
     /// See: <https://docs.python.org/3/reference/compound_stmts.html#the-with-statement>
     fn parse_with_statement(&mut self, start: TextSize) -> ast::StmtWith {
+        let with_start = self.current_token_range().start();
         self.bump(TokenKind::With);
 
         let mut items = self.parse_with_items();
@@ -2257,7 +2274,7 @@ impl<'src> Parser<'src> {
 
         self.expect(TokenKind::Colon);
 
-        let body = self.parse_body(Clause::With);
+        let body = self.parse_body(BlockClause::With, with_start);
 
         ast::StmtWith {
             items,
@@ -2618,7 +2635,7 @@ impl<'src> Parser<'src> {
                 // `match [x, y, z]: {dict}` or `match[0]: int`.
                 self.bump(TokenKind::Colon);
 
-                let cases = self.parse_match_body();
+                let cases = self.parse_match_body(start);
 
                 Some(ast::StmtMatch {
                     subject: Box::new(subject),
@@ -2641,7 +2658,7 @@ impl<'src> Parser<'src> {
                     self.current_token_range(),
                 );
 
-                let cases = self.parse_match_body();
+                let cases = self.parse_match_body(start);
 
                 Some(ast::StmtMatch {
                     subject: Box::new(subject),
@@ -2675,7 +2692,7 @@ impl<'src> Parser<'src> {
         let subject = self.parse_match_subject_expression();
         self.expect(TokenKind::Colon);
 
-        let cases = self.parse_match_body();
+        let cases = self.parse_match_body(start);
 
         // test_err match_before_py310
         // # parse_options: { "target-version": "3.9" }
@@ -2754,7 +2771,9 @@ impl<'src> Parser<'src> {
     ///
     /// This method expects that the parser is positioned at a `Newline` token. If not, it adds a
     /// syntax error and continues parsing.
-    fn parse_match_body(&mut self) -> Vec<ast::MatchCase> {
+    ///
+    /// `header_start` is the start of the `match` keyword.
+    fn parse_match_body(&mut self, header_start: TextSize) -> Vec<ast::MatchCase> {
         // test_err match_stmt_no_newline_before_case
         // match foo: case _: ...
         self.expect(TokenKind::Newline);
@@ -2765,9 +2784,10 @@ impl<'src> Parser<'src> {
             // match foo:
             // case _: ...
             self.add_error(
-                ParseErrorType::OtherError(
-                    "expected an indented block after `match` statement".to_string(),
-                ),
+                ParseErrorType::ExpectedIndentedBlock {
+                    clause: BlockClause::Match,
+                    line: self.line_number(header_start),
+                },
                 self.current_token_range(),
             );
         }
@@ -2867,7 +2887,7 @@ impl<'src> Parser<'src> {
         // match subject:
         //     case 1:
         //     case 2: ...
-        let body = self.parse_body(Clause::Case);
+        let body = self.parse_body(BlockClause::Case, start);
 
         ast::MatchCase {
             pattern,
@@ -3122,11 +3142,13 @@ impl<'src> Parser<'src> {
         }
     }
 
-    /// Parses the body of the given [`Clause`].
+    /// Parses the body of the given [`BlockClause`].
     ///
     /// This could either be a single statement that's on the same line as the
     /// clause header or an indented block.
-    fn parse_body(&mut self, parent_clause: Clause) -> Suite {
+    ///
+    /// `header_start` is the start of the clause's header keyword token.
+    fn parse_body(&mut self, clause: BlockClause, header_start: TextSize) -> Suite {
         // Note: The test cases in this method chooses a clause at random to test
         // the error logic.
 
@@ -3143,9 +3165,10 @@ impl<'src> Parser<'src> {
             // # at the newline token after `:`
             // if True:
             self.add_error(
-                ParseErrorType::OtherError(format!(
-                    "expected an indented block after {parent_clause}"
-                )),
+                ParseErrorType::ExpectedIndentedBlock {
+                    clause,
+                    line: self.line_number(header_start),
+                },
                 if self.current_token_range().is_empty() {
                     newline_range
                 } else {
@@ -4072,7 +4095,6 @@ impl<'src> Parser<'src> {
         let recovery_kind = match clause {
             Clause::ElIf => RecoveryContextKind::Elif,
             Clause::Except => RecoveryContextKind::Except,
-            _ => unreachable!("Clause is not supported"),
         };
 
         let saved_context = self.recovery_context;
@@ -4092,37 +4114,8 @@ impl<'src> Parser<'src> {
 
 #[derive(Copy, Clone)]
 enum Clause {
-    If,
-    Else,
     ElIf,
-    For,
-    With,
-    Class,
-    While,
-    FunctionDef,
-    Case,
-    Try,
     Except,
-    Finally,
-}
-
-impl Display for Clause {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Clause::If => write!(f, "`if` statement"),
-            Clause::Else => write!(f, "`else` clause"),
-            Clause::ElIf => write!(f, "`elif` clause"),
-            Clause::For => write!(f, "`for` statement"),
-            Clause::With => write!(f, "`with` statement"),
-            Clause::Class => write!(f, "`class` definition"),
-            Clause::While => write!(f, "`while` statement"),
-            Clause::FunctionDef => write!(f, "function definition"),
-            Clause::Case => write!(f, "`case` block"),
-            Clause::Try => write!(f, "`try` statement"),
-            Clause::Except => write!(f, "`except` clause"),
-            Clause::Finally => write!(f, "`finally` clause"),
-        }
-    }
 }
 
 /// The classification of the `match` token.
@@ -4200,10 +4193,10 @@ impl ElifOrElse {
         }
     }
 
-    const fn as_clause(self) -> Clause {
+    const fn as_block_clause(self) -> BlockClause {
         match self {
-            ElifOrElse::Elif => Clause::ElIf,
-            ElifOrElse::Else => Clause::Else,
+            ElifOrElse::Elif => BlockClause::Elif,
+            ElifOrElse::Else => BlockClause::Else,
         }
     }
 }

@@ -883,7 +883,7 @@ Module(
 1 | # No indentation before the function definition
 2 | if call(foo
 3 | def bar():
-  | ^^^ Syntax Error: expected an indented block after `if` statement
+  | ^^^ Syntax Error: expected an indented block after 'if' statement on line 2
 4 |     pass
   |
 

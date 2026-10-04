@@ -270,7 +270,7 @@ Module(
   |
 1 | def foo(a: int, b:
 2 | def foo():
-  | ^^^ Syntax Error: expected an indented block after function definition
+  | ^^^ Syntax Error: expected an indented block after function definition on line 1
 3 |     return 42
 4 | def foo(a: int, b: str
   |
