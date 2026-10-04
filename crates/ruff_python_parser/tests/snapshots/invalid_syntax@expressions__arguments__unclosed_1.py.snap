@@ -93,7 +93,7 @@ Module(
 
   |
 1 | call(x
-  |       ^ Syntax Error: Expected `)`, found newline
+  |       ^ Syntax Error: invalid syntax
 2 |
 3 | def foo():
 4 |     pass

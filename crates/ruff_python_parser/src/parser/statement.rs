@@ -540,7 +540,7 @@ impl<'src> Parser<'src> {
                 // raise from None
                 self.add_error(
                     ParseErrorType::OtherError(
-                        "Exception missing in `raise` statement with cause".to_string(),
+                        "exception missing in `raise` statement with cause".to_string(),
                     ),
                     self.current_token_range(),
                 );
@@ -684,7 +684,7 @@ impl<'src> Parser<'src> {
                 // from
                 // from import x
                 self.add_error(
-                    ParseErrorType::OtherError("Expected a module name".to_string()),
+                    ParseErrorType::OtherError("expected a module name".to_string()),
                     self.current_token_range(),
                 );
             }
@@ -732,7 +732,7 @@ impl<'src> Parser<'src> {
             // test_err from_import_parenthesized_star
             // from x import (*)
             self.add_error(
-                ParseErrorType::OtherError("Star import cannot be parenthesized".to_string()),
+                ParseErrorType::OtherError("star import cannot be parenthesized".to_string()),
                 self.node_range(names_start),
             );
         }
@@ -744,7 +744,7 @@ impl<'src> Parser<'src> {
             // from x import *, a as b
             // from x import *, *, a
             self.add_error(
-                ParseErrorType::OtherError("Star import must be the only import".to_string()),
+                ParseErrorType::OtherError("star import must be the only import".to_string()),
                 self.node_range(names_start),
             );
         }
@@ -807,7 +807,7 @@ impl<'src> Parser<'src> {
                 // test_err import_alias_missing_asname
                 // import x as
                 self.add_error(
-                    ParseErrorType::OtherError("Expected symbol after `as`".to_string()),
+                    ParseErrorType::OtherError("expected symbol after `as`".to_string()),
                     self.current_token_range(),
                 );
                 None
@@ -1152,7 +1152,7 @@ impl<'src> Parser<'src> {
                     } else {
                         parser.add_error(
                             ParseErrorType::OtherError(
-                                "Only integer literals are allowed in subscript expressions \
+                                "only integer literals are allowed in subscript expressions \
                                     in help end escape command"
                                     .to_string(),
                             ),
@@ -1171,7 +1171,7 @@ impl<'src> Parser<'src> {
                 _ => {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Expected name, subscript or attribute expression \
+                            "expected name, subscript or attribute expression \
                                 in help end escape command"
                                 .to_string(),
                         ),
@@ -1194,7 +1194,7 @@ impl<'src> Parser<'src> {
             let token_range = self.node_range(start);
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Help end escape command cannot be applied on a parenthesized expression"
+                    "help end escape command cannot be applied on a parenthesized expression"
                         .to_string(),
                 ),
                 token_range,
@@ -1204,7 +1204,7 @@ impl<'src> Parser<'src> {
         if self.at(TokenKind::Question) {
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Maximum of 2 `?` tokens are allowed in help end escape command".to_string(),
+                    "maximum of 2 `?` tokens are allowed in help end escape command".to_string(),
                 ),
                 self.current_token_range(),
             );
@@ -1599,7 +1599,7 @@ impl<'src> Parser<'src> {
         for handler_err_range in mixed_except_ranges {
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Cannot have both 'except' and 'except*' on the same 'try'".to_string(),
+                    "cannot have both 'except' and 'except*' on the same 'try'".to_string(),
                 ),
                 handler_err_range,
             );
@@ -1644,9 +1644,7 @@ impl<'src> Parser<'src> {
             // else:
             //     pass
             self.add_error(
-                ParseErrorType::OtherError(
-                    "Expected `except` or `finally` after `try` block".to_string(),
-                ),
+                ParseErrorType::OtherError("expected 'except' or 'finally' block".to_string()),
                 self.current_token_range(),
             );
         }
@@ -1786,7 +1784,7 @@ impl<'src> Parser<'src> {
                 // except* as exc:
                 //     pass
                 self.add_error(
-                    ParseErrorType::OtherError("Expected one or more exception types".to_string()),
+                    ParseErrorType::OtherError("expected one or more exception types".to_string()),
                     self.current_token_range(),
                 );
             }
@@ -1810,7 +1808,7 @@ impl<'src> Parser<'src> {
                 // except Exception as
                 //     pass
                 self.add_error(
-                    ParseErrorType::OtherError("Expected name after `as`".to_string()),
+                    ParseErrorType::OtherError("expected name after `as`".to_string()),
                     self.current_token_range(),
                 );
                 None
@@ -1837,7 +1835,7 @@ impl<'src> Parser<'src> {
         {
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Multiple exception types must be parenthesized when using `as`".to_string(),
+                    "multiple exception types must be parenthesized when using 'as'".to_string(),
                 ),
                 TextRange::new(types_start, self.current_token_range().start()),
             );
@@ -2118,7 +2116,7 @@ impl<'src> Parser<'src> {
                     // def foo() -> int, str: ...
                     self.add_error(
                         ParseErrorType::OtherError(
-                            "Multiple return types must be parenthesized".to_string(),
+                            "multiple return types must be parenthesized".to_string(),
                         ),
                         returns.range(),
                     );
@@ -2280,7 +2278,7 @@ impl<'src> Parser<'src> {
         if !self.at_expr() {
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Expected the start of an expression after `with` keyword".to_string(),
+                    "expected the start of an expression after `with` keyword".to_string(),
                 ),
                 self.current_token_range(),
             );
@@ -2768,7 +2766,7 @@ impl<'src> Parser<'src> {
             // case _: ...
             self.add_error(
                 ParseErrorType::OtherError(
-                    "Expected an indented block after `match` statement".to_string(),
+                    "expected an indented block after `match` statement".to_string(),
                 ),
                 self.current_token_range(),
             );
@@ -2794,7 +2792,7 @@ impl<'src> Parser<'src> {
             //     match y:
             //         case _: ...
             self.add_error(
-                ParseErrorType::OtherError("Expected `case` block".to_string()),
+                ParseErrorType::OtherError("expected `case` block".to_string()),
                 self.current_token_range(),
             );
             return cases;
@@ -3088,7 +3086,7 @@ impl<'src> Parser<'src> {
                 // x = 1
                 self.add_error(
                     ParseErrorType::OtherError(
-                        "Expected class, function definition or async function definition \
+                        "expected class, function definition or async function definition \
                             after decorator"
                             .to_string(),
                     ),
@@ -3146,7 +3144,7 @@ impl<'src> Parser<'src> {
             // if True:
             self.add_error(
                 ParseErrorType::OtherError(format!(
-                    "Expected an indented block after {parent_clause}"
+                    "expected an indented block after {parent_clause}"
                 )),
                 if self.current_token_range().is_empty() {
                     newline_range
@@ -3161,7 +3159,7 @@ impl<'src> Parser<'src> {
             // test_err clause_expect_single_statement
             // if True: if True: pass
             self.add_error(
-                ParseErrorType::OtherError("Expected a simple statement".to_string()),
+                ParseErrorType::OtherError("expected a simple statement".to_string()),
                 self.current_token_range(),
             );
         }
@@ -3417,7 +3415,7 @@ impl<'src> Parser<'src> {
                             // def foo(a, *args1, b, c, *args2): ...
                             parser.add_error(
                                 ParseErrorType::OtherError(
-                                    "Only one '*' parameter allowed".to_string(),
+                                    "* argument may appear only once".to_string(),
                                 ),
                                 param_star_range,
                             );
@@ -3437,7 +3435,7 @@ impl<'src> Parser<'src> {
                             // def foo(a, *, b, c, *): ...
                             parser.add_error(
                                 ParseErrorType::OtherError(
-                                    "Only one '*' separator allowed".to_string(),
+                                    "only one '*' separator allowed".to_string(),
                                 ),
                                 star_range,
                             );
@@ -3449,7 +3447,7 @@ impl<'src> Parser<'src> {
                             // def foo(a, *args, b, c, *): ...
                             parser.add_error(
                                 ParseErrorType::OtherError(
-                                    "Keyword-only parameter separator not allowed \
+                                    "keyword-only parameter separator not allowed \
                                         after '*' parameter"
                                         .to_string(),
                                 ),
@@ -3474,7 +3472,7 @@ impl<'src> Parser<'src> {
                         // def foo(a, **kwargs1, **kwargs2): ...
                         parser.add_error(
                             ParseErrorType::OtherError(
-                                "Only one '**' parameter allowed".to_string(),
+                                "only one '**' parameter allowed".to_string(),
                             ),
                             param_double_star_range,
                         );
@@ -3518,8 +3516,7 @@ impl<'src> Parser<'src> {
                         // def foo(/, a): ...
                         parser.add_error(
                             ParseErrorType::OtherError(
-                                "Position-only parameter separator not allowed as first parameter"
-                                    .to_string(),
+                                "at least one argument must precede /".to_string(),
                             ),
                             slash_range,
                         );
@@ -3530,9 +3527,7 @@ impl<'src> Parser<'src> {
                         // def foo(a, /, /, b): ...
                         // def foo(a, /, b, c, /): ...
                         parser.add_error(
-                            ParseErrorType::OtherError(
-                                "Only one '/' separator allowed".to_string(),
-                            ),
+                            ParseErrorType::OtherError("/ may appear only once".to_string()),
                             slash_range,
                         );
                     }
@@ -3544,9 +3539,7 @@ impl<'src> Parser<'src> {
                         // def foo(a, *, /, b): ...
                         // def foo(a, *, b, c, /, d): ...
                         parser.add_error(
-                            ParseErrorType::OtherError(
-                                "'/' parameter must appear before '*' parameter".to_string(),
-                            ),
+                            ParseErrorType::OtherError("/ must be ahead of *".to_string()),
                             slash_range,
                         );
                     }
@@ -3900,13 +3893,13 @@ impl<'src> Parser<'src> {
         match expr {
             Expr::List(_) => self.add_error(
                 ParseErrorType::OtherError(
-                    "Only single target (not list) can be annotated".to_string(),
+                    "only single target (not list) can be annotated".to_string(),
                 ),
                 expr,
             ),
             Expr::Tuple(_) => self.add_error(
                 ParseErrorType::OtherError(
-                    "Only single target (not tuple) can be annotated".to_string(),
+                    "only single target (not tuple) can be annotated".to_string(),
                 ),
                 expr,
             ),

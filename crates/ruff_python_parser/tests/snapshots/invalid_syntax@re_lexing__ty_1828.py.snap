@@ -163,7 +163,7 @@ Module(
   |
 1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
 2 | (c: int = 1,f"""{d=[
-  |   ^ Syntax Error: Expected `)`, found `:`
+  |   ^ Syntax Error: invalid syntax
 3 | def a(
 4 | class A:
   |
@@ -172,7 +172,7 @@ Module(
   |
 1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
 2 | (c: int = 1,f"""{d=[
-  |                    ^ Syntax Error: f-string: expecting `}`
+  |                    ^ Syntax Error: f-string: expecting '}'
 3 | def a(
 4 | class A:
   |
@@ -182,7 +182,7 @@ Module(
 1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
 2 | (c: int = 1,f"""{d=[
 3 | def a(
-  | ^^^ Syntax Error: Expected `:`, found `def`
+  | ^^^ Syntax Error: invalid syntax
 4 | class A:
 5 |     pass
   |
@@ -192,27 +192,8 @@ Module(
 1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
 2 | (c: int = 1,f"""{d=[
 3 | def a(
-  |     ^ Syntax Error: Expected `]`, found identifier
+  |     ^ Syntax Error: invalid syntax
 4 | class A:
-5 |     pass
-  |
-
-
-  |
-1 |   # Regression test for https://github.com/astral-sh/ty/issues/1828
-2 |   (c: int = 1,f"""{d=[
-3 |   def a(
-  |  _______^
-4 | | class A:
-5 | |     pass
-  | |_________^ Syntax Error: f-string: unterminated triple-quoted string
-
-
-  |
-2 | (c: int = 1,f"""{d=[
-3 | def a(
-4 | class A:
-  | ^^^^^ Syntax Error: Expected `)`, found `class`
 5 |     pass
   |
 
@@ -224,7 +205,26 @@ Module(
   |  _______^
 4 | | class A:
 5 | |     pass
-  | |_________^ Syntax Error: Expected a statement
+  | |_________^ Syntax Error: unterminated triple-quoted f-string literal
+
+
+  |
+2 | (c: int = 1,f"""{d=[
+3 | def a(
+4 | class A:
+  | ^^^^^ Syntax Error: invalid syntax
+5 |     pass
+  |
+
+
+  |
+1 |   # Regression test for https://github.com/astral-sh/ty/issues/1828
+2 |   (c: int = 1,f"""{d=[
+3 |   def a(
+  |  _______^
+4 | | class A:
+5 | |     pass
+  | |_________^ Syntax Error: invalid syntax
 
 
   |

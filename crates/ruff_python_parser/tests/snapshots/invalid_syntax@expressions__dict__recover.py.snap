@@ -485,7 +485,7 @@ Module(
 1 | # Test cases for dictionary expressions where the parser recovers from a syntax error.
 2 |
 3 | {,}
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 4 |
 5 | {1: 2,,3: 4}
   |
@@ -495,7 +495,7 @@ Module(
 3 | {,}
 4 |
 5 | {1: 2,,3: 4}
-  |       ^ Syntax Error: Expected an expression or a '}'
+  |       ^ Syntax Error: invalid syntax
 6 |
 7 | {1: 2,,}
   |
@@ -505,7 +505,7 @@ Module(
 5 | {1: 2,,3: 4}
 6 |
 7 | {1: 2,,}
-  |       ^ Syntax Error: Expected an expression or a '}'
+  |       ^ Syntax Error: invalid syntax
 8 |
 9 | # Missing comma
   |
@@ -514,7 +514,7 @@ Module(
    |
  9 | # Missing comma
 10 | {1: 2 3: 4}
-   |       ^ Syntax Error: Expected `,`, found int
+   |       ^ Syntax Error: invalid syntax
 11 |
 12 | # No value
    |
@@ -523,7 +523,7 @@ Module(
    |
 12 | # No value
 13 | {1: }
-   |     ^ Syntax Error: Expected an expression
+   |     ^ Syntax Error: invalid syntax
 14 |
 15 | # No value for double star unpacking
    |
@@ -532,7 +532,7 @@ Module(
    |
 15 | # No value for double star unpacking
 16 | {**}
-   |    ^ Syntax Error: Expected an expression
+   |    ^ Syntax Error: invalid syntax
 17 | {x: y, **, a: b}
    |
 
@@ -541,7 +541,7 @@ Module(
 15 | # No value for double star unpacking
 16 | {**}
 17 | {x: y, **, a: b}
-   |          ^ Syntax Error: Expected an expression
+   |          ^ Syntax Error: invalid syntax
 18 |
 19 | # This is not a double star unpacking
    |
@@ -550,7 +550,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |  ^^ Syntax Error: Starred expression cannot be used here
+   |  ^^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -558,7 +558,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |               ^^ Syntax Error: Starred expression cannot be used here
+   |               ^^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -567,11 +567,11 @@ Module(
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |     ^^ Syntax Error: Starred expression cannot be used here
+   |     ^^ Syntax Error: invalid syntax
 
 
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |            ^^ Syntax Error: Starred expression cannot be used here
+   |            ^^ Syntax Error: invalid syntax

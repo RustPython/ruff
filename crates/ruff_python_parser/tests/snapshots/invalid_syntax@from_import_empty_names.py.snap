@@ -70,7 +70,7 @@ Module(
 
   |
 1 | from x import
-  |              ^ Syntax Error: Expected one or more symbol names after import
+  |              ^ Syntax Error: Expected one or more names after 'import'
 2 | from x import ()
 3 | from x import ,,
   |
@@ -79,7 +79,7 @@ Module(
   |
 1 | from x import
 2 | from x import ()
-  |                ^ Syntax Error: Expected one or more symbol names after import
+  |                ^ Syntax Error: Expected one or more names after 'import'
 3 | from x import ,,
   |
 
@@ -88,18 +88,18 @@ Module(
 1 | from x import
 2 | from x import ()
 3 | from x import ,,
-  |               ^ Syntax Error: Expected an import name
+  |               ^ Syntax Error: invalid syntax
 
 
   |
 1 | from x import
 2 | from x import ()
 3 | from x import ,,
-  |                ^ Syntax Error: Expected an import name
+  |                ^ Syntax Error: invalid syntax
 
 
   |
 1 | from x import
 2 | from x import ()
 3 | from x import ,,
-  |                 ^ Syntax Error: Expected one or more symbol names after import
+  |                 ^ Syntax Error: Expected one or more names after 'import'

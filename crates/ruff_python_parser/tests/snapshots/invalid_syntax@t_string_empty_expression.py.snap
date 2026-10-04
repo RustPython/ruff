@@ -120,7 +120,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"{}"
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 3 | t"{  }"
   |
 
@@ -129,4 +129,4 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"{}"
 3 | t"{  }"
-  |      ^ Syntax Error: Expected an expression
+  |      ^ Syntax Error: invalid syntax

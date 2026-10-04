@@ -141,7 +141,7 @@ Module(
 
   |
 1 | def foo(x:): ...
-  |           ^ Syntax Error: Expected an expression
+  |           ^ Syntax Error: invalid syntax
 2 | def foo(x:,): ...
   |
 
@@ -149,4 +149,4 @@ Module(
   |
 1 | def foo(x:): ...
 2 | def foo(x:,): ...
-  |           ^ Syntax Error: Expected an expression
+  |           ^ Syntax Error: invalid syntax

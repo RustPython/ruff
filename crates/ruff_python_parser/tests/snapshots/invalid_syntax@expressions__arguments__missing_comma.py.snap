@@ -64,4 +64,4 @@ Module(
 
   |
 1 | call(x y)
-  |        ^ Syntax Error: Expected `,`, found identifier
+  |        ^ Syntax Error: invalid syntax

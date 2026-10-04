@@ -124,7 +124,7 @@ Module(
   |
 1 | print(*
 2 | *[])
-  | ^^^ Syntax Error: Starred expression cannot be used here
+  | ^^^ Syntax Error: invalid syntax
 3 | print(* *[])
   |
 
@@ -133,4 +133,4 @@ Module(
 1 | print(*
 2 | *[])
 3 | print(* *[])
-  |         ^^^ Syntax Error: Starred expression cannot be used here
+  |         ^^^ Syntax Error: invalid syntax

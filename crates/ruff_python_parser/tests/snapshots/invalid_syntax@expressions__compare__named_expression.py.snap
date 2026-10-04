@@ -137,7 +137,7 @@ Module(
 
   |
 1 | x not in y := (1, 2)
-  |            ^^ Syntax Error: Expected a statement
+  |            ^^ Syntax Error: invalid syntax
 2 | x > y := 2
   |
 
@@ -145,4 +145,4 @@ Module(
   |
 1 | x not in y := (1, 2)
 2 | x > y := 2
-  |       ^^ Syntax Error: Expected a statement
+  |       ^^ Syntax Error: invalid syntax

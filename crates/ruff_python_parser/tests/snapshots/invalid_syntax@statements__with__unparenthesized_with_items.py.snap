@@ -365,7 +365,7 @@ Module(
 1 | # For parenthesized with items test cases, refer to `./ambiguous_lpar_with_items.py`
 2 |
 3 | with item,: pass
-  |          ^ Syntax Error: Trailing comma not allowed
+  |          ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 4 | with item as x,: pass
 5 | with *item: pass
   |
@@ -374,7 +374,7 @@ Module(
   |
 3 | with item,: pass
 4 | with item as x,: pass
-  |               ^ Syntax Error: Trailing comma not allowed
+  |               ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 5 | with *item: pass
 6 | with *item as x: pass
   |
@@ -384,7 +384,7 @@ Module(
 3 | with item,: pass
 4 | with item as x,: pass
 5 | with *item: pass
-  |      ^^^^^ Syntax Error: Starred expression cannot be used here
+  |      ^^^^^ Syntax Error: invalid syntax
 6 | with *item as x: pass
 7 | with *item1, item2 as f: pass
   |
@@ -394,7 +394,7 @@ Module(
 4 | with item as x,: pass
 5 | with *item: pass
 6 | with *item as x: pass
-  |      ^^^^^ Syntax Error: Starred expression cannot be used here
+  |      ^^^^^ Syntax Error: invalid syntax
 7 | with *item1, item2 as f: pass
 8 | with item1 as f, *item2: pass
   |
@@ -404,7 +404,7 @@ Module(
 5 | with *item: pass
 6 | with *item as x: pass
 7 | with *item1, item2 as f: pass
-  |      ^^^^^^ Syntax Error: Starred expression cannot be used here
+  |      ^^^^^^ Syntax Error: invalid syntax
 8 | with item1 as f, *item2: pass
 9 | with item := 0 as f: pass
   |
@@ -414,7 +414,7 @@ Module(
 6 | with *item as x: pass
 7 | with *item1, item2 as f: pass
 8 | with item1 as f, *item2: pass
-  |                  ^^^^^^ Syntax Error: Starred expression cannot be used here
+  |                  ^^^^^^ Syntax Error: invalid syntax
 9 | with item := 0 as f: pass
   |
 
@@ -423,4 +423,4 @@ Module(
 7 | with *item1, item2 as f: pass
 8 | with item1 as f, *item2: pass
 9 | with item := 0 as f: pass
-  |           ^^ Syntax Error: Expected `,`, found `:=`
+  |           ^^ Syntax Error: invalid syntax

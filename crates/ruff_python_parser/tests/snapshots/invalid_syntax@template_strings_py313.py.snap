@@ -157,7 +157,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.13"}
 2 | t"{hey}"
-  | ^^^^^^^^ Syntax Error: Cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)
+  | ^^^^^^^^ Syntax Error: cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)
 3 | t'{there}'
 4 | t"""what's
   |
@@ -167,7 +167,7 @@ Module(
 1 | # parse_options: {"target-version": "3.13"}
 2 | t"{hey}"
 3 | t'{there}'
-  | ^^^^^^^^^^ Syntax Error: Cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)
+  | ^^^^^^^^^^ Syntax Error: cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)
 4 | t"""what's
 5 | happening?"""
   |
@@ -178,4 +178,4 @@ Module(
 3 |   t'{there}'
 4 | / t"""what's
 5 | | happening?"""
-  | |_____________^ Syntax Error: Cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)
+  | |_____________^ Syntax Error: cannot use t-strings on Python 3.13 (syntax was added in Python 3.14)

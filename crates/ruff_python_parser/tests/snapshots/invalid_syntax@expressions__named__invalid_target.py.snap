@@ -208,7 +208,7 @@ Module(
 1 | # Assignment expression target can only be an identifier
 2 |
 3 | (x.y := 1)
-  |  ^^^ Syntax Error: Assignment expression target must be an identifier
+  |  ^^^ Syntax Error: assignment expression target must be an identifier
 4 | (x[y] := 1)
 5 | (*x := 1)
   |
@@ -217,7 +217,7 @@ Module(
   |
 3 | (x.y := 1)
 4 | (x[y] := 1)
-  |  ^^^^ Syntax Error: Assignment expression target must be an identifier
+  |  ^^^^ Syntax Error: assignment expression target must be an identifier
 5 | (*x := 1)
 6 | ([x, y] := [1, 2])
   |
@@ -227,7 +227,7 @@ Module(
 3 | (x.y := 1)
 4 | (x[y] := 1)
 5 | (*x := 1)
-  |  ^^ Syntax Error: Assignment expression target must be an identifier
+  |  ^^ Syntax Error: assignment expression target must be an identifier
 6 | ([x, y] := [1, 2])
   |
 
@@ -236,4 +236,4 @@ Module(
 4 | (x[y] := 1)
 5 | (*x := 1)
 6 | ([x, y] := [1, 2])
-  |  ^^^^^^ Syntax Error: Assignment expression target must be an identifier
+  |  ^^^^^^ Syntax Error: assignment expression target must be an identifier

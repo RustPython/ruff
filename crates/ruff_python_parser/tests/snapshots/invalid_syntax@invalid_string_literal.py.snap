@@ -73,7 +73,7 @@ Module(
 
   |
 1 | 'hello \N{INVALID} world'
-  |           ^^^^^^^ Syntax Error: Got unexpected unicode
+  |           ^^^^^^^ Syntax Error: got unexpected unicode
 2 | """hello \N{INVALID} world"""
   |
 
@@ -81,4 +81,4 @@ Module(
   |
 1 | 'hello \N{INVALID} world'
 2 | """hello \N{INVALID} world"""
-  |             ^^^^^^^ Syntax Error: Got unexpected unicode
+  |             ^^^^^^^ Syntax Error: got unexpected unicode

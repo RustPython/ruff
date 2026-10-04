@@ -327,7 +327,7 @@ Module(
 
   |
 1 | x = (*a and b,)
-  |       ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |       ^^^^^^^ Syntax Error: boolean expression cannot be used here
 2 | x = (42, *yield x)
 3 | x = (42, *yield from x)
   |
@@ -336,7 +336,7 @@ Module(
   |
 1 | x = (*a and b,)
 2 | x = (42, *yield x)
-  |           ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | x = (42, *yield from x)
 4 | x = (*lambda x: x,)
   |
@@ -346,7 +346,7 @@ Module(
 1 | x = (*a and b,)
 2 | x = (42, *yield x)
 3 | x = (42, *yield from x)
-  |           ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 4 | x = (*lambda x: x,)
 5 | x = x := 1
   |
@@ -356,7 +356,7 @@ Module(
 2 | x = (42, *yield x)
 3 | x = (42, *yield from x)
 4 | x = (*lambda x: x,)
-  |       ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+  |       ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 5 | x = x := 1
   |
 
@@ -365,4 +365,4 @@ Module(
 3 | x = (42, *yield from x)
 4 | x = (*lambda x: x,)
 5 | x = x := 1
-  |       ^^ Syntax Error: Expected a statement
+  |       ^^ Syntax Error: invalid syntax

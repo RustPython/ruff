@@ -66,9 +66,9 @@ Module(
 
   |
 1 | if True: break; continue pass; continue break
-  |                          ^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |                          ^^^^ Syntax Error: invalid syntax
 
 
   |
 1 | if True: break; continue pass; continue break
-  |                                         ^^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |                                         ^^^^^ Syntax Error: invalid syntax

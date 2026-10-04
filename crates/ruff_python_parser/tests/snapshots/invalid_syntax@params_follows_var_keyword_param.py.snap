@@ -134,24 +134,24 @@ Module(
 
   |
 1 | def foo(**kwargs, a, /, b=10, *, *args): ...
-  |                   ^ Syntax Error: Parameter cannot follow var-keyword parameter
+  |                   ^ Syntax Error: arguments cannot follow var-keyword argument
 
 
   |
 1 | def foo(**kwargs, a, /, b=10, *, *args): ...
-  |                      ^ Syntax Error: Parameter cannot follow var-keyword parameter
+  |                      ^ Syntax Error: arguments cannot follow var-keyword argument
 
 
   |
 1 | def foo(**kwargs, a, /, b=10, *, *args): ...
-  |                         ^ Syntax Error: Parameter cannot follow var-keyword parameter
+  |                         ^ Syntax Error: arguments cannot follow var-keyword argument
 
 
   |
 1 | def foo(**kwargs, a, /, b=10, *, *args): ...
-  |                               ^ Syntax Error: Parameter cannot follow var-keyword parameter
+  |                               ^ Syntax Error: arguments cannot follow var-keyword argument
 
 
   |
 1 | def foo(**kwargs, a, /, b=10, *, *args): ...
-  |                                  ^ Syntax Error: Parameter cannot follow var-keyword parameter
+  |                                  ^ Syntax Error: arguments cannot follow var-keyword argument

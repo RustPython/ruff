@@ -295,7 +295,7 @@ Module(
 
   |
 1 | lambda x: *y
-  |           ^^ Syntax Error: Starred expression cannot be used here
+  |           ^^ Syntax Error: invalid syntax
 2 | lambda x: *y,
 3 | lambda x: *y, z
   |
@@ -304,7 +304,7 @@ Module(
   |
 1 | lambda x: *y
 2 | lambda x: *y,
-  |           ^^ Syntax Error: Starred expression cannot be used here
+  |           ^^ Syntax Error: invalid syntax
 3 | lambda x: *y, z
 4 | lambda x: *y and z
   |
@@ -314,7 +314,7 @@ Module(
 1 | lambda x: *y
 2 | lambda x: *y,
 3 | lambda x: *y, z
-  |           ^^ Syntax Error: Starred expression cannot be used here
+  |           ^^ Syntax Error: invalid syntax
 4 | lambda x: *y and z
   |
 
@@ -323,4 +323,4 @@ Module(
 2 | lambda x: *y,
 3 | lambda x: *y, z
 4 | lambda x: *y and z
-  |           ^^^^^^^^ Syntax Error: Starred expression cannot be used here
+  |           ^^^^^^^^ Syntax Error: invalid syntax

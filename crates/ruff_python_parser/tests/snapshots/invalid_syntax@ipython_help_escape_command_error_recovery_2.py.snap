@@ -65,7 +65,7 @@ Module(
   |
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b
-  |          ^ Syntax Error: Expected an expression or a ')'
+  |          ^ Syntax Error: invalid syntax
 3 | ?
   |
 
@@ -74,7 +74,7 @@ Module(
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b
 3 | ?
-  | ^ Syntax Error: Expected `,`, found `?`
+  | ^ Syntax Error: invalid syntax
 
 
   |

@@ -173,7 +173,7 @@ Module(
 
   |
 1 | from x import a.
-  |                ^ Syntax Error: Expected `,`, found `.`
+  |                ^ Syntax Error: invalid syntax
 2 | from x import a.b
 3 | from x import a, b.c, d, e.f, g
   |
@@ -182,7 +182,7 @@ Module(
   |
 1 | from x import a.
 2 | from x import a.b
-  |                ^ Syntax Error: Expected `,`, found `.`
+  |                ^ Syntax Error: invalid syntax
 3 | from x import a, b.c, d, e.f, g
   |
 
@@ -191,11 +191,11 @@ Module(
 1 | from x import a.
 2 | from x import a.b
 3 | from x import a, b.c, d, e.f, g
-  |                   ^ Syntax Error: Expected `,`, found `.`
+  |                   ^ Syntax Error: invalid syntax
 
 
   |
 1 | from x import a.
 2 | from x import a.b
 3 | from x import a, b.c, d, e.f, g
-  |                           ^ Syntax Error: Expected `,`, found `.`
+  |                           ^ Syntax Error: invalid syntax

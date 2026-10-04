@@ -121,7 +121,7 @@ Module(
 
   |
 1 | x + lambda y: y
-  |     ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+  |     ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 2 |
 3 | x - yield y
   |
@@ -131,4 +131,4 @@ Module(
 1 | x + lambda y: y
 2 |
 3 | x - yield y
-  |     ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |     ^^^^^^^ Syntax Error: yield expression cannot be used here

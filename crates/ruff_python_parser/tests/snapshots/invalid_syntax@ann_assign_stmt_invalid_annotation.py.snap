@@ -198,7 +198,7 @@ Module(
 
   |
 1 | x: *int = 1
-  |    ^^^^ Syntax Error: Starred expression cannot be used here
+  |    ^^^^ Syntax Error: invalid syntax
 2 | x: yield a = 1
 3 | x: yield from b = 1
   |
@@ -207,7 +207,7 @@ Module(
   |
 1 | x: *int = 1
 2 | x: yield a = 1
-  |    ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |    ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | x: yield from b = 1
 4 | x: y := int = 1
   |
@@ -217,7 +217,7 @@ Module(
 1 | x: *int = 1
 2 | x: yield a = 1
 3 | x: yield from b = 1
-  |    ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |    ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 4 | x: y := int = 1
   |
 
@@ -226,7 +226,7 @@ Module(
 2 | x: yield a = 1
 3 | x: yield from b = 1
 4 | x: y := int = 1
-  |      ^^ Syntax Error: Expected a statement
+  |      ^^ Syntax Error: invalid syntax
 
 
 ## Semantic Syntax Errors

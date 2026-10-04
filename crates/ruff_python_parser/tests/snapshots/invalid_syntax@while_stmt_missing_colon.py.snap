@@ -67,6 +67,6 @@ Module(
 1 | while (
 2 |     a < 30 # comment
 3 | )
-  |  ^ Syntax Error: Expected `:`, found newline
+  |  ^ Syntax Error: expected ':'
 4 |     pass
   |

@@ -77,7 +77,7 @@ Module(
   |
 1 | # No expression after `await`, a statement on another line
 2 | await
-  |      ^ Syntax Error: Expected an expression
+  |      ^ Syntax Error: invalid syntax
 3 |
 4 | def foo():
 5 |     pass

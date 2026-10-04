@@ -80,7 +80,7 @@ Module(
 
   |
 1 | (async)
-  |  ^^^^^ Syntax Error: Expected an identifier, but found a keyword `async` that cannot be used here
+  |  ^^^^^ Syntax Error: invalid syntax
 2 | (x async x in iter)
   |
 
@@ -88,4 +88,4 @@ Module(
   |
 1 | (async)
 2 | (x async x in iter)
-  |          ^ Syntax Error: Expected `for`, found identifier
+  |          ^ Syntax Error: invalid syntax

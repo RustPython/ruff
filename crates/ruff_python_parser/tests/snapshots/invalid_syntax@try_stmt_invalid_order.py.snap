@@ -65,7 +65,7 @@ Module(
 3 | finally:
 4 |     pass
 5 | else:
-  |     ^ Syntax Error: Expected a statement
+  |     ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -74,7 +74,7 @@ Module(
 3 | finally:
 4 |     pass
 5 | else:
-  |      ^ Syntax Error: Expected a statement
+  |      ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -83,4 +83,4 @@ Module(
 4 |     pass
 5 | else:
 6 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation

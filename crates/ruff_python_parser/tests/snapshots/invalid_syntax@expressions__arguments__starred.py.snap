@@ -199,7 +199,7 @@ Module(
   |
 1 | call(*data for data in iter)
 2 | call(*yield x)
-  |       ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |       ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | call(*yield from x)
   |
 
@@ -208,14 +208,14 @@ Module(
 1 | call(*data for data in iter)
 2 | call(*yield x)
 3 | call(*yield from x)
-  |       ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |       ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 
 
 ## Unsupported Syntax Errors
 
   |
 1 | call(*data for data in iter)
-  |      ^^^^^ Syntax Error: Cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)
+  |      ^^^^^ Syntax Error: cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)
 2 | call(*yield x)
 3 | call(*yield from x)
   |

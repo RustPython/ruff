@@ -1059,7 +1059,15 @@ impl<'src> Lexer<'src> {
         if !number.has_digit {
             let err = u64::from_str_radix("", radix.as_u32()).unwrap_err();
             return self.push_error(LexicalError::new(
-                LexicalErrorType::OtherError(format!("{err:?}").into_boxed_str()),
+                LexicalErrorType::OtherError({
+                    let msg = format!("{err:?}");
+                    let mut chars = msg.chars();
+                    match chars.next() {
+                        Some(first) => format!("{}{}", first.to_ascii_lowercase(), chars.as_str())
+                            .into_boxed_str(),
+                        None => msg.into_boxed_str(),
+                    }
+                }),
                 self.token_range(),
             ));
         }
@@ -1083,7 +1091,7 @@ impl<'src> Lexer<'src> {
         let is_float = if first_digit_or_dot == '.' || self.cursor.eat_char('.') {
             if self.cursor.eat_char('_') {
                 return self.push_error(LexicalError::new(
-                    LexicalErrorType::OtherError("Invalid Syntax".to_string().into_boxed_str()),
+                    LexicalErrorType::OtherError("invalid syntax".to_string().into_boxed_str()),
                     TextRange::new(self.offset() - TextSize::new(1), self.offset()),
                 ));
             }
@@ -1117,7 +1125,7 @@ impl<'src> Lexer<'src> {
             // Leading zeros in decimal integer literals are not permitted.
             self.push_error(LexicalError::new(
                 LexicalErrorType::OtherError(
-                    "Invalid decimal integer literal"
+                    "invalid decimal integer literal"
                         .to_string()
                         .into_boxed_str(),
                 ),

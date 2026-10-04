@@ -117,7 +117,7 @@ Module(
   |
 1 | def foo():
 2 | def foo() -> int:
-  | ^^^ Syntax Error: Expected an indented block after function definition
+  | ^^^ Syntax Error: expected an indented block after function definition
 3 | x = 42
   |
 
@@ -126,4 +126,4 @@ Module(
 1 | def foo():
 2 | def foo() -> int:
 3 | x = 42
-  | ^ Syntax Error: Expected an indented block after function definition
+  | ^ Syntax Error: expected an indented block after function definition

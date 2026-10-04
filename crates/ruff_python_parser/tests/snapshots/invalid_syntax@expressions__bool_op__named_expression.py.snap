@@ -111,7 +111,7 @@ Module(
 
   |
 1 | x and a := b
-  |         ^^ Syntax Error: Expected a statement
+  |         ^^ Syntax Error: invalid syntax
 2 | x or a := b
   |
 
@@ -119,4 +119,4 @@ Module(
   |
 1 | x and a := b
 2 | x or a := b
-  |        ^^ Syntax Error: Expected a statement
+  |        ^^ Syntax Error: invalid syntax

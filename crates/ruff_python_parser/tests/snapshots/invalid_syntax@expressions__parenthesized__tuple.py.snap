@@ -293,7 +293,7 @@ Module(
 1 | # Test cases for tuple expressions where the parser recovers from a syntax error.
 2 |
 3 | (,)
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 4 |
 5 | (1,,2)
   |
@@ -303,7 +303,7 @@ Module(
 3 | (,)
 4 |
 5 | (1,,2)
-  |    ^ Syntax Error: Expected an expression or a ')'
+  |    ^ Syntax Error: invalid syntax
 6 |
 7 | (1,,)
   |
@@ -313,7 +313,7 @@ Module(
 5 | (1,,2)
 6 |
 7 | (1,,)
-  |    ^ Syntax Error: Expected an expression or a ')'
+  |    ^ Syntax Error: invalid syntax
 8 |
 9 | # Missing comma
   |
@@ -322,7 +322,7 @@ Module(
    |
  9 | # Missing comma
 10 | (1 2)
-   |    ^ Syntax Error: Expected `)`, found int
+   |    ^ Syntax Error: invalid syntax
 11 |
 12 | # Dictionary element in a list
    |
@@ -331,7 +331,7 @@ Module(
    |
  9 | # Missing comma
 10 | (1 2)
-   |     ^ Syntax Error: Expected a statement
+   |     ^ Syntax Error: invalid syntax
 11 |
 12 | # Dictionary element in a list
    |
@@ -340,7 +340,7 @@ Module(
    |
  9 | # Missing comma
 10 | (1 2)
-   |      ^ Syntax Error: Expected a statement
+   |      ^ Syntax Error: invalid syntax
 11 |
 12 | # Dictionary element in a list
 13 | (1: 2)
@@ -350,7 +350,7 @@ Module(
    |
 12 | # Dictionary element in a list
 13 | (1: 2)
-   |   ^ Syntax Error: Expected `)`, found `:`
+   |   ^ Syntax Error: invalid syntax
 14 |
 15 | # Missing expression
    |
@@ -359,7 +359,7 @@ Module(
    |
 12 | # Dictionary element in a list
 13 | (1: 2)
-   |  ^ Syntax Error: Invalid annotated assignment target
+   |  ^ Syntax Error: illegal target for annotation
 14 |
 15 | # Missing expression
    |
@@ -368,7 +368,7 @@ Module(
    |
 12 | # Dictionary element in a list
 13 | (1: 2)
-   |      ^ Syntax Error: Expected a statement
+   |      ^ Syntax Error: invalid syntax
 14 |
 15 | # Missing expression
    |
@@ -377,7 +377,7 @@ Module(
    |
 12 | # Dictionary element in a list
 13 | (1: 2)
-   |       ^ Syntax Error: Expected a statement
+   |       ^ Syntax Error: invalid syntax
 14 |
 15 | # Missing expression
 16 | (1, x + )
@@ -387,7 +387,7 @@ Module(
    |
 15 | # Missing expression
 16 | (1, x + )
-   |         ^ Syntax Error: Expected an expression
+   |         ^ Syntax Error: invalid syntax
 17 |
 18 | (1; 2)
    |
@@ -397,7 +397,7 @@ Module(
 16 | (1, x + )
 17 |
 18 | (1; 2)
-   |   ^ Syntax Error: Expected `)`, found `;`
+   |   ^ Syntax Error: invalid syntax
 19 |
 20 | # Unparenthesized named expression is not allowed
    |
@@ -407,7 +407,7 @@ Module(
 16 | (1, x + )
 17 |
 18 | (1; 2)
-   |      ^ Syntax Error: Expected a statement
+   |      ^ Syntax Error: invalid syntax
 19 |
 20 | # Unparenthesized named expression is not allowed
    |
@@ -417,7 +417,7 @@ Module(
 16 | (1, x + )
 17 |
 18 | (1; 2)
-   |       ^ Syntax Error: Expected a statement
+   |       ^ Syntax Error: invalid syntax
 19 |
 20 | # Unparenthesized named expression is not allowed
 21 | x, y := 2, z
@@ -427,4 +427,4 @@ Module(
    |
 20 | # Unparenthesized named expression is not allowed
 21 | x, y := 2, z
-   |      ^^ Syntax Error: Expected `,`, found `:=`
+   |      ^^ Syntax Error: invalid syntax

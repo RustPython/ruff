@@ -123,9 +123,9 @@ Module(
 
   |
 1 | if call(foo, [a, b␍    def bar():␍        pass
-  |                        ^^^ Syntax Error: Expected `]`, found `def`
+  |                        ^^^ Syntax Error: invalid syntax
 
 
   |
 1 | if call(foo, [a, b␍    def bar():␍        pass
-  |                   ^ Syntax Error: Expected `)`, found newline
+  |                   ^ Syntax Error: invalid syntax

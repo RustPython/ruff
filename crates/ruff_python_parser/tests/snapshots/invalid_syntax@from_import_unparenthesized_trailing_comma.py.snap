@@ -119,7 +119,7 @@ Module(
 
   |
 1 | from a import b,
-  |                ^ Syntax Error: Trailing comma not allowed
+  |                ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 2 | from a import b as c,
 3 | from a import b, c,
   |
@@ -128,7 +128,7 @@ Module(
   |
 1 | from a import b,
 2 | from a import b as c,
-  |                     ^ Syntax Error: Trailing comma not allowed
+  |                     ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 3 | from a import b, c,
   |
 
@@ -137,4 +137,4 @@ Module(
 1 | from a import b,
 2 | from a import b as c,
 3 | from a import b, c,
-  |                   ^ Syntax Error: Trailing comma not allowed
+  |                   ^ Syntax Error: trailing comma not allowed without surrounding parentheses

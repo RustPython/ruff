@@ -89,7 +89,7 @@ Module(
   |
 1 | def _():
 2 |     nonlocal ,
-  |              ^ Syntax Error: Expected an identifier
+  |              ^ Syntax Error: invalid syntax
 3 |     nonlocal x,
 4 |     nonlocal x, y,
   |
@@ -98,7 +98,7 @@ Module(
   |
 1 | def _():
 2 |     nonlocal ,
-  |               ^ Syntax Error: Nonlocal statement must have at least one name
+  |               ^ Syntax Error: nonlocal statement must have at least one name
 3 |     nonlocal x,
 4 |     nonlocal x, y,
   |
@@ -108,7 +108,7 @@ Module(
 1 | def _():
 2 |     nonlocal ,
 3 |     nonlocal x,
-  |               ^ Syntax Error: Trailing comma not allowed
+  |               ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 4 |     nonlocal x, y,
   |
 
@@ -117,4 +117,4 @@ Module(
 2 |     nonlocal ,
 3 |     nonlocal x,
 4 |     nonlocal x, y,
-  |                  ^ Syntax Error: Trailing comma not allowed
+  |                  ^ Syntax Error: trailing comma not allowed without surrounding parentheses

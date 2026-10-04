@@ -34,4 +34,4 @@ Module(
 
   |
 1 | assert x,
-  |          ^ Syntax Error: Expected an expression
+  |          ^ Syntax Error: invalid syntax

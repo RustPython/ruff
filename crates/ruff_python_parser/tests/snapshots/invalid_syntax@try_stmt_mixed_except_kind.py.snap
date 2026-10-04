@@ -263,7 +263,7 @@ Module(
 4 |       pass
 5 | / except* ExceptionGroup:
 6 | |     pass
-  | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
+  | |________^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
 7 |   try:
 8 |       pass
   |
@@ -274,7 +274,7 @@ Module(
 10 |       pass
 11 | / except:
 12 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
+   | |________^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
 13 |   try:
 14 |       pass
    |
@@ -285,7 +285,7 @@ Module(
 18 |       pass
 19 | / except* ExceptionGroup:
 20 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
+   | |________^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
 21 |   except* ExceptionGroup:
 22 |       pass
    |
@@ -296,4 +296,4 @@ Module(
 20 |       pass
 21 | / except* ExceptionGroup:
 22 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
+   | |________^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'

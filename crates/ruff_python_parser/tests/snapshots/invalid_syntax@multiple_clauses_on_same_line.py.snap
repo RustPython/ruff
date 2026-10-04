@@ -355,7 +355,7 @@ Module(
 
   |
 1 | if True: pass elif False: pass else: pass
-  |               ^^^^ Syntax Error: Expected newline, found `elif`
+  |               ^^^^ Syntax Error: invalid syntax
 2 | if True: pass; elif False: pass; else: pass
 3 | for x in iter: break else: pass
   |
@@ -363,7 +363,7 @@ Module(
 
   |
 1 | if True: pass elif False: pass else: pass
-  |                                ^^^^ Syntax Error: Expected newline, found `else`
+  |                                ^^^^ Syntax Error: invalid syntax
 2 | if True: pass; elif False: pass; else: pass
 3 | for x in iter: break else: pass
   |
@@ -372,16 +372,7 @@ Module(
   |
 1 | if True: pass elif False: pass else: pass
 2 | if True: pass; elif False: pass; else: pass
-  |                ^^^^ Syntax Error: Expected newline, found `elif`
-3 | for x in iter: break else: pass
-4 | for x in iter: break; else: pass
-  |
-
-
-  |
-1 | if True: pass elif False: pass else: pass
-2 | if True: pass; elif False: pass; else: pass
-  |                                  ^^^^ Syntax Error: Expected newline, found `else`
+  |                ^^^^ Syntax Error: invalid syntax
 3 | for x in iter: break else: pass
 4 | for x in iter: break; else: pass
   |
@@ -390,8 +381,17 @@ Module(
   |
 1 | if True: pass elif False: pass else: pass
 2 | if True: pass; elif False: pass; else: pass
+  |                                  ^^^^ Syntax Error: invalid syntax
 3 | for x in iter: break else: pass
-  |                      ^^^^ Syntax Error: Expected newline, found `else`
+4 | for x in iter: break; else: pass
+  |
+
+
+  |
+1 | if True: pass elif False: pass else: pass
+2 | if True: pass; elif False: pass; else: pass
+3 | for x in iter: break else: pass
+  |                      ^^^^ Syntax Error: invalid syntax
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
   |
@@ -401,7 +401,7 @@ Module(
 2 | if True: pass; elif False: pass; else: pass
 3 | for x in iter: break else: pass
 4 | for x in iter: break; else: pass
-  |                       ^^^^ Syntax Error: Expected newline, found `else`
+  |                       ^^^^ Syntax Error: invalid syntax
 5 | try: pass except exc: pass else: pass finally: pass
 6 | try: pass; except exc: pass; else: pass; finally: pass
   |
@@ -411,7 +411,7 @@ Module(
 3 | for x in iter: break else: pass
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
-  |           ^^^^^^ Syntax Error: Expected newline, found `except`
+  |           ^^^^^^ Syntax Error: invalid syntax
 6 | try: pass; except exc: pass; else: pass; finally: pass
   |
 
@@ -420,7 +420,7 @@ Module(
 3 | for x in iter: break else: pass
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
-  |                            ^^^^ Syntax Error: Expected newline, found `else`
+  |                            ^^^^ Syntax Error: invalid syntax
 6 | try: pass; except exc: pass; else: pass; finally: pass
   |
 
@@ -429,7 +429,7 @@ Module(
 3 | for x in iter: break else: pass
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
-  |                                       ^^^^^^^ Syntax Error: Expected newline, found `finally`
+  |                                       ^^^^^^^ Syntax Error: invalid syntax
 6 | try: pass; except exc: pass; else: pass; finally: pass
   |
 
@@ -438,18 +438,18 @@ Module(
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
 6 | try: pass; except exc: pass; else: pass; finally: pass
-  |            ^^^^^^ Syntax Error: Expected newline, found `except`
+  |            ^^^^^^ Syntax Error: invalid syntax
 
 
   |
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
 6 | try: pass; except exc: pass; else: pass; finally: pass
-  |                              ^^^^ Syntax Error: Expected newline, found `else`
+  |                              ^^^^ Syntax Error: invalid syntax
 
 
   |
 4 | for x in iter: break; else: pass
 5 | try: pass except exc: pass else: pass finally: pass
 6 | try: pass; except exc: pass; else: pass; finally: pass
-  |                                          ^^^^^^^ Syntax Error: Expected newline, found `finally`
+  |                                          ^^^^^^^ Syntax Error: invalid syntax

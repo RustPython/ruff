@@ -282,7 +282,7 @@ Module(
 3 | # These are same as for the list expressions.
 4 |
 5 | {,}
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 6 |
 7 | {1,,2}
   |
@@ -292,7 +292,7 @@ Module(
 5 | {,}
 6 |
 7 | {1,,2}
-  |    ^ Syntax Error: Expected an expression or a '}'
+  |    ^ Syntax Error: invalid syntax
 8 |
 9 | {1,,}
   |
@@ -302,7 +302,7 @@ Module(
  7 | {1,,2}
  8 |
  9 | {1,,}
-   |    ^ Syntax Error: Expected an expression or a '}'
+   |    ^ Syntax Error: invalid syntax
 10 |
 11 | # Missing comma
    |
@@ -311,7 +311,7 @@ Module(
    |
 11 | # Missing comma
 12 | {1 2}
-   |    ^ Syntax Error: Expected `,`, found int
+   |    ^ Syntax Error: invalid syntax
 13 |
 14 | # Dictionary element in a list
    |
@@ -320,7 +320,7 @@ Module(
    |
 17 | # Missing expression
 18 | {1, x + }
-   |         ^ Syntax Error: Expected an expression
+   |         ^ Syntax Error: invalid syntax
 19 |
 20 | {1; 2}
    |
@@ -330,7 +330,7 @@ Module(
 18 | {1, x + }
 19 |
 20 | {1; 2}
-   |   ^ Syntax Error: Expected an expression or a '}'
+   |   ^ Syntax Error: invalid syntax
 21 |
 22 | [*]
    |
@@ -340,4 +340,4 @@ Module(
 20 | {1; 2}
 21 |
 22 | [*]
-   |   ^ Syntax Error: Expected an expression
+   |   ^ Syntax Error: invalid syntax

@@ -91,7 +91,7 @@ Module(
 
   |
 1 | -x := 1
-  |    ^^ Syntax Error: Expected a statement
+  |    ^^ Syntax Error: invalid syntax
 2 | not x := 1
   |
 
@@ -99,4 +99,4 @@ Module(
   |
 1 | -x := 1
 2 | not x := 1
-  |       ^^ Syntax Error: Expected a statement
+  |       ^^ Syntax Error: invalid syntax

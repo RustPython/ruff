@@ -207,7 +207,7 @@ Module(
 1 | try:
 2 |     pass
 3 | exept:  # spellchecker:disable-line
-  | ^^^^^ Syntax Error: Expected `except` or `finally` after `try` block
+  | ^^^^^ Syntax Error: expected 'except' or 'finally' block
 4 |     pass
 5 | finally:
   |
@@ -217,7 +217,7 @@ Module(
 1 | try:
 2 |     pass
 3 | exept:  # spellchecker:disable-line
-  |                                    ^ Syntax Error: Expected an expression
+  |                                    ^ Syntax Error: invalid syntax
 4 |     pass
 5 | finally:
 6 |     pass
@@ -228,7 +228,7 @@ Module(
 2 |     pass
 3 | exept:  # spellchecker:disable-line
 4 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation
 5 | finally:
 6 |     pass
   |
@@ -238,17 +238,7 @@ Module(
 3 | exept:  # spellchecker:disable-line
 4 |     pass
 5 | finally:
-  | ^^^^^^^ Syntax Error: Expected a statement
-6 |     pass
-7 | a = 1
-  |
-
-
-  |
-3 | exept:  # spellchecker:disable-line
-4 |     pass
-5 | finally:
-  |        ^ Syntax Error: Expected a statement
+  | ^^^^^^^ Syntax Error: invalid syntax
 6 |     pass
 7 | a = 1
   |
@@ -258,7 +248,17 @@ Module(
 3 | exept:  # spellchecker:disable-line
 4 |     pass
 5 | finally:
-  |         ^ Syntax Error: Expected a statement
+  |        ^ Syntax Error: invalid syntax
+6 |     pass
+7 | a = 1
+  |
+
+
+  |
+3 | exept:  # spellchecker:disable-line
+4 |     pass
+5 | finally:
+  |         ^ Syntax Error: invalid syntax
 6 |     pass
 7 | a = 1
 8 | try:
@@ -269,7 +269,7 @@ Module(
 4 |     pass
 5 | finally:
 6 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  | ^^^^ Syntax Error: unexpected indentation
 7 | a = 1
 8 | try:
   |
@@ -279,7 +279,7 @@ Module(
 10 | except:
 11 |     pass
 12 | exept:  # spellchecker:disable-line
-   |                                    ^ Syntax Error: Expected an expression
+   |                                    ^ Syntax Error: invalid syntax
 13 |     pass
 14 | b = 1
    |
@@ -289,6 +289,6 @@ Module(
 11 |     pass
 12 | exept:  # spellchecker:disable-line
 13 |     pass
-   | ^^^^ Syntax Error: Unexpected indentation
+   | ^^^^ Syntax Error: unexpected indentation
 14 | b = 1
    |

@@ -116,6 +116,6 @@ Module(
   |
 1 | # parse_options: { "target-version": "3.8" }
 2 | @foo().bar()
-  |  ^^^^^ Syntax Error: Cannot use a call expression in a decorator on Python 3.8 unless it is the top-level expression or it occurs in the argument list of a top-level call expression (relaxed decorator syntax was added in Python 3.9)
+  |  ^^^^^ Syntax Error: cannot use a call expression in a decorator on Python 3.8 unless it is the top-level expression or it occurs in the argument list of a top-level call expression (relaxed decorator syntax was added in Python 3.9)
 3 | def baz(): ...
   |

@@ -344,7 +344,7 @@ impl<'src> Parser<'src> {
                 if left_precedence > OperatorPrecedence::Not {
                     self.add_error(
                         ParseErrorType::OtherError(
-                            "Boolean 'not' expression cannot be used here".to_string(),
+                            "'not' after an operator must be parenthesized".to_string(),
                         ),
                         &expr,
                     );
@@ -359,7 +359,7 @@ impl<'src> Parser<'src> {
                 {
                     self.add_error(
                         ParseErrorType::OtherError(format!(
-                            "Unary '{unary_op}' expression cannot be used here",
+                            "unary '{unary_op}' expression cannot be used here",
                         )),
                         &expr,
                     );
@@ -388,7 +388,7 @@ impl<'src> Parser<'src> {
                 if left_precedence >= OperatorPrecedence::Await {
                     self.add_error(
                         ParseErrorType::OtherError(
-                            "Await expression cannot be used here".to_string(),
+                            "await expression cannot be used here".to_string(),
                         ),
                         &await_expr,
                     );
@@ -441,14 +441,14 @@ impl<'src> Parser<'src> {
         }
 
         let expr_name = match parsed_expr.expr {
-            Expr::Compare(_) => "Comparison",
+            Expr::Compare(_) => "comparison",
             Expr::BoolOp(_)
             | Expr::UnaryOp(ast::ExprUnaryOp {
                 op: ast::UnaryOp::Not,
                 ..
-            }) => "Boolean",
-            Expr::If(_) => "Conditional",
-            Expr::Lambda(_) => "Lambda",
+            }) => "boolean",
+            Expr::If(_) => "conditional",
+            Expr::Lambda(_) => "lambda",
             _ => return parsed_expr,
         };
 
@@ -543,13 +543,7 @@ impl<'src> Parser<'src> {
 
         if self.current_token_kind().is_keyword() {
             // Non-soft keyword
-            self.add_error(
-                ParseErrorType::OtherError(format!(
-                    "Expected an identifier, but found a keyword {} that cannot be used here",
-                    self.current_token_kind()
-                )),
-                range,
-            );
+            self.add_error(ParseErrorType::OtherError("invalid syntax".into()), range);
 
             let text = self.src_text(range);
             let id = self.intern_name(text);
@@ -566,7 +560,7 @@ impl<'src> Parser<'src> {
 
     fn parse_missing_identifier(&mut self) -> ast::Identifier {
         self.add_error(
-            ParseErrorType::OtherError("Expected an identifier".into()),
+            ParseErrorType::OtherError("invalid syntax".into()),
             self.current_token_range(),
         );
 
@@ -830,7 +824,7 @@ impl<'src> Parser<'src> {
                             // not a name expression. We could add the expression into `args` but
                             // that means the error is a missing comma instead.
                             parser.add_error(
-                                ParseErrorType::OtherError("Expected a parameter name".to_string()),
+                                ParseErrorType::OtherError("expected a parameter name".to_string()),
                                 &parsed_expr,
                             );
                             ast::Identifier {
@@ -1523,10 +1517,10 @@ impl<'src> Parser<'src> {
                 [StringType::TString(_), StringType::TString(_)]
                 | [StringType::Bytes(_), StringType::Bytes(_)] => continue,
                 [StringType::TString(_), _] | [_, StringType::TString(_)] => {
-                    "Cannot mix t-string literals with string or bytes literals"
+                    "cannot mix t-string literals with string or bytes literals"
                 }
                 [StringType::Bytes(_), _] | [_, StringType::Bytes(_)] => {
-                    "Bytes literal cannot be mixed with non-bytes literals"
+                    "cannot mix bytes and nonbytes literals"
                 }
                 _ => continue,
             };
@@ -2058,7 +2052,7 @@ impl<'src> Parser<'src> {
         // Nice error message when having a unclosed open bracket `[`
         if self.at_ts(NEWLINE_EOF_SET) {
             self.add_error(
-                ParseErrorType::OtherError("Missing closing bracket `]`".to_string()),
+                ParseErrorType::OtherError("missing closing bracket `]`".to_string()),
                 self.current_token_range(),
             );
         }
@@ -2151,7 +2145,7 @@ impl<'src> Parser<'src> {
         // Nice error message when having a unclosed open brace `{`
         if self.at_ts(NEWLINE_EOF_SET) {
             self.add_error(
-                ParseErrorType::OtherError("Missing closing brace `}`".to_string()),
+                ParseErrorType::OtherError("missing closing brace `}`".to_string()),
                 self.current_token_range(),
             );
         }
@@ -2313,7 +2307,7 @@ impl<'src> Parser<'src> {
         if self.at_ts(NEWLINE_EOF_SET) {
             let range = self.current_token_range();
             self.add_error(
-                ParseErrorType::OtherError("Missing closing parenthesis `)`".to_string()),
+                ParseErrorType::OtherError("missing closing parenthesis `)`".to_string()),
                 range,
             );
         }

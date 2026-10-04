@@ -171,7 +171,7 @@ Module(
 
   |
 1 | call( = 1)
-  |       ^ Syntax Error: Expected an expression or a ')'
+  |       ^ Syntax Error: invalid syntax
 2 | call(x = )
 3 | call(*, y)
   |
@@ -180,7 +180,7 @@ Module(
   |
 1 | call( = 1)
 2 | call(x = )
-  |          ^ Syntax Error: Expected an expression
+  |          ^ Syntax Error: invalid syntax
 3 | call(*, y)
   |
 
@@ -189,7 +189,7 @@ Module(
 1 | call( = 1)
 2 | call(x = )
 3 | call(*, y)
-  |       ^ Syntax Error: Expected an expression
+  |       ^ Syntax Error: invalid syntax
 4 |
 5 | foo
   |

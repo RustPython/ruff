@@ -1325,7 +1325,7 @@ Module(
 2 | # Test the first and any other element as there are two separate calls.
 3 |
 4 | (*x in y, z, *x in y)
-  |   ^^^^^^ Syntax Error: Comparison expression cannot be used here
+  |   ^^^^^^ Syntax Error: comparison expression cannot be used here
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
   |
@@ -1335,7 +1335,7 @@ Module(
 2 | # Test the first and any other element as there are two separate calls.
 3 |
 4 | (*x in y, z, *x in y)
-  |               ^^^^^^ Syntax Error: Comparison expression cannot be used here
+  |               ^^^^^^ Syntax Error: comparison expression cannot be used here
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
   |
@@ -1344,7 +1344,7 @@ Module(
   |
 4 | (*x in y, z, *x in y)
 5 | (*not x, z, *not x)
-  |   ^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^ Syntax Error: boolean expression cannot be used here
 6 | (*x and y, z, *x and y)
 7 | (*x or y, z, *x or y)
   |
@@ -1353,7 +1353,7 @@ Module(
   |
 4 | (*x in y, z, *x in y)
 5 | (*not x, z, *not x)
-  |              ^^^^^ Syntax Error: Boolean expression cannot be used here
+  |              ^^^^^ Syntax Error: boolean expression cannot be used here
 6 | (*x and y, z, *x and y)
 7 | (*x or y, z, *x or y)
   |
@@ -1363,7 +1363,7 @@ Module(
 4 | (*x in y, z, *x in y)
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
-  |   ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^^^ Syntax Error: boolean expression cannot be used here
 7 | (*x or y, z, *x or y)
 8 | (*x if True else y, z, *x if True else y)
   |
@@ -1373,7 +1373,7 @@ Module(
 4 | (*x in y, z, *x in y)
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
-  |                ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |                ^^^^^^^ Syntax Error: boolean expression cannot be used here
 7 | (*x or y, z, *x or y)
 8 | (*x if True else y, z, *x if True else y)
   |
@@ -1383,7 +1383,7 @@ Module(
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
 7 | (*x or y, z, *x or y)
-  |   ^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^^ Syntax Error: boolean expression cannot be used here
 8 | (*x if True else y, z, *x if True else y)
 9 | (*lambda x: x, z, *lambda x: x)
   |
@@ -1393,7 +1393,7 @@ Module(
 5 | (*not x, z, *not x)
 6 | (*x and y, z, *x and y)
 7 | (*x or y, z, *x or y)
-  |               ^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |               ^^^^^^ Syntax Error: boolean expression cannot be used here
 8 | (*x if True else y, z, *x if True else y)
 9 | (*lambda x: x, z, *lambda x: x)
   |
@@ -1403,7 +1403,7 @@ Module(
  6 | (*x and y, z, *x and y)
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
-   |   ^^^^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |   ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
    |
@@ -1413,7 +1413,7 @@ Module(
  6 | (*x and y, z, *x and y)
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
-   |                         ^^^^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |                         ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
    |
@@ -1423,7 +1423,7 @@ Module(
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
  9 | (*lambda x: x, z, *lambda x: x)
-   |   ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |   ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 10 | (*x := 2, z, *x := 2)
    |
 
@@ -1432,7 +1432,7 @@ Module(
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
  9 | (*lambda x: x, z, *lambda x: x)
-   |                    ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |                    ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 10 | (*x := 2, z, *x := 2)
    |
 
@@ -1441,29 +1441,20 @@ Module(
  8 | (*x if True else y, z, *x if True else y)
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
-   |  ^^ Syntax Error: Assignment expression target must be an identifier
+   |  ^^ Syntax Error: assignment expression target must be an identifier
 
 
    |
  8 | (*x if True else y, z, *x if True else y)
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
-   |              ^^ Syntax Error: Assignment expression target must be an identifier
+   |              ^^ Syntax Error: assignment expression target must be an identifier
 
 
    |
 13 | # Non-parenthesized
 14 | *x in y, z, *x in y
-   |  ^^^^^^ Syntax Error: Comparison expression cannot be used here
-15 | *not x, z, *not x
-16 | *x and y, z, *x and y
-   |
-
-
-   |
-13 | # Non-parenthesized
-14 | *x in y, z, *x in y
-   |              ^^^^^^ Syntax Error: Comparison expression cannot be used here
+   |  ^^^^^^ Syntax Error: comparison expression cannot be used here
 15 | *not x, z, *not x
 16 | *x and y, z, *x and y
    |
@@ -1472,8 +1463,17 @@ Module(
    |
 13 | # Non-parenthesized
 14 | *x in y, z, *x in y
+   |              ^^^^^^ Syntax Error: comparison expression cannot be used here
 15 | *not x, z, *not x
-   |  ^^^^^ Syntax Error: Boolean expression cannot be used here
+16 | *x and y, z, *x and y
+   |
+
+
+   |
+13 | # Non-parenthesized
+14 | *x in y, z, *x in y
+15 | *not x, z, *not x
+   |  ^^^^^ Syntax Error: boolean expression cannot be used here
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
    |
@@ -1483,7 +1483,7 @@ Module(
 13 | # Non-parenthesized
 14 | *x in y, z, *x in y
 15 | *not x, z, *not x
-   |             ^^^^^ Syntax Error: Boolean expression cannot be used here
+   |             ^^^^^ Syntax Error: boolean expression cannot be used here
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
    |
@@ -1493,7 +1493,7 @@ Module(
 14 | *x in y, z, *x in y
 15 | *not x, z, *not x
 16 | *x and y, z, *x and y
-   |  ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+   |  ^^^^^^^ Syntax Error: boolean expression cannot be used here
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
    |
@@ -1503,7 +1503,7 @@ Module(
 14 | *x in y, z, *x in y
 15 | *not x, z, *not x
 16 | *x and y, z, *x and y
-   |               ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+   |               ^^^^^^^ Syntax Error: boolean expression cannot be used here
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
    |
@@ -1513,7 +1513,7 @@ Module(
 15 | *not x, z, *not x
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
-   |  ^^^^^^ Syntax Error: Boolean expression cannot be used here
+   |  ^^^^^^ Syntax Error: boolean expression cannot be used here
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
    |
@@ -1523,7 +1523,7 @@ Module(
 15 | *not x, z, *not x
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
-   |              ^^^^^^ Syntax Error: Boolean expression cannot be used here
+   |              ^^^^^^ Syntax Error: boolean expression cannot be used here
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
    |
@@ -1533,7 +1533,7 @@ Module(
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
-   |  ^^^^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |  ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
    |
@@ -1543,7 +1543,7 @@ Module(
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
-   |                        ^^^^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |                        ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
    |
@@ -1553,7 +1553,7 @@ Module(
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
-   |  ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |  ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 20 | *x := 2, z, *x := 2
    |
 
@@ -1562,7 +1562,7 @@ Module(
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
-   |                   ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |                   ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 20 | *x := 2, z, *x := 2
    |
 
@@ -1571,11 +1571,11 @@ Module(
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
-   |    ^^ Syntax Error: Expected a statement
+   |    ^^ Syntax Error: invalid syntax
 
 
    |
 18 | *x if True else y, z, *x if True else y
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
-   |                ^^ Syntax Error: Expected `,`, found `:=`
+   |                ^^ Syntax Error: invalid syntax

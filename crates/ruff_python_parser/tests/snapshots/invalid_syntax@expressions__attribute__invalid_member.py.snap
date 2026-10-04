@@ -134,7 +134,7 @@ Module(
 
   |
 1 | x.1
-  |  ^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |  ^^ Syntax Error: invalid syntax
 2 | x.1.0
 3 | x.[0]
   |
@@ -143,7 +143,7 @@ Module(
   |
 1 | x.1
 2 | x.1.0
-  |  ^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |  ^^ Syntax Error: invalid syntax
 3 | x.[0]
   |
 
@@ -151,7 +151,7 @@ Module(
   |
 1 | x.1
 2 | x.1.0
-  |    ^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |    ^^ Syntax Error: invalid syntax
 3 | x.[0]
   |
 
@@ -160,4 +160,4 @@ Module(
 1 | x.1
 2 | x.1.0
 3 | x.[0]
-  |   ^ Syntax Error: Expected an identifier
+  |   ^ Syntax Error: invalid syntax

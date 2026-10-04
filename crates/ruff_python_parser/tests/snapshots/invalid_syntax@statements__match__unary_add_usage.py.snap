@@ -422,7 +422,7 @@ Module(
 1 | # Unary addition isn't allowed before Python 3.15.
 2 | match subject:
 3 |     case +1:
-  |          ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+  |          ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 4 |         pass
 5 |     case 1 | +2 | -3:
   |
@@ -432,7 +432,7 @@ Module(
 3 |     case +1:
 4 |         pass
 5 |     case 1 | +2 | -3:
-  |              ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+  |              ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 6 |         pass
 7 |     case [1, +2, -3]:
   |
@@ -442,7 +442,7 @@ Module(
 5 |     case 1 | +2 | -3:
 6 |         pass
 7 |     case [1, +2, -3]:
-  |              ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+  |              ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 8 |         pass
 9 |     case Foo(x=+1, y=-2):
   |
@@ -452,7 +452,7 @@ Module(
  7 |     case [1, +2, -3]:
  8 |         pass
  9 |     case Foo(x=+1, y=-2):
-   |                ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+   |                ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 10 |         pass
 11 |     case {True: +1, False: -2}:
    |
@@ -462,6 +462,6 @@ Module(
  9 |     case Foo(x=+1, y=-2):
 10 |         pass
 11 |     case {True: +1, False: -2}:
-   |                 ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+   |                 ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 12 |         pass
    |

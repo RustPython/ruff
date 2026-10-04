@@ -160,7 +160,7 @@ Module(
 
   |
 1 | return *
-  |         ^ Syntax Error: Expected an expression
+  |         ^ Syntax Error: invalid syntax
 2 | return yield x
 3 | return yield from x
 4 | return x := 1
@@ -170,7 +170,7 @@ Module(
   |
 1 | return *
 2 | return yield x
-  |        ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |        ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | return yield from x
 4 | return x := 1
   |
@@ -180,7 +180,7 @@ Module(
 1 | return *
 2 | return yield x
 3 | return yield from x
-  |        ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |        ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 4 | return x := 1
 5 | return *x and y
   |
@@ -190,7 +190,7 @@ Module(
 2 | return yield x
 3 | return yield from x
 4 | return x := 1
-  |          ^^ Syntax Error: Expected a statement
+  |          ^^ Syntax Error: invalid syntax
 5 | return *x and y
   |
 
@@ -199,7 +199,7 @@ Module(
 3 | return yield from x
 4 | return x := 1
 5 | return *x and y
-  |         ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |         ^^^^^^^ Syntax Error: boolean expression cannot be used here
 
 
 ## Semantic Syntax Errors

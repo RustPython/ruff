@@ -420,7 +420,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.10"}
 2 | lst[*index]  # simple index
-  |     ^^^^^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |     ^^^^^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 3 | class Array(Generic[DType, *Shape]): ...  # motivating example from the PEP
 4 | lst[a, *b, c]  # different positions
   |
@@ -430,7 +430,7 @@ Module(
 1 | # parse_options: {"target-version": "3.10"}
 2 | lst[*index]  # simple index
 3 | class Array(Generic[DType, *Shape]): ...  # motivating example from the PEP
-  |                            ^^^^^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |                            ^^^^^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 4 | lst[a, *b, c]  # different positions
 5 | lst[a, b, *c]  # different positions
   |
@@ -440,7 +440,7 @@ Module(
 2 | lst[*index]  # simple index
 3 | class Array(Generic[DType, *Shape]): ...  # motivating example from the PEP
 4 | lst[a, *b, c]  # different positions
-  |        ^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |        ^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 5 | lst[a, b, *c]  # different positions
 6 | lst[*a, *b]  # multiple unpacks
   |
@@ -450,7 +450,7 @@ Module(
 3 | class Array(Generic[DType, *Shape]): ...  # motivating example from the PEP
 4 | lst[a, *b, c]  # different positions
 5 | lst[a, b, *c]  # different positions
-  |           ^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |           ^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 6 | lst[*a, *b]  # multiple unpacks
 7 | array[3:5, *idxs]  # mixed with slices
   |
@@ -460,7 +460,7 @@ Module(
 4 | lst[a, *b, c]  # different positions
 5 | lst[a, b, *c]  # different positions
 6 | lst[*a, *b]  # multiple unpacks
-  |     ^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |     ^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 7 | array[3:5, *idxs]  # mixed with slices
   |
 
@@ -469,7 +469,7 @@ Module(
 4 | lst[a, *b, c]  # different positions
 5 | lst[a, b, *c]  # different positions
 6 | lst[*a, *b]  # multiple unpacks
-  |         ^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |         ^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
 7 | array[3:5, *idxs]  # mixed with slices
   |
 
@@ -478,4 +478,4 @@ Module(
 5 | lst[a, b, *c]  # different positions
 6 | lst[*a, *b]  # multiple unpacks
 7 | array[3:5, *idxs]  # mixed with slices
-  |            ^^^^^ Syntax Error: Cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)
+  |            ^^^^^ Syntax Error: cannot use star expression in index on Python 3.10 (syntax was added in Python 3.11)

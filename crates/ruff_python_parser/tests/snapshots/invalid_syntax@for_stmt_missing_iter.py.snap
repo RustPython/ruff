@@ -77,6 +77,6 @@ Module(
 
   |
 1 | for x in:
-  |         ^ Syntax Error: Expected an expression
+  |         ^ Syntax Error: invalid syntax
 2 |     a = 1
   |

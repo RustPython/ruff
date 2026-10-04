@@ -52,7 +52,7 @@ Module(
 
   |
 1 | from
-  |     ^ Syntax Error: Expected a module name
+  |     ^ Syntax Error: expected a module name
 2 | from import x
   |
 
@@ -60,4 +60,4 @@ Module(
   |
 1 | from
 2 | from import x
-  |      ^^^^^^ Syntax Error: Expected a module name
+  |      ^^^^^^ Syntax Error: expected a module name

@@ -315,7 +315,7 @@ Module(
 
   |
 1 | call(**kwargs, x)
-  |                ^ Syntax Error: Positional argument cannot follow keyword argument unpacking
+  |                ^ Syntax Error: positional argument follows keyword argument unpacking
 2 | call(x=1, y)
 3 | call(x=1, **kwargs, y)
   |
@@ -324,7 +324,7 @@ Module(
   |
 1 | call(**kwargs, x)
 2 | call(x=1, y)
-  |           ^ Syntax Error: Positional argument cannot follow keyword argument
+  |           ^ Syntax Error: positional argument follows keyword argument
 3 | call(x=1, **kwargs, y)
 4 | call(**kwargs, *args)
   |
@@ -334,7 +334,7 @@ Module(
 1 | call(**kwargs, x)
 2 | call(x=1, y)
 3 | call(x=1, **kwargs, y)
-  |                     ^ Syntax Error: Positional argument cannot follow keyword argument unpacking
+  |                     ^ Syntax Error: positional argument follows keyword argument unpacking
 4 | call(**kwargs, *args)
 5 | call(**kwargs, (*args))
   |
@@ -344,7 +344,7 @@ Module(
 2 | call(x=1, y)
 3 | call(x=1, **kwargs, y)
 4 | call(**kwargs, *args)
-  |                ^^^^^ Syntax Error: Iterable argument unpacking cannot follow keyword argument unpacking
+  |                ^^^^^ Syntax Error: iterable argument unpacking follows keyword argument unpacking
 5 | call(**kwargs, (*args))
   |
 
@@ -353,4 +353,4 @@ Module(
 3 | call(x=1, **kwargs, y)
 4 | call(**kwargs, *args)
 5 | call(**kwargs, (*args))
-  |                 ^^^^^ Syntax Error: Starred expression cannot be used here
+  |                 ^^^^^ Syntax Error: invalid syntax

@@ -69,7 +69,7 @@ Module(
 
   |
 1 | not
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 2 |
 3 | x + y
   |
