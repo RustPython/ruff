@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/except_stmt_unparenthesized_tuple_as.py
+input_file: crates/ruff_python_parser/resources/inline/err/except_stmt_unparenthesized_tuple_as_incomplete.py
 ---
 ## AST
 
@@ -8,12 +8,12 @@ input_file: crates/ruff_python_parser/resources/inline/err/except_stmt_unparenth
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..86,
+        range: 0..87,
         body: [
             Try(
                 StmtTry {
                     node_index: NodeIndex(None),
-                    range: 0..42,
+                    range: 0..35,
                     body: [
                         Pass(
                             StmtPass {
@@ -25,7 +25,7 @@ Module(
                     handlers: [
                         ExceptHandler(
                             ExceptHandlerExceptHandler {
-                                range: 14..42,
+                                range: 14..35,
                                 node_index: NodeIndex(None),
                                 type_: Some(
                                     Tuple(
@@ -56,18 +56,31 @@ Module(
                                         },
                                     ),
                                 ),
-                                name: Some(
-                                    Identifier {
-                                        id: Name("exc"),
-                                        range: 29..32,
-                                        node_index: NodeIndex(None),
-                                    },
-                                ),
+                                name: None,
                                 body: [
-                                    Pass(
-                                        StmtPass {
+                                    AnnAssign(
+                                        StmtAnnAssign {
                                             node_index: NodeIndex(None),
-                                            range: 38..42,
+                                            range: 29..35,
+                                            target: Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 30..33,
+                                                    id: Name("exc"),
+                                                    ctx: Store,
+                                                },
+                                            ),
+                                            annotation: Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 35..35,
+                                                    id: Name(""),
+                                                    ctx: Invalid,
+                                                },
+                                            ),
+                                            value: None,
+                                            simple: false,
+                                            runtime_simple: None,
                                         },
                                     ),
                                 ],
@@ -84,33 +97,39 @@ Module(
                     runtime_finalbody: None,
                 },
             ),
+            Pass(
+                StmtPass {
+                    node_index: NodeIndex(None),
+                    range: 40..44,
+                },
+            ),
             Try(
                 StmtTry {
                     node_index: NodeIndex(None),
-                    range: 43..85,
+                    range: 45..86,
                     body: [
                         Pass(
                             StmtPass {
                                 node_index: NodeIndex(None),
-                                range: 52..56,
+                                range: 54..58,
                             },
                         ),
                     ],
                     handlers: [
                         ExceptHandler(
                             ExceptHandlerExceptHandler {
-                                range: 57..85,
+                                range: 59..86,
                                 node_index: NodeIndex(None),
                                 type_: Some(
                                     Tuple(
                                         ExprTuple {
                                             node_index: NodeIndex(None),
-                                            range: 65..69,
+                                            range: 66..70,
                                             elts: [
                                                 Name(
                                                     ExprName {
                                                         node_index: NodeIndex(None),
-                                                        range: 65..66,
+                                                        range: 66..67,
                                                         id: Name("x"),
                                                         ctx: Load,
                                                     },
@@ -118,7 +137,7 @@ Module(
                                                 Name(
                                                     ExprName {
                                                         node_index: NodeIndex(None),
-                                                        range: 68..69,
+                                                        range: 69..70,
                                                         id: Name("y"),
                                                         ctx: Load,
                                                     },
@@ -132,8 +151,8 @@ Module(
                                 ),
                                 name: Some(
                                     Identifier {
-                                        id: Name("eg"),
-                                        range: 73..75,
+                                        id: Name("exc"),
+                                        range: 74..77,
                                         node_index: NodeIndex(None),
                                     },
                                 ),
@@ -141,7 +160,7 @@ Module(
                                     Pass(
                                         StmtPass {
                                             node_index: NodeIndex(None),
-                                            range: 81..85,
+                                            range: 82..86,
                                         },
                                     ),
                                 ],
@@ -151,7 +170,7 @@ Module(
                     ],
                     orelse: [],
                     finalbody: [],
-                    is_star: true,
+                    is_star: false,
                     runtime_body: None,
                     runtime_handlers: None,
                     runtime_orelse: None,
@@ -168,17 +187,38 @@ Module(
   |
 1 | try:
 2 |     pass
-3 | except x, y as exc:
-  |        ^^^^^^^^^^^ Syntax Error: Multiple exception types must be parenthesized when using `as`
+3 | except x, y as (exc):
+  |                ^ Syntax Error: Expected name after `as`
 4 |     pass
 5 | try:
   |
 
 
   |
+1 | try:
+2 |     pass
+3 | except x, y as (exc):
+  |                      ^ Syntax Error: Expected an expression
+4 |     pass
 5 | try:
 6 |     pass
-7 | except* x, y as eg:
-  |         ^^^^^^^^^^ Syntax Error: Multiple exception types must be parenthesized when using `as`
+  |
+
+
+  |
+2 |     pass
+3 | except x, y as (exc):
+4 |     pass
+  | ^^^^ Syntax Error: Unexpected indentation
+5 | try:
+6 |     pass
+  |
+
+
+  |
+5 | try:
+6 |     pass
+7 | except x, y as exc
+  |                   ^ Syntax Error: Expected `:`, found newline
 8 |     pass
   |
