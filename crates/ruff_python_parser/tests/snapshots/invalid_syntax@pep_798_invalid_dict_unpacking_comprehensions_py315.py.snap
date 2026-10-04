@@ -110,18 +110,11 @@ Module(
                                     },
                                 ),
                             ),
-                            value: Starred(
-                                ExprStarred {
+                            value: Name(
+                                ExprName {
                                     node_index: NodeIndex(None),
-                                    range: 74..76,
-                                    value: Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 75..76,
-                                            id: Name("v"),
-                                            ctx: Load,
-                                        },
-                                    ),
+                                    range: 75..76,
+                                    id: Name("v"),
                                     ctx: Load,
                                 },
                             ),
@@ -344,7 +337,7 @@ Module(
 1 | # parse_options: {"target-version": "3.15"}
 2 | {*k: v for k, v in items}
 3 | {k: *v for k, v in items}
-  |     ^ Syntax Error: invalid syntax
+  |     ^^ Syntax Error: cannot use a starred expression in a dictionary value
 4 | {**k: v for k, v in items}
 5 | {k: **v for k, v in items}
   |

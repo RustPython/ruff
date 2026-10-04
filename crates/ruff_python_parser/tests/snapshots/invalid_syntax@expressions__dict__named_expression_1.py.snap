@@ -157,6 +157,16 @@ Module(
 1 | # Unparenthesized named expression not allowed in value
 2 |
 3 | {x: y := 1, z: a := 2}
+  |          ^ Syntax Error: ':' expected after dictionary key
+4 |
+5 | x + y
+  |
+
+
+  |
+1 | # Unparenthesized named expression not allowed in value
+2 |
+3 | {x: y := 1, z: a := 2}
   |           ^ Syntax Error: invalid syntax
 4 |
 5 | x + y
@@ -168,6 +178,16 @@ Module(
 2 |
 3 | {x: y := 1, z: a := 2}
   |                  ^^ Syntax Error: invalid syntax
+4 |
+5 | x + y
+  |
+
+
+  |
+1 | # Unparenthesized named expression not allowed in value
+2 |
+3 | {x: y := 1, z: a := 2}
+  |                     ^ Syntax Error: ':' expected after dictionary key
 4 |
 5 | x + y
   |

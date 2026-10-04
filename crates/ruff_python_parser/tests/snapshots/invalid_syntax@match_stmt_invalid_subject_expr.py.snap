@@ -210,7 +210,7 @@ Module(
 
   |
 1 | match (*x):
-  |        ^ Syntax Error: invalid syntax
+  |        ^^ Syntax Error: cannot use starred expression here
 2 |     case _: ...
 3 | # Starred expression precedence test
   |

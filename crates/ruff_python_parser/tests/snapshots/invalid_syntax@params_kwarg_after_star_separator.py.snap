@@ -75,4 +75,4 @@ Module(
 
   |
 1 | def foo(*, **kwargs): ...
-  |            ^^^^^^^^ Syntax Error: named arguments must follow bare *
+  |         ^ Syntax Error: named arguments must follow bare *

@@ -205,7 +205,7 @@ Module(
 
   |
 1 | call(x + y = 1)
-  |      ^^^^^ Syntax Error: expected a parameter name
+  |      ^^^^^^^ Syntax Error: expression cannot contain assignment, perhaps you meant "=="?
 2 | call(x := 1 = 1)
   |
 
@@ -213,7 +213,7 @@ Module(
   |
 1 | call(x + y = 1)
 2 | call(x := 1 = 1)
-  |      ^^^^^^ Syntax Error: expected a parameter name
+  |      ^^^^^^^^ Syntax Error: expression cannot contain assignment, perhaps you meant "=="?
 3 |
 4 | call(yield x)
   |

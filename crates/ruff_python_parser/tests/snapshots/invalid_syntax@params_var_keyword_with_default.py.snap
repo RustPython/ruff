@@ -176,7 +176,7 @@ Module(
 
   |
 1 | def foo(a, **kwargs={'b': 1, 'c': 2}): ...
-  |                    ^ Syntax Error: var-positional argument cannot have default value
+  |                    ^ Syntax Error: var-keyword argument cannot have default value
 
 
   |

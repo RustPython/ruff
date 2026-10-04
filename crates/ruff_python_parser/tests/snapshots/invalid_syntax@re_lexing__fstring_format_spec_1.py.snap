@@ -425,6 +425,17 @@ Module(
 
 
   |
+3 |   # https://github.com/astral-sh/ruff/issues/12004
+4 |
+5 | / f'middle {'string':\
+6 | |         'format spec'}
+  | |_______________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+7 |
+8 |   f'middle {'string':\\
+  |
+
+
+  |
 5 | f'middle {'string':\
 6 |         'format spec'}
   |          ^^^^^^ Syntax Error: invalid syntax
@@ -494,6 +505,14 @@ Module(
 11 | f'middle {'string':\\\
 12 |         'format spec'}
    |         ^ Syntax Error: f-string: expecting '}'
+
+
+   |
+ 9 |           'format spec'}
+10 |
+11 | / f'middle {'string':\\\
+12 | |         'format spec'}
+   | |_______________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
 
 
    |

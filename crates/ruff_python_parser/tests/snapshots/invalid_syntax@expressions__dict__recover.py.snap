@@ -425,18 +425,11 @@ Module(
                                             },
                                         ),
                                     ),
-                                    value: Starred(
-                                        ExprStarred {
+                                    value: Name(
+                                        ExprName {
                                             node_index: NodeIndex(None),
-                                            range: 335..337,
-                                            value: Name(
-                                                ExprName {
-                                                    node_index: NodeIndex(None),
-                                                    range: 336..337,
-                                                    id: Name("y"),
-                                                    ctx: Load,
-                                                },
-                                            ),
+                                            range: 336..337,
+                                            id: Name("y"),
                                             ctx: Load,
                                         },
                                     ),
@@ -452,18 +445,11 @@ Module(
                                             },
                                         ),
                                     ),
-                                    value: Starred(
-                                        ExprStarred {
+                                    value: Name(
+                                        ExprName {
                                             node_index: NodeIndex(None),
-                                            range: 342..344,
-                                            value: Name(
-                                                ExprName {
-                                                    node_index: NodeIndex(None),
-                                                    range: 343..344,
-                                                    id: Name("a"),
-                                                    ctx: Load,
-                                                },
-                                            ),
+                                            range: 343..344,
+                                            id: Name("a"),
                                             ctx: Load,
                                         },
                                     ),
@@ -514,9 +500,27 @@ Module(
    |
  9 | # Missing comma
 10 | {1: 2 3: 4}
+   |     ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+11 |
+12 | # No value
+   |
+
+
+   |
+ 9 | # Missing comma
+10 | {1: 2 3: 4}
    |       ^ Syntax Error: invalid syntax
 11 |
 12 | # No value
+   |
+
+
+   |
+12 | # No value
+13 | {1: }
+   |   ^ Syntax Error: expression expected after dictionary key and ':'
+14 |
+15 | # No value for double star unpacking
    |
 
 
@@ -567,11 +571,11 @@ Module(
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |     ^ Syntax Error: invalid syntax
+   |     ^^ Syntax Error: cannot use a starred expression in a dictionary value
 
 
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |            ^ Syntax Error: invalid syntax
+   |            ^^ Syntax Error: cannot use a starred expression in a dictionary value

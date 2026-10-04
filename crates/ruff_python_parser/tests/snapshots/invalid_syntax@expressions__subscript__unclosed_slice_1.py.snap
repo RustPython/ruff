@@ -122,6 +122,24 @@ Module(
 
 
   |
+1 | / x[::
+2 | |
+3 | | def foo():
+  | |_________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+4 |       pass
+  |
+
+
+  |
+1 | x[::
+2 |
+3 | def foo():
+  |     ^^^ Syntax Error: invalid syntax
+4 |     pass
+  |
+
+
+  |
 3 | def foo():
 4 |     pass
   |     ^^^^ Syntax Error: invalid syntax

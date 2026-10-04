@@ -3425,6 +3425,7 @@ impl<'src> Parser<'src> {
     ) -> ast::ParameterWithDefault {
         let parameter = self.parse_parameter(start, function_kind, AllowStarAnnotation::No);
 
+        let equal_range = self.current_token_range();
         let default = if self.eat(TokenKind::Equal) {
             if self.at_expr() {
                 // test_ok param_with_default
@@ -3442,10 +3443,17 @@ impl<'src> Parser<'src> {
                 // test_err param_missing_default
                 // def foo(x=): ...
                 // def foo(x: int = ): ...
-                self.add_error(
-                    ParseErrorType::ExpectedExpression,
-                    self.current_token_range(),
-                );
+                if self.at(TokenKind::Rpar) || self.at(TokenKind::Comma) {
+                    self.add_error(
+                        ParseErrorType::OtherError("expected default value expression".to_string()),
+                        equal_range,
+                    );
+                } else {
+                    self.add_error(
+                        ParseErrorType::ExpectedExpression,
+                        self.current_token_range(),
+                    );
+                }
                 None
             }
         } else {
@@ -3485,8 +3493,8 @@ impl<'src> Parser<'src> {
         let mut seen_keyword_only_separator = false; // `*`
         let mut seen_keyword_only_param_after_separator = false;
 
-        // Range of the keyword only separator if it's the last parameter in the list.
-        let mut last_keyword_only_separator_range = None;
+        // Whether only parameters without a default have been seen.
+        let mut only_parameters_without_default = true;
 
         self.parse_comma_separated_list(RecoveryContextKind::Parameters(function_kind), |parser| {
             let param_start = parser.node_start();
@@ -3500,7 +3508,32 @@ impl<'src> Parser<'src> {
                 );
             }
 
+            let only_parameters_without_default_before = only_parameters_without_default;
+            only_parameters_without_default = false;
+
             match parser.current_token_kind() {
+                TokenKind::Lpar => {
+                    // test_err params_parenthesized
+                    // def foo(a, (b, c)): ...
+                    // def foo((a)): ...
+                    // lambda (a,): ...
+                    let range = parser
+                        .parenthesized_parameters_range(function_kind)
+                        .filter(|_| only_parameters_without_default_before);
+                    let message = if range.is_none() {
+                        "invalid syntax"
+                    } else if matches!(function_kind, FunctionKind::Lambda) {
+                        "Lambda expression parameters cannot be parenthesized"
+                    } else {
+                        "Function parameters cannot be parenthesized"
+                    };
+                    let lpar_range = parser.current_token_range();
+                    parser.add_error(
+                        ParseErrorType::OtherError(message.to_string()),
+                        range.unwrap_or(lpar_range),
+                    );
+                    parser.bump(TokenKind::Lpar);
+                }
                 TokenKind::Star => {
                     let star_range = parser.current_token_range();
                     parser.bump(TokenKind::Star);
@@ -3513,7 +3546,6 @@ impl<'src> Parser<'src> {
                             function_kind,
                             AllowStarAnnotation::Yes,
                         );
-                        let param_star_range = parser.node_range(star_range.start());
 
                         if parser.at(TokenKind::Equal) {
                             // test_err params_var_positional_with_default
@@ -3534,7 +3566,7 @@ impl<'src> Parser<'src> {
                                 ParseErrorType::OtherError(
                                     "* argument may appear only once".to_string(),
                                 ),
-                                param_star_range,
+                                star_range,
                             );
                         }
 
@@ -3543,37 +3575,37 @@ impl<'src> Parser<'src> {
                         if parameters.vararg.is_none() {
                             parameters.vararg = Some(Box::new(param));
                         }
-
-                        last_keyword_only_separator_range = None;
                     } else {
-                        if seen_keyword_only_separator {
+                        if seen_keyword_only_separator || parameters.vararg.is_some() {
                             // test_err params_multiple_star_separator
                             // def foo(a, *, *, b): ...
                             // def foo(a, *, b, c, *): ...
-                            parser.add_error(
-                                ParseErrorType::OtherError(
-                                    "only one '*' separator allowed".to_string(),
-                                ),
-                                star_range,
-                            );
-                        }
 
-                        if parameters.vararg.is_some() {
                             // test_err params_star_separator_after_star_param
                             // def foo(a, *args, *, b): ...
                             // def foo(a, *args, b, c, *): ...
+                            let message = if parser.at(TokenKind::Comma) {
+                                "* argument may appear only once"
+                            } else {
+                                "invalid syntax"
+                            };
                             parser.add_error(
-                                ParseErrorType::OtherError(
-                                    "keyword-only parameter separator not allowed \
-                                        after '*' parameter"
-                                        .to_string(),
-                                ),
+                                ParseErrorType::OtherError(message.to_string()),
                                 star_range,
                             );
+                        } else if let Some(range) =
+                            parser.bare_star_error_range(function_kind, star_range)
+                        {
+                            // test_err params_expected_after_star_separator
+                            // def foo(*): ...
+                            // def foo(*,): ...
+                            // def foo(a, *): ...
+                            // def foo(a, *,): ...
+                            // def foo(*, **kwargs): ...
+                            parser.add_error(ParseErrorType::ExpectedKeywordParam, range);
                         }
 
                         seen_keyword_only_separator = true;
-                        last_keyword_only_separator_range = Some(star_range);
                     }
                 }
                 TokenKind::DoubleStar => {
@@ -3599,30 +3631,36 @@ impl<'src> Parser<'src> {
                         // test_err params_var_keyword_with_default
                         // def foo(a, **kwargs={'b': 1, 'c': 2}): ...
                         parser.add_error(
-                            ParseErrorType::VarParameterWithDefault,
+                            ParseErrorType::VarKeywordParameterWithDefault,
                             parser.current_token_range(),
                         );
                     }
 
-                    if seen_keyword_only_separator && !seen_keyword_only_param_after_separator {
-                        // test_ok params_seen_keyword_only_param_after_star
-                        // def foo(*, a, **kwargs): ...
-                        // def foo(*, a=10, **kwargs): ...
+                    // test_ok params_seen_keyword_only_param_after_star
+                    // def foo(*, a, **kwargs): ...
+                    // def foo(*, a=10, **kwargs): ...
 
-                        // test_err params_kwarg_after_star_separator
-                        // def foo(*, **kwargs): ...
-                        parser.add_error(
-                            ParseErrorType::ExpectedKeywordParam,
-                            param_double_star_range,
-                        );
-                    }
-
+                    // test_err params_kwarg_after_star_separator
+                    // def foo(*, **kwargs): ...
                     parameters.kwarg = Some(Box::new(param));
-                    last_keyword_only_separator_range = None;
                 }
                 TokenKind::Slash => {
                     let slash_range = parser.current_token_range();
                     parser.bump(TokenKind::Slash);
+
+                    if parser.at(TokenKind::Star)
+                        && !parser.parameter_scratch.is_empty(&parameters_snapshot)
+                    {
+                        // test_err params_star_after_slash_without_comma
+                        // def foo(a, /*, b): ...
+                        // lambda a, /*, b: ...
+                        parser.add_error(
+                            ParseErrorType::OtherError(
+                                "expected comma between / and *".to_string(),
+                            ),
+                            parser.current_token_range(),
+                        );
+                    }
 
                     if parser.parameter_scratch.is_empty(&parameters_snapshot)
                         && parameters.vararg.is_none()
@@ -3684,8 +3722,6 @@ impl<'src> Parser<'src> {
                             slash_range,
                         );
                     }
-
-                    last_keyword_only_separator_range = None;
                 }
                 _ if parser.at_identifier_or_soft_keyword() => {
                     let param = parser.parse_parameter_with_default(param_start, function_kind);
@@ -3707,13 +3743,14 @@ impl<'src> Parser<'src> {
                     }
 
                     seen_default_param |= param.default.is_some();
+                    only_parameters_without_default =
+                        only_parameters_without_default_before && param.default.is_none();
 
                     if seen_keyword_only_separator {
                         seen_keyword_only_param_after_separator = true;
                     }
 
                     parser.parameter_scratch.push(param);
-                    last_keyword_only_separator_range = None;
                 }
                 _ => {
                     // This corresponds to the expected token kinds for `is_list_element`.
@@ -3721,16 +3758,6 @@ impl<'src> Parser<'src> {
                 }
             }
         });
-
-        if let Some(star_range) = last_keyword_only_separator_range {
-            // test_err params_expected_after_star_separator
-            // def foo(*): ...
-            // def foo(*,): ...
-            // def foo(a, *): ...
-            // def foo(a, *,): ...
-            // def foo(*, **kwargs): ...
-            self.add_error(ParseErrorType::ExpectedKeywordParam, star_range);
-        }
 
         if matches!(function_kind, FunctionKind::FunctionDef) {
             self.expect(TokenKind::Rpar);
@@ -3751,6 +3778,87 @@ impl<'src> Parser<'src> {
         parameters.range = self.node_range(start);
 
         parameters
+    }
+
+    /// Parses and reports a bound or constraints after a `TypeVarTuple` or `ParamSpec` name, if
+    /// there is one. The AST has no place for them.
+    fn parse_variadic_type_param_bound(&mut self, kind: &str) {
+        if !self.at(TokenKind::Colon)
+            || !(EXPR_SET.contains(self.peek()) || self.peek().is_soft_keyword())
+        {
+            return;
+        }
+        let start = self.current_token_range().start();
+        self.bump(TokenKind::Colon);
+        let bound = self.parse_conditional_expression_or_higher();
+        let what = if bound.expr.is_tuple_expr() {
+            "constraints"
+        } else {
+            "bound"
+        };
+        self.add_error(
+            ParseErrorType::OtherError(format!("cannot use {what} with {kind}")),
+            TextRange::new(start, bound.end()),
+        );
+    }
+
+    /// Returns the range of the error for a bare `*` separator not followed by a keyword-only
+    /// parameter, if there is one. The parser is positioned right after the `*`.
+    fn bare_star_error_range(
+        &mut self,
+        function_kind: FunctionKind,
+        star_range: TextRange,
+    ) -> Option<TextRange> {
+        let terminator = function_kind.list_terminator();
+        if self.at(terminator) {
+            return Some(match function_kind {
+                FunctionKind::FunctionDef => star_range,
+                FunctionKind::Lambda => self.current_token_range(),
+            });
+        }
+        if !self.at(TokenKind::Comma)
+            || !matches!(self.peek(), kind if kind == terminator || kind == TokenKind::DoubleStar)
+        {
+            return None;
+        }
+        Some(match function_kind {
+            FunctionKind::FunctionDef => star_range,
+            FunctionKind::Lambda => {
+                let checkpoint = self.checkpoint();
+                self.bump(TokenKind::Comma);
+                let range = self.current_token_range();
+                self.rewind(checkpoint);
+                range
+            }
+        })
+    }
+
+    /// Returns the range from the current `(` to its `)` if they enclose only parameters
+    /// without a default (or names, for a lambda), separated by commas.
+    fn parenthesized_parameters_range(&mut self, function_kind: FunctionKind) -> Option<TextRange> {
+        let checkpoint = self.checkpoint();
+        let start = self.current_token_range().start();
+        self.bump(TokenKind::Lpar);
+        let mut range = None;
+        while self.at_identifier_or_soft_keyword() {
+            self.bump_any();
+            if matches!(function_kind, FunctionKind::FunctionDef) && self.eat(TokenKind::Colon) {
+                if !self.at_expr() {
+                    break;
+                }
+                self.parse_conditional_expression_or_higher();
+            }
+            let comma = self.eat(TokenKind::Comma);
+            if self.at(TokenKind::Rpar) {
+                range = Some(TextRange::new(start, self.current_token_range().end()));
+                break;
+            }
+            if !comma {
+                break;
+            }
+        }
+        self.rewind(checkpoint);
+        range
     }
 
     /// Try to parse a type parameter list. If the parser is not at the start of a
@@ -3819,6 +3927,7 @@ impl<'src> Parser<'src> {
         // type X[T, *Ts = int] = int
         if self.eat(TokenKind::Star) {
             let name = self.parse_identifier();
+            self.parse_variadic_type_param_bound("TypeVarTuple");
 
             let default = if self.eat(TokenKind::Equal) {
                 if self.at_expr() {
@@ -3864,6 +3973,7 @@ impl<'src> Parser<'src> {
         // type X[T, **P = int] = int
         } else if self.eat(TokenKind::DoubleStar) {
             let name = self.parse_identifier();
+            self.parse_variadic_type_param_bound("ParamSpec");
 
             let default = if self.eat(TokenKind::Equal) {
                 if self.at_expr() {

@@ -267,4 +267,4 @@ Module(
 2 | call(x = yield from y)
 3 | call(x = *y)
 4 | call(x = (*y))
-  |           ^ Syntax Error: invalid syntax
+  |           ^^ Syntax Error: cannot use starred expression here

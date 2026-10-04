@@ -126,6 +126,15 @@ pub(crate) struct Parser<'src> {
     elif_else_scratch: ScratchBuffer<ElifElseClause>,
 }
 
+/// A bracket that encloses part of an expression.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Bracket {
+    /// The arguments of a call or the slices of a subscript.
+    CallOrSubscript,
+    /// A parenthesized expression, list, set or dictionary.
+    Display,
+}
+
 impl<'src> Parser<'src> {
     /// Create a new parser for the given source code.
     pub(crate) fn new(source: &'src str, options: ParseOptions) -> Self {
@@ -360,6 +369,87 @@ impl<'src> Parser<'src> {
             .filter(|token| token.kind() == TokenKind::Lpar)?;
         let (after_kind, after_range) = self.token_after(range.end());
         (after_kind == TokenKind::Rpar).then(|| TextRange::new(before.start(), after_range.end()))
+    }
+
+    /// Returns the kind and range of the last non-trivia token that starts before `offset`.
+    fn token_before(&self, offset: TextSize) -> Option<(TokenKind, TextRange)> {
+        let tokens = self.tokens.bumped();
+        tokens[..tokens.partition_point(|token| token.start() < offset)]
+            .iter()
+            .rev()
+            .find(|token| !token.kind().is_trivia())
+            .map(|token| (token.kind(), token.range()))
+    }
+
+    /// Returns how many brackets enclose the tokens bumped so far.
+    fn bracket_level(&self) -> usize {
+        let mut level = 0usize;
+        for token in self.tokens.bumped() {
+            match token.kind() {
+                TokenKind::Lpar | TokenKind::Lsqb | TokenKind::Lbrace => level += 1,
+                TokenKind::Rpar | TokenKind::Rsqb | TokenKind::Rbrace => {
+                    level = level.saturating_sub(1);
+                }
+                _ => {}
+            }
+        }
+        level
+    }
+
+    /// Returns the innermost bracket enclosing the tokens bumped so far, or `None` if there is
+    /// none or it starts an f-string or t-string replacement field.
+    fn innermost_bracket(&self) -> Option<Bracket> {
+        #[derive(PartialEq)]
+        enum Opener {
+            Bracket(Bracket),
+            InterpolatedString,
+            ReplacementField,
+        }
+        let mut openers = Vec::new();
+        let mut previous = TokenKind::Unknown;
+        for token in self.tokens.bumped() {
+            if token.kind().is_trivia() {
+                continue;
+            }
+            match token.kind() {
+                TokenKind::FStringStart | TokenKind::TStringStart => {
+                    openers.push(Opener::InterpolatedString);
+                }
+                TokenKind::Lbrace if openers.last() == Some(&Opener::InterpolatedString) => {
+                    openers.push(Opener::ReplacementField);
+                }
+                TokenKind::Lpar | TokenKind::Lsqb
+                    if matches!(
+                        previous,
+                        TokenKind::Identifier
+                            | TokenKind::String
+                            | TokenKind::FStringEnd
+                            | TokenKind::TStringEnd
+                            | TokenKind::Rpar
+                            | TokenKind::Rsqb
+                            | TokenKind::Rbrace
+                    ) || previous.is_soft_keyword() =>
+                {
+                    openers.push(Opener::Bracket(Bracket::CallOrSubscript));
+                }
+                TokenKind::Lpar | TokenKind::Lsqb | TokenKind::Lbrace => {
+                    openers.push(Opener::Bracket(Bracket::Display));
+                }
+                TokenKind::Rpar
+                | TokenKind::Rsqb
+                | TokenKind::Rbrace
+                | TokenKind::FStringEnd
+                | TokenKind::TStringEnd => {
+                    openers.pop();
+                }
+                _ => {}
+            }
+            previous = token.kind();
+        }
+        match openers.pop() {
+            Some(Opener::Bracket(bracket)) => Some(bracket),
+            _ => None,
+        }
     }
 
     /// Returns the kind of the first non-trivia token that starts at or after `offset`.
@@ -1586,9 +1676,10 @@ impl RecoveryContextKind {
             RecoveryContextKind::DeleteTargets => p.at_expr(),
             RecoveryContextKind::Identifiers => p.at_identifier_or_soft_keyword(),
             RecoveryContextKind::Parameters(_) => {
+                // A `(` is an element only to report parenthesized parameters.
                 matches!(
                     p.current_token_kind(),
-                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Slash
+                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Slash | TokenKind::Lpar
                 ) || p.at_identifier_or_soft_keyword()
             }
             RecoveryContextKind::WithItems(_) => p.at_expr(),

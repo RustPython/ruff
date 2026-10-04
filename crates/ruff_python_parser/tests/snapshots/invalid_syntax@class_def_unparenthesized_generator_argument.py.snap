@@ -100,4 +100,4 @@ Module(
 
   |
 1 | class Foo(base for base in bases): ...
-  |           ^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: invalid syntax
+  |                ^^^ Syntax Error: invalid syntax

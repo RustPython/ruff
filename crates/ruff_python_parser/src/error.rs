@@ -171,6 +171,11 @@ pub enum ParseErrorType {
     NonDefaultParamAfterDefaultParam,
     /// A default value was found for a `*` or `**` parameter.
     VarParameterWithDefault,
+    /// A default value was found for a `**` parameter.
+    VarKeywordParameterWithDefault,
+    /// A dictionary key after the first item is not followed by a `:`. The error range is the
+    /// last character of the key.
+    ExpectedColonAfterDictionaryKey,
 
     /// An invalid expression was found in the assignment target. `maybe_comparison` is set when
     /// the `=` after it may have been meant as `==`.
@@ -490,6 +495,12 @@ impl std::fmt::Display for ParseErrorType {
             }
             ParseErrorType::ExpectedKeywordParam => {
                 f.write_str("named arguments must follow bare *")
+            }
+            ParseErrorType::VarKeywordParameterWithDefault => {
+                f.write_str("var-keyword argument cannot have default value")
+            }
+            ParseErrorType::ExpectedColonAfterDictionaryKey => {
+                f.write_str("':' expected after dictionary key")
             }
             ParseErrorType::VarParameterWithDefault => {
                 f.write_str("var-positional argument cannot have default value")
