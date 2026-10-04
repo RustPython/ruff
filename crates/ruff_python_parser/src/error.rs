@@ -64,10 +64,10 @@ pub enum InterpolatedStringErrorType {
     InvalidConversionFlag,
     /// A single right brace was encountered.
     SingleRbrace,
-    /// Unterminated string.
-    UnterminatedString,
-    /// Unterminated triple-quoted string.
-    UnterminatedTripleQuotedString,
+    /// Unterminated string, detected at the given one-based line.
+    UnterminatedString { detected_line: u32 },
+    /// Unterminated triple-quoted string, detected at the given one-based line.
+    UnterminatedTripleQuotedString { detected_line: u32 },
     /// A lambda expression without parentheses was encountered.
     LambdaWithoutParentheses,
     /// Conversion flag does not immediately follow exclamation.
@@ -82,8 +82,10 @@ impl std::fmt::Display for InterpolatedStringErrorType {
             Self::UnclosedLbrace => f.write_str("expecting '}'"),
             Self::InvalidConversionFlag => write!(f, "invalid conversion character"),
             Self::SingleRbrace => f.write_str("single '}' is not allowed"),
-            Self::UnterminatedString => write!(f, "unterminated string"),
-            Self::UnterminatedTripleQuotedString => write!(f, "unterminated triple-quoted string"),
+            Self::UnterminatedString { .. } => write!(f, "unterminated string"),
+            Self::UnterminatedTripleQuotedString { .. } => {
+                write!(f, "unterminated triple-quoted string")
+            }
             Self::LambdaWithoutParentheses => {
                 write!(f, "lambda expressions are not allowed without parentheses")
             }
@@ -107,11 +109,17 @@ fn write_interpolated_string_error(
     error: &InterpolatedStringErrorType,
 ) -> std::fmt::Result {
     match error {
-        InterpolatedStringErrorType::UnterminatedString => {
-            write!(f, "unterminated {kind} literal")
+        InterpolatedStringErrorType::UnterminatedString { detected_line } => {
+            write!(
+                f,
+                "unterminated {kind} literal (detected at line {detected_line})"
+            )
         }
-        InterpolatedStringErrorType::UnterminatedTripleQuotedString => {
-            write!(f, "unterminated triple-quoted {kind} literal")
+        InterpolatedStringErrorType::UnterminatedTripleQuotedString { detected_line } => {
+            write!(
+                f,
+                "unterminated triple-quoted {kind} literal (detected at line {detected_line})"
+            )
         }
         _ => write!(f, "{kind}: {error}"),
     }
@@ -411,8 +419,13 @@ pub enum LexicalErrorType {
     // to use the `UnicodeError` variant instead.
     #[doc(hidden)]
     StringError,
-    /// A string literal without the closing quote.
-    UnclosedStringError,
+    /// A string literal without the closing quote, detected at the given one-based line.
+    UnclosedStringError {
+        triple_quoted: bool,
+        /// The literal contains a backslash followed by its quote character.
+        escaped_end_quote: bool,
+        detected_line: u32,
+    },
     /// Decoding of a unicode escape sequence in a string literal failed.
     UnicodeError,
     /// Missing the `{` for unicode escape sequence.
@@ -480,8 +493,27 @@ impl std::fmt::Display for LexicalErrorType {
             }
             Self::Eof => write!(f, "unexpected EOF while parsing"),
             Self::OtherError(msg) => write!(f, "{msg}"),
-            Self::UnclosedStringError => {
-                write!(f, "missing closing quote in string literal")
+            Self::UnclosedStringError {
+                triple_quoted: true,
+                detected_line,
+                ..
+            } => write!(
+                f,
+                "unterminated triple-quoted string literal (detected at line {detected_line})"
+            ),
+            Self::UnclosedStringError {
+                escaped_end_quote,
+                detected_line,
+                ..
+            } => {
+                write!(
+                    f,
+                    "unterminated string literal (detected at line {detected_line})"
+                )?;
+                if *escaped_end_quote {
+                    f.write_str("; perhaps you escaped the end quote?")?;
+                }
+                Ok(())
             }
             Self::MissingUnicodeLbrace => {
                 write!(f, "missing `{{` in Unicode escape sequence")

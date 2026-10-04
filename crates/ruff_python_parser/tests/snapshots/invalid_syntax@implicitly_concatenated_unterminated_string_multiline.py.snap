@@ -224,7 +224,7 @@ Module(
 1 | (
 2 |     'hello'
 3 |     f'world {x}
-  |                ^ Syntax Error: unterminated f-string literal
+  |     ^ Syntax Error: unterminated f-string literal (detected at line 3)
 4 | )
 5 | 1 + 1
   |
@@ -255,7 +255,7 @@ Module(
  6 | (
  7 |     'first'
  8 |     'second
-   |     ^^^^^^^ Syntax Error: missing closing quote in string literal
+   |     ^ Syntax Error: unterminated string literal (detected at line 8)
  9 |     f'third'
 10 | )
    |
