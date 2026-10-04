@@ -93,7 +93,7 @@ Module(
   |
 1 | # Missing orelse expression, followed by a statement
 2 | x if expr else
-  |               ^ Syntax Error: invalid syntax
+  |               ^ Syntax Error: expected expression after 'else', but statement is given
 3 |
 4 | def foo():
 5 |     pass

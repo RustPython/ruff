@@ -265,6 +265,12 @@ impl<'src> Parser<'src> {
     ///
     /// See: <https://docs.python.org/3/reference/simple_stmts.html>
     fn parse_simple_statement(&mut self) -> Stmt {
+        if matches!(
+            self.current_token_kind(),
+            TokenKind::Pass | TokenKind::Break | TokenKind::Continue
+        ) {
+            self.check_statement_before_if_expression();
+        }
         match self.current_token_kind() {
             TokenKind::Return => Stmt::Return(self.parse_return_statement()),
             TokenKind::Import => {
@@ -363,6 +369,29 @@ impl<'src> Parser<'src> {
                 // simple_stmt: `... | yield_stmt | star_expressions | ...`
                 let parsed_expr =
                     self.parse_expression_list(ExpressionContext::yield_or_starred_bitwise_or());
+
+                if self.at(TokenKind::ColonEqual) {
+                    // test_err named_expr_statement_invalid_target
+                    // x + y := 1
+                    // a.b := 1
+                    let target = match &parsed_expr.expr {
+                        Expr::Tuple(tuple) if !parsed_expr.is_parenthesized => tuple.elts.last(),
+                        expr => Some(expr),
+                    };
+                    if let Some(target) = target.filter(|target| {
+                        !matches!(
+                            target,
+                            Expr::Name(_) | Expr::Starred(_) | Expr::Yield(_) | Expr::YieldFrom(_)
+                        )
+                    }) {
+                        self.add_error(
+                            ParseErrorType::InvalidNamedAssignmentTarget(ExpressionKind::of(
+                                target,
+                            )),
+                            target.range(),
+                        );
+                    }
+                }
 
                 if self.at(TokenKind::Equal) {
                     Stmt::Assign(self.parse_assign_statement(parsed_expr, start))
@@ -4126,7 +4155,7 @@ impl<'src> Parser<'src> {
     }
 
     /// Returns `true` if `expr` is a `bitwise_or` expression or any parenthesized expression.
-    fn is_bitwise_or(&self, expr: &Expr) -> bool {
+    pub(super) fn is_bitwise_or(&self, expr: &Expr) -> bool {
         if self.is_parenthesized(expr.range()) {
             return true;
         }
@@ -4148,7 +4177,7 @@ impl<'src> Parser<'src> {
 
     /// Returns `true` if `expr` starts with a list or tuple display, a parenthesized generator
     /// expression, `True`, `False` or `None`.
-    fn starts_with_display_or_constant(&self, mut expr: &Expr) -> bool {
+    pub(super) fn starts_with_display_or_constant(&self, mut expr: &Expr) -> bool {
         loop {
             if self.is_parenthesized(expr.range()) {
                 return false;
@@ -4167,7 +4196,7 @@ impl<'src> Parser<'src> {
     }
 
     /// Returns the `bitwise_or` expression that `expr` starts with, if any.
-    fn bitwise_or_prefix<'a>(&self, mut expr: &'a Expr) -> Option<&'a Expr> {
+    pub(super) fn bitwise_or_prefix<'a>(&self, mut expr: &'a Expr) -> Option<&'a Expr> {
         loop {
             if self.is_parenthesized(expr.range()) {
                 return Some(expr);

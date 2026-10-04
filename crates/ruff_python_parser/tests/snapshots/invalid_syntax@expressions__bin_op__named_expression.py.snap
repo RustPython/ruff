@@ -127,9 +127,22 @@ Module(
 
   |
 1 | x - y := (1, 2)
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+2 | x / y := 2
+  |
+
+
+  |
+1 | x - y := (1, 2)
   |       ^^ Syntax Error: invalid syntax
 2 | x / y := 2
   |
+
+
+  |
+1 | x - y := (1, 2)
+2 | x / y := 2
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
 
 
   |
