@@ -320,7 +320,7 @@ Module(
 
   |
 1 | type X[**P = *int] = int
-  |              ^^^^ Syntax Error: invalid syntax
+  |              ^ Syntax Error: invalid syntax
 2 | type X[**P = yield x] = int
 3 | type X[**P = yield from x] = int
   |
@@ -358,7 +358,7 @@ Module(
 3 | type X[**P = yield from x] = int
 4 | type X[**P = x := int] = int
 5 | type X[**P = *int] = int
-  |              ^^^^ Syntax Error: invalid syntax
+  |              ^ Syntax Error: invalid syntax
 
 
 ## Semantic Syntax Errors

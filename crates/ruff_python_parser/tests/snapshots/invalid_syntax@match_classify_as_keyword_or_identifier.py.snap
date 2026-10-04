@@ -70,6 +70,6 @@ Module(
 
   |
 1 | match *foo:  # Keyword
-  |       ^^^^ Syntax Error: invalid syntax
+  |       ^ Syntax Error: invalid syntax
 2 |     case _: ...
   |

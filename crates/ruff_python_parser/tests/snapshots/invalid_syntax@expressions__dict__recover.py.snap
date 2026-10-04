@@ -550,7 +550,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |  ^^ Syntax Error: invalid syntax
+   |  ^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -558,7 +558,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |               ^^ Syntax Error: invalid syntax
+   |               ^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -567,11 +567,11 @@ Module(
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |     ^^ Syntax Error: invalid syntax
+   |     ^ Syntax Error: invalid syntax
 
 
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |            ^^ Syntax Error: invalid syntax
+   |            ^ Syntax Error: invalid syntax

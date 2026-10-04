@@ -147,7 +147,7 @@ Module(
 
   |
 1 | type x = *y
-  |          ^^ Syntax Error: invalid syntax
+  |          ^ Syntax Error: invalid syntax
 2 | type x = yield y
 3 | type x = yield from y
   |

@@ -81,9 +81,9 @@ Module(
 
   |
 1 | array[*start:*end]
-  |       ^^^^^^ Syntax Error: invalid syntax
+  |       ^ Syntax Error: invalid syntax
 
 
   |
 1 | array[*start:*end]
-  |              ^^^^ Syntax Error: invalid syntax
+  |              ^ Syntax Error: invalid syntax

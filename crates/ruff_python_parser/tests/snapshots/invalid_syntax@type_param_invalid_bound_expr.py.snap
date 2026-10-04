@@ -265,7 +265,7 @@ Module(
 
   |
 1 | type X[T: *int] = int
-  |           ^^^^ Syntax Error: invalid syntax
+  |           ^ Syntax Error: invalid syntax
 2 | type X[T: yield x] = int
 3 | type X[T: yield from x] = int
   |

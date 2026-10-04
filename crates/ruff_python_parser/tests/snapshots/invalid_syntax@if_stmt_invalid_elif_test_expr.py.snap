@@ -109,7 +109,7 @@ Module(
 1 | if x:
 2 |     pass
 3 | elif *x:
-  |      ^^ Syntax Error: invalid syntax
+  |      ^ Syntax Error: invalid syntax
 4 |     pass
 5 | elif yield x:
   |

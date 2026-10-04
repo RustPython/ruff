@@ -300,7 +300,7 @@ Module(
   |
 3 | # Starred expression
 4 | x[*x:]
-  |   ^^ Syntax Error: invalid syntax
+  |   ^ Syntax Error: invalid syntax
 5 | x[:*x]
 6 | x[::*x]
   |
@@ -310,7 +310,7 @@ Module(
 3 | # Starred expression
 4 | x[*x:]
 5 | x[:*x]
-  |    ^^ Syntax Error: invalid syntax
+  |    ^ Syntax Error: invalid syntax
 6 | x[::*x]
   |
 
@@ -319,7 +319,7 @@ Module(
 4 | x[*x:]
 5 | x[:*x]
 6 | x[::*x]
-  |     ^^ Syntax Error: invalid syntax
+  |     ^ Syntax Error: invalid syntax
 7 |
 8 | # Empty slice
   |

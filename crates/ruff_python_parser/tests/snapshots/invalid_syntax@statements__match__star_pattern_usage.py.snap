@@ -605,7 +605,7 @@ Module(
 1 | # Star pattern is only allowed inside a sequence pattern
 2 | match subject:
 3 |     case *_:
-  |          ^^ Syntax Error: cannot use starred expression here
+  |          ^ Syntax Error: cannot use starred expression here
 4 |         pass
 5 |     case *_ as x:
   |
@@ -615,7 +615,7 @@ Module(
 3 |     case *_:
 4 |         pass
 5 |     case *_ as x:
-  |          ^^ Syntax Error: cannot use starred expression here
+  |          ^ Syntax Error: cannot use starred expression here
 6 |         pass
 7 |     case *foo:
   |
@@ -625,7 +625,7 @@ Module(
 5 |     case *_ as x:
 6 |         pass
 7 |     case *foo:
-  |          ^^^^ Syntax Error: cannot use starred expression here
+  |          ^ Syntax Error: cannot use starred expression here
 8 |         pass
 9 |     case *foo | 1:
   |
@@ -635,7 +635,7 @@ Module(
  7 |     case *foo:
  8 |         pass
  9 |     case *foo | 1:
-   |          ^^^^ Syntax Error: cannot use starred expression here
+   |          ^ Syntax Error: cannot use starred expression here
 10 |         pass
 11 |     case 1 | *foo:
    |
@@ -645,7 +645,7 @@ Module(
  9 |     case *foo | 1:
 10 |         pass
 11 |     case 1 | *foo:
-   |              ^^^^ Syntax Error: cannot use starred expression here
+   |              ^ Syntax Error: cannot use starred expression here
 12 |         pass
 13 |     case Foo(*_):
    |
@@ -655,7 +655,7 @@ Module(
 11 |     case 1 | *foo:
 12 |         pass
 13 |     case Foo(*_):
-   |              ^^ Syntax Error: cannot use starred expression here
+   |              ^ Syntax Error: cannot use starred expression here
 14 |         pass
 15 |     case Foo(x=*_):
    |
@@ -665,7 +665,7 @@ Module(
 13 |     case Foo(*_):
 14 |         pass
 15 |     case Foo(x=*_):
-   |                ^^ Syntax Error: cannot use starred expression here
+   |                ^ Syntax Error: cannot use starred expression here
 16 |         pass
 17 |     case {*_}:
    |
@@ -675,7 +675,7 @@ Module(
 15 |     case Foo(x=*_):
 16 |         pass
 17 |     case {*_}:
-   |           ^^ Syntax Error: cannot use starred expression here
+   |           ^ Syntax Error: cannot use starred expression here
 18 |         pass
 19 |     case {*_: 1}:
    |
@@ -695,7 +695,7 @@ Module(
 17 |     case {*_}:
 18 |         pass
 19 |     case {*_: 1}:
-   |           ^^ Syntax Error: cannot use starred expression here
+   |           ^ Syntax Error: cannot use starred expression here
 20 |         pass
 21 |     case {None: *_}:
    |
@@ -705,7 +705,7 @@ Module(
 19 |     case {*_: 1}:
 20 |         pass
 21 |     case {None: *_}:
-   |                 ^^ Syntax Error: cannot use starred expression here
+   |                 ^ Syntax Error: cannot use starred expression here
 22 |         pass
 23 |     case 1 + *_:
    |
@@ -715,7 +715,7 @@ Module(
 21 |     case {None: *_}:
 22 |         pass
 23 |     case 1 + *_:
-   |              ^^ Syntax Error: cannot use starred expression here
+   |              ^ Syntax Error: cannot use starred expression here
 24 |         pass
    |
 

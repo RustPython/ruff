@@ -374,14 +374,10 @@ impl<'src> StringParser<'src> {
     }
 
     fn parse_bytes(mut self) -> Result<StringType, LexicalError> {
-        if let Some(index) = self.source.as_bytes().find_non_ascii_byte() {
-            let ch = self.source.chars().nth(index).unwrap();
+        if self.source.as_bytes().find_non_ascii_byte().is_some() {
             return Err(LexicalError::new(
                 LexicalErrorType::InvalidByteLiteral,
-                TextRange::at(
-                    self.compute_position(index),
-                    TextSize::try_from(ch.len_utf8()).unwrap(),
-                ),
+                self.range,
             ));
         }
 

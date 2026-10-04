@@ -1184,7 +1184,7 @@ Module(
    |
  7 | # Invalid iter
  8 | [x for x in *y]
-   |             ^^ Syntax Error: invalid syntax
+   |             ^ Syntax Error: invalid syntax
  9 | [x for x in yield y]
 10 | [x for x in yield from y]
    |
@@ -1293,7 +1293,7 @@ Module(
    |
 16 | # Invalid if
 17 | [x for x in data if *y]
-   |                     ^^ Syntax Error: invalid syntax
+   |                     ^ Syntax Error: invalid syntax
 18 | [x for x in data if yield y]
 19 | [x for x in data if yield from y]
    |
@@ -1342,7 +1342,7 @@ Module(
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
 22 | [x if x else *y for x in z]
-   |              ^^ Syntax Error: invalid syntax
+   |              ^ Syntax Error: invalid syntax
 
 
 ## Unsupported Syntax Errors
