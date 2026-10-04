@@ -18,4 +18,4 @@ Module(
 
   |
 1 | 👍
-  | ^^ Syntax Error: invalid syntax
+  | ^^ Syntax Error: invalid character '👍' (U+1F44D)

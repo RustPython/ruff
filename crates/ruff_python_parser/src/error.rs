@@ -450,6 +450,23 @@ pub enum LexicalErrorType {
     LineContinuationError,
     /// An unexpected end of file was encountered.
     Eof,
+    /// A closing bracket without an opening bracket.
+    UnmatchedBracket { closing: char },
+    /// A closing bracket that does not match the innermost opening bracket. `opening_line` is the
+    /// line of the opening bracket if it is on another line.
+    MismatchedBracket {
+        closing: char,
+        opening: char,
+        opening_line: Option<u32>,
+    },
+    /// An opening bracket that is not closed by the end of the source.
+    ///
+    /// `incomplete` is whether more input could still close it: the parser read to the end of the
+    /// source with the bracket open. Otherwise, the error is reported in place of an earlier syntax
+    /// error.
+    UnclosedBracket { opening: char, incomplete: bool },
+    /// Brackets are nested too deeply.
+    TooDeeplyNestedBrackets,
     /// An unexpected error occurred.
     OtherError(Box<str>),
 }
@@ -457,6 +474,38 @@ pub enum LexicalErrorType {
 impl std::error::Error for LexicalErrorType {}
 
 impl LexicalErrorType {
+    /// Returns `true` if the error stops tokenization, as opposed to an error found while
+    /// decoding the content of a token.
+    pub fn is_tokenizer_error(&self) -> bool {
+        match self {
+            Self::StringError
+            | Self::UnicodeError
+            | Self::MissingUnicodeLbrace
+            | Self::MissingUnicodeRbrace
+            | Self::InvalidByteLiteral
+            | Self::OtherError(_) => false,
+            // An ASCII punctuation character is a token that the parser rejects.
+            Self::UnrecognizedToken { tok } => !tok.is_ascii() || tok.is_ascii_control(),
+            Self::FStringError(error) | Self::TStringError(error) => matches!(
+                error,
+                InterpolatedStringErrorType::UnterminatedString { .. }
+                    | InterpolatedStringErrorType::UnterminatedTripleQuotedString { .. }
+                    | InterpolatedStringErrorType::SingleRbrace
+                    | InterpolatedStringErrorType::NewlineInFormatSpec
+            ),
+            Self::UnclosedStringError { .. }
+            | Self::IndentationError
+            | Self::TabError
+            | Self::TooDeepIndentation
+            | Self::LineContinuationError
+            | Self::Eof
+            | Self::UnmatchedBracket { .. }
+            | Self::MismatchedBracket { .. }
+            | Self::UnclosedBracket { .. }
+            | Self::TooDeeplyNestedBrackets => true,
+        }
+    }
+
     pub(crate) fn from_interpolated_string_error(
         error: InterpolatedStringErrorType,
         string_kind: InterpolatedStringKind,
@@ -487,11 +536,38 @@ impl std::fmt::Display for LexicalErrorType {
             }
             Self::TabError => write!(f, "inconsistent use of tabs and spaces in indentation"),
             Self::TooDeepIndentation => write!(f, "too many levels of indentation"),
+            Self::UnrecognizedToken { tok } if tok.is_ascii_control() => {
+                write!(
+                    f,
+                    "invalid non-printable character U+{:04X}",
+                    u32::from(*tok)
+                )
+            }
+            Self::UnrecognizedToken { tok } if !tok.is_ascii() => {
+                write!(f, "invalid character '{tok}' (U+{:04X})", u32::from(*tok))
+            }
             Self::UnrecognizedToken { .. } => f.write_str("invalid syntax"),
             Self::LineContinuationError => {
                 write!(f, "unexpected character after line continuation character")
             }
             Self::Eof => write!(f, "unexpected EOF while parsing"),
+            Self::UnmatchedBracket { closing } => write!(f, "unmatched '{closing}'"),
+            Self::MismatchedBracket {
+                closing,
+                opening,
+                opening_line,
+            } => {
+                write!(
+                    f,
+                    "closing parenthesis '{closing}' does not match opening parenthesis '{opening}'"
+                )?;
+                if let Some(line) = opening_line {
+                    write!(f, " on line {line}")?;
+                }
+                Ok(())
+            }
+            Self::UnclosedBracket { opening, .. } => write!(f, "'{opening}' was never closed"),
+            Self::TooDeeplyNestedBrackets => f.write_str("too many nested parentheses"),
             Self::OtherError(msg) => write!(f, "{msg}"),
             Self::UnclosedStringError {
                 triple_quoted: true,

@@ -861,6 +861,15 @@ Module(
 ```
 ## Errors
 
+   |
+34 | # The outer parenthesis is closed but the inner bracket isn't
+35 | if call(foo, [a, b)
+   |                   ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '['
+36 |     def bar():
+37 |         pass
+   |
+
+
   |
 1 | # No indentation before the function definition
 2 | if call(foo
@@ -929,15 +938,6 @@ Module(
    |
 34 | # The outer parenthesis is closed but the inner bracket isn't
 35 | if call(foo, [a, b)
-   |                   ^ Syntax Error: invalid syntax
-36 |     def bar():
-37 |         pass
-   |
-
-
-   |
-34 | # The outer parenthesis is closed but the inner bracket isn't
-35 | if call(foo, [a, b)
    |                    ^ Syntax Error: expected ':'
 36 |     def bar():
 37 |         pass
@@ -948,7 +948,7 @@ Module(
 42 | if call(foo, [a,
 43 |     b
 44 | )
-   | ^ Syntax Error: invalid syntax
+   | ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '[' on line 42
 45 |     def bar():
 46 |         pass
    |

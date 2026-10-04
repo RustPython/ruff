@@ -409,6 +409,15 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
+  |                     ^ Syntax Error: unterminated string literal (detected at line 6)
+7 |
+8 | f'middle {'string':\\
+  |
+
+
+  |
+5 | f'middle {'string':\
+6 |         'format spec'}
   |         ^ Syntax Error: f-string: expecting '}'
 7 |
 8 | f'middle {'string':\\
@@ -428,15 +437,6 @@ Module(
 5 | f'middle {'string':\
 6 |         'format spec'}
   |                 ^^^^ Syntax Error: invalid syntax
-7 |
-8 | f'middle {'string':\\
-  |
-
-
-  |
-5 | f'middle {'string':\
-6 |         'format spec'}
-  |                     ^ Syntax Error: unterminated string literal (detected at line 6)
 7 |
 8 | f'middle {'string':\\
   |
@@ -474,7 +474,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   |                      ^ Syntax Error: invalid syntax
+   |                      ^ Syntax Error: unmatched '}'
 10 |
 11 | f'middle {'string':\\\
    |

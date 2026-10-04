@@ -186,7 +186,12 @@ Module(
 
   |
 1 | def foo(a, **kwargs={'b': 1, 'c': 2}): ...
-  |                                     ^ Syntax Error: invalid syntax
+  |                                    ^ Syntax Error: closing parenthesis '}' does not match opening parenthesis '('
+
+
+  |
+1 | def foo(a, **kwargs={'b': 1, 'c': 2}): ...
+  |                                     ^ Syntax Error: unmatched ')'
 
 
   |

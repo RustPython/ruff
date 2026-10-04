@@ -137,7 +137,16 @@ Module(
 2 |     #     Not in the mapping start token set, so the list parsing bails
 3 |     #     v
 4 |     case {(x as y): 1}:
-  |                      ^ Syntax Error: invalid syntax
+  |                  ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '{'
+5 |         pass
+  |
+
+
+  |
+2 |     #     Not in the mapping start token set, so the list parsing bails
+3 |     #     v
+4 |     case {(x as y): 1}:
+  |                      ^ Syntax Error: unmatched '}'
 5 |         pass
   |
 

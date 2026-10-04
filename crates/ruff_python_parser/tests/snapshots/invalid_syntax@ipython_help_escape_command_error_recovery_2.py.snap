@@ -65,6 +65,14 @@ Module(
   |
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b
+  |      ^ Syntax Error: '(' was never closed
+3 | ?
+  |
+
+
+  |
+1 | # parse_options: {"mode": "ipython"}
+2 | with (a, ?b
   |          ^ Syntax Error: invalid syntax
 3 | ?
   |
@@ -80,4 +88,4 @@ Module(
   |
 2 | with (a, ?b
 3 | ?
-  |  ^ Syntax Error: unexpected EOF while parsing
+  |  ^ Syntax Error: invalid syntax

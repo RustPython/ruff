@@ -123,6 +123,11 @@ Module(
 
   |
 1 | if call(foo, [a, b␍    def bar():␍        pass
+  |              ^ Syntax Error: '[' was never closed
+
+
+  |
+1 | if call(foo, [a, b␍    def bar():␍        pass
   |                        ^^^ Syntax Error: invalid syntax
 
 

@@ -93,7 +93,7 @@ Module(
 
   |
 1 | (x := 1, for x in y)
-  |                    ^ Syntax Error: invalid syntax
+  |                    ^ Syntax Error: unmatched ')'
 
 
   |

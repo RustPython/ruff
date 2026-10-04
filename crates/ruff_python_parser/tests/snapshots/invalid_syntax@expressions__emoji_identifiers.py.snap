@@ -94,7 +94,7 @@ Module(
 
   |
 1 | a = (🐶
-  |      ^^ Syntax Error: invalid syntax
+  |      ^^ Syntax Error: invalid character '🐶' (U+1F436)
 2 |     # comment 🐶
 3 | )
   |
@@ -125,7 +125,7 @@ Module(
 3 | )
 4 |
 5 | a = (🐶 +
-  |      ^^ Syntax Error: invalid syntax
+  |      ^^ Syntax Error: invalid character '🐶' (U+1F436)
 6 |     # comment
 7 | 🐶)
   |
@@ -135,7 +135,7 @@ Module(
 5 | a = (🐶 +
 6 |     # comment
 7 | 🐶)
-  | ^^ Syntax Error: invalid syntax
+  | ^^ Syntax Error: invalid character '🐶' (U+1F436)
 
 
   |
