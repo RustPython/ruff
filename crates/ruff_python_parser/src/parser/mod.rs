@@ -668,21 +668,33 @@ impl<'src> Parser<'src> {
 
             if !is_same_location {
                 errors.push(ParseError {
+                    location: reported_range(&error, range),
                     error,
-                    location: range,
                 });
             }
         }
 
-        let mut range = ranged.range();
-        // A misplaced starred expression or star pattern is reported at its `*`.
-        if matches!(
-            error,
-            ParseErrorType::InvalidStarredExpressionUsage | ParseErrorType::InvalidStarPatternUsage
-        ) {
-            range = TextRange::at(range.start(), TextSize::new(1));
+        fn reported_range(error: &ParseErrorType, range: TextRange) -> TextRange {
+            match error {
+                // A misplaced starred expression or star pattern is reported at its `*`.
+                ParseErrorType::InvalidStarredExpressionUsage
+                | ParseErrorType::InvalidStarPatternUsage => {
+                    TextRange::at(range.start(), TextSize::new(1))
+                }
+                // An unexpected indent is reported at the last character of the indentation.
+                ParseErrorType::UnexpectedIndentation if !range.is_empty() => {
+                    TextRange::at(range.end() - TextSize::new(1), TextSize::new(1))
+                }
+                _ => range,
+            }
         }
-        inner(&mut self.errors, error, range);
+
+        // The lexer already reported an error for the current token, which comes first.
+        if self.at(TokenKind::Unknown) {
+            return;
+        }
+
+        inner(&mut self.errors, error, ranged.range());
     }
 
     /// Add an [`UnsupportedSyntaxError`] with the given [`UnsupportedSyntaxErrorKind`] and

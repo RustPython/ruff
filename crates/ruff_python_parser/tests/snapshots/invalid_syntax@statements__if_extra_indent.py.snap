@@ -532,7 +532,7 @@ Module(
 2 | if True:
 3 |     pass
 4 |         a + b
-  | ^^^^^^^^ Syntax Error: unexpected indentation
+  |        ^ Syntax Error: unexpected indent
 5 |
 6 |     pass
   |
@@ -542,7 +542,7 @@ Module(
 11 | if True:
 12 |     before_nested
 13 |         first_nested
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 14 |             second_nested
 15 |     after_nested
    |
@@ -552,7 +552,7 @@ Module(
 12 |     before_nested
 13 |         first_nested
 14 |             second_nested
-   | ^^^^^^^^^^^^ Syntax Error: unexpected indentation
+   |            ^ Syntax Error: unexpected indent
 15 |     after_nested
    |
 
@@ -561,7 +561,7 @@ Module(
 20 | if True:
 21 |     before_compound
 22 |         if condition:
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 23 |             nested_compound
 24 |         recovered_compound
    |
@@ -571,7 +571,7 @@ Module(
 30 | if True:
 31 |     before_regions
 32 |         first_region
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 33 |     middle_region
 34 |         second_region
    |
@@ -581,7 +581,7 @@ Module(
 32 |         first_region
 33 |     middle_region
 34 |         second_region
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 35 |     after_region
    |
 
@@ -590,7 +590,7 @@ Module(
 40 | if True:
 41 |     before_error
 42 |         broken(,)
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 43 |     after_error
    |
 
@@ -608,4 +608,4 @@ Module(
 48 | if True:
 49 |     before_eof
 50 |         final_eof
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent

@@ -164,7 +164,7 @@ Module(
 3 |     #     v
 4 |     case {(x as y): 1}:
 5 |         pass
-  | ^^^^^^^^ Syntax Error: unexpected indentation
+  |        ^ Syntax Error: unexpected indent
 
 
   |

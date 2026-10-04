@@ -465,7 +465,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   | ^^^^^^^^ Syntax Error: unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 10 |
 11 | f'middle {'string':\\\
    |

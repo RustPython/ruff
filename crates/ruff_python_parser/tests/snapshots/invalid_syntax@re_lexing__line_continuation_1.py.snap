@@ -101,7 +101,7 @@ Module(
 
   |
 1 | call(a, b, \\\
-  |            ^ Syntax Error: unexpected character after line continuation character
+  |             ^ Syntax Error: unexpected character after line continuation character
 2 |
 3 | def bar():
   |
@@ -109,7 +109,7 @@ Module(
 
   |
 1 | call(a, b, \\\
-  |             ^ Syntax Error: unexpected character after line continuation character
+  |              ^ Syntax Error: unexpected character after line continuation character
 2 |
 3 | def bar():
   |
