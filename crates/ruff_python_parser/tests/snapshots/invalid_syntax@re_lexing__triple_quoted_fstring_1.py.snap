@@ -75,12 +75,12 @@ Module(
 ## Errors
 
   |
-3 |   # https://github.com/astral-sh/ruff/issues/11929
+3 | # https://github.com/astral-sh/ruff/issues/11929
 4 |
-5 |   f"""hello {x # comment    
-  |  ___________________________^
-6 | | y = 1
-  | |_____^ Syntax Error: unterminated triple-quoted f-string literal
+5 | f"""hello {x # comment    
+  | ^ Syntax Error: unterminated triple-quoted f-string literal (detected at line 6)
+6 | y = 1
+  |
 
 
   |

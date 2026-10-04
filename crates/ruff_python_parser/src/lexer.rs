@@ -792,7 +792,11 @@ impl<'src> Lexer<'src> {
             self.current_flags |= TokenFlags::TRIPLE_QUOTED_STRING;
         }
 
-        let ftcontext = InterpolatedStringContext::new(self.current_flags, self.nesting)?;
+        let ftcontext = InterpolatedStringContext::new(
+            self.current_flags,
+            self.nesting,
+            self.token_range().start(),
+        )?;
 
         let kind = ftcontext.kind();
 
@@ -831,10 +835,14 @@ impl<'src> Lexer<'src> {
                 // in the source code and the one returned by `self.cursor.first()` when
                 // we reach the end of the source code.
                 EOF_CHAR if self.cursor.is_eof() => {
+                    let detected_line = self.detected_line();
+                    let range = TextRange::empty(interpolated_string.start());
                     let error = if interpolated_string.is_triple_quoted() {
-                        InterpolatedStringErrorType::UnterminatedTripleQuotedString
+                        InterpolatedStringErrorType::UnterminatedTripleQuotedString {
+                            detected_line,
+                        }
                     } else {
-                        InterpolatedStringErrorType::UnterminatedString
+                        InterpolatedStringErrorType::UnterminatedString { detected_line }
                     };
 
                     self.nesting = interpolated_string.nesting();
@@ -842,7 +850,7 @@ impl<'src> Lexer<'src> {
                     self.current_flags |= TokenFlags::UNCLOSED_STRING;
                     self.push_error(LexicalError::new(
                         LexicalErrorType::from_interpolated_string_error(error, string_kind),
-                        self.token_range(),
+                        range,
                     ));
 
                     break;
@@ -850,10 +858,18 @@ impl<'src> Lexer<'src> {
                 '\n' | '\r' if !interpolated_string.is_triple_quoted() => {
                     // https://github.com/astral-sh/ruff/issues/18632
 
-                    let error_type = if in_format_spec {
-                        InterpolatedStringErrorType::NewlineInFormatSpec
+                    let (error_type, range) = if in_format_spec {
+                        (
+                            InterpolatedStringErrorType::NewlineInFormatSpec,
+                            self.token_range(),
+                        )
                     } else {
-                        InterpolatedStringErrorType::UnterminatedString
+                        (
+                            InterpolatedStringErrorType::UnterminatedString {
+                                detected_line: self.detected_line(),
+                            },
+                            TextRange::empty(interpolated_string.start()),
+                        )
                     };
 
                     self.nesting = interpolated_string.nesting();
@@ -862,7 +878,7 @@ impl<'src> Lexer<'src> {
 
                     self.push_error(LexicalError::new(
                         LexicalErrorType::from_interpolated_string_error(error_type, string_kind),
-                        self.token_range(),
+                        range,
                     ));
 
                     break;
@@ -953,10 +969,7 @@ impl<'src> Lexer<'src> {
                     self.cursor.skip_to_end();
 
                     self.current_flags |= TokenFlags::UNCLOSED_STRING;
-                    self.push_error(LexicalError::new(
-                        LexicalErrorType::UnclosedStringError,
-                        self.token_range(),
-                    ));
+                    self.push_unclosed_string_error(quote);
                     break;
                 };
 
@@ -990,11 +1003,7 @@ impl<'src> Lexer<'src> {
                 else {
                     self.cursor.skip_to_end();
                     self.current_flags |= TokenFlags::UNCLOSED_STRING;
-
-                    self.push_error(LexicalError::new(
-                        LexicalErrorType::UnclosedStringError,
-                        self.token_range(),
-                    ));
+                    self.push_unclosed_string_error(quote);
 
                     break;
                 };
@@ -1025,10 +1034,7 @@ impl<'src> Lexer<'src> {
                 match quote_or_newline {
                     '\r' | '\n' => {
                         self.current_flags |= TokenFlags::UNCLOSED_STRING;
-                        self.push_error(LexicalError::new(
-                            LexicalErrorType::UnclosedStringError,
-                            self.token_range(),
-                        ));
+                        self.push_unclosed_string_error(quote);
                         break;
                     }
                     ch if ch == quote => {
@@ -1041,6 +1047,46 @@ impl<'src> Lexer<'src> {
         }
 
         TokenKind::String
+    }
+
+    /// Pushes an [`LexicalErrorType::UnclosedStringError`] for the string token lexed so far,
+    /// reported at the start of the token.
+    fn push_unclosed_string_error(&mut self, quote: char) {
+        let range = self.token_range();
+        let body = &self.source[range];
+        let body = &body[body.find(quote).unwrap_or(0)..];
+        let mut escaped_end_quote = false;
+        let mut chars = body.chars();
+        while let Some(c) = chars.next() {
+            if c == '\\' && chars.next() == Some(quote) {
+                escaped_end_quote = true;
+                break;
+            }
+        }
+        let error = LexicalErrorType::UnclosedStringError {
+            triple_quoted: self.current_flags.is_triple_quoted(),
+            escaped_end_quote,
+            detected_line: self.detected_line(),
+        };
+        self.push_error(LexicalError::new(error, TextRange::empty(range.start())));
+    }
+
+    /// Returns the one-based line number of the cursor, where a newline that ends the source
+    /// belongs to the line it terminates.
+    fn detected_line(&self) -> u32 {
+        let source = self.source.as_bytes();
+        let mut offset = self.offset().to_usize();
+        if offset == source.len() && matches!(source.last(), Some(b'\n' | b'\r')) {
+            offset -= 1;
+        }
+        let newlines = source[..offset]
+            .iter()
+            .enumerate()
+            .filter(|&(index, &byte)| {
+                byte == b'\n' || (byte == b'\r' && source.get(index + 1) != Some(&b'\n'))
+            })
+            .count();
+        u32::try_from(newlines + 1).unwrap()
     }
 
     /// Numeric lexing. The feast can start!
@@ -1207,12 +1253,13 @@ impl<'src> Lexer<'src> {
         // First, finish any unterminated interpolated-strings.
         while let Some(interpolated_string) = self.interpolated_strings.pop() {
             self.nesting = interpolated_string.nesting();
+            let detected_line = self.detected_line();
             self.push_error(LexicalError::new(
                 LexicalErrorType::from_interpolated_string_error(
-                    InterpolatedStringErrorType::UnterminatedString,
+                    InterpolatedStringErrorType::UnterminatedString { detected_line },
                     interpolated_string.kind(),
                 ),
-                self.token_range(),
+                TextRange::empty(interpolated_string.start()),
             ));
         }
 
@@ -1389,8 +1436,8 @@ impl<'src> Lexer<'src> {
         }
 
         if self.errors.last().is_some_and(|error| {
-            error.location() == self.current_range
-                && matches!(error.error(), LexicalErrorType::UnclosedStringError)
+            error.location().start() == self.current_range.start()
+                && matches!(error.error(), LexicalErrorType::UnclosedStringError { .. })
         }) {
             self.errors.pop();
         }
@@ -1429,8 +1476,8 @@ impl<'src> Lexer<'src> {
                 == AnyStringPrefix::Regular(StringLiteralPrefix::Raw { uppercase: false })
         {
             if self.errors.last().is_some_and(|error| {
-                error.location() == self.current_range
-                    && matches!(error.error(), LexicalErrorType::UnclosedStringError)
+                error.location().start() == self.current_range.start()
+                    && matches!(error.error(), LexicalErrorType::UnclosedStringError { .. })
             }) {
                 self.errors.pop();
             }
@@ -2647,19 +2694,31 @@ t"{(lambda x:{x})}"
         assert_eq!(lex_fstring_error("f'{3:}}>10}'"), SingleRbrace);
         assert_eq!(lex_fstring_error(r"f'\{foo}\}'"), SingleRbrace);
 
-        assert_eq!(lex_fstring_error(r#"f""#), UnterminatedString);
-        assert_eq!(lex_fstring_error(r"f'"), UnterminatedString);
+        assert!(matches!(
+            lex_fstring_error(r#"f""#),
+            UnterminatedString { .. }
+        ));
+        assert!(matches!(
+            lex_fstring_error(r"f'"),
+            UnterminatedString { .. }
+        ));
 
-        assert_eq!(lex_fstring_error(r#"f""""#), UnterminatedTripleQuotedString);
-        assert_eq!(lex_fstring_error(r"f'''"), UnterminatedTripleQuotedString);
-        assert_eq!(
+        assert!(matches!(
+            lex_fstring_error(r#"f""""#),
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
+            lex_fstring_error(r"f'''"),
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
             lex_fstring_error(r#"f"""""#),
-            UnterminatedTripleQuotedString
-        );
-        assert_eq!(
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
             lex_fstring_error(r#"f""""""#),
-            UnterminatedTripleQuotedString
-        );
+            UnterminatedTripleQuotedString { .. }
+        ));
     }
 
     fn lex_tstring_error(source: &str) -> InterpolatedStringErrorType {
@@ -2694,9 +2753,11 @@ t"{(lambda x:{x})}"
         [
             LexicalError {
                 error: FStringError(
-                    UnterminatedString,
+                    UnterminatedString {
+                        detected_line: 1,
+                    },
                 ),
-                location: 2..7,
+                location: 0..0,
             },
         ]
         ```
@@ -2721,14 +2782,20 @@ t"{(lambda x:{x})}"
         ```
         [
             LexicalError {
-                error: UnclosedStringError,
-                location: 3..4,
+                error: UnclosedStringError {
+                    triple_quoted: false,
+                    escaped_end_quote: false,
+                    detected_line: 1,
+                },
+                location: 3..3,
             },
             LexicalError {
                 error: FStringError(
-                    UnterminatedString,
+                    UnterminatedString {
+                        detected_line: 1,
+                    },
                 ),
-                location: 4..4,
+                location: 0..0,
             },
         ]
         ```
@@ -2755,14 +2822,20 @@ t"{(lambda x:{x})}"
         ```
         [
             LexicalError {
-                error: UnclosedStringError,
-                location: 7..9,
+                error: UnclosedStringError {
+                    triple_quoted: false,
+                    escaped_end_quote: false,
+                    detected_line: 1,
+                },
+                location: 7..7,
             },
             LexicalError {
                 error: FStringError(
-                    UnterminatedString,
+                    UnterminatedString {
+                        detected_line: 1,
+                    },
                 ),
-                location: 9..9,
+                location: 0..0,
             },
         ]
         ```
@@ -2784,19 +2857,31 @@ t"{(lambda x:{x})}"
         assert_eq!(lex_tstring_error("t'{3:}}>10}'"), SingleRbrace);
         assert_eq!(lex_tstring_error(r"t'\{foo}\}'"), SingleRbrace);
 
-        assert_eq!(lex_tstring_error(r#"t""#), UnterminatedString);
-        assert_eq!(lex_tstring_error(r"t'"), UnterminatedString);
+        assert!(matches!(
+            lex_tstring_error(r#"t""#),
+            UnterminatedString { .. }
+        ));
+        assert!(matches!(
+            lex_tstring_error(r"t'"),
+            UnterminatedString { .. }
+        ));
 
-        assert_eq!(lex_tstring_error(r#"t""""#), UnterminatedTripleQuotedString);
-        assert_eq!(lex_tstring_error(r"t'''"), UnterminatedTripleQuotedString);
-        assert_eq!(
+        assert!(matches!(
+            lex_tstring_error(r#"t""""#),
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
+            lex_tstring_error(r"t'''"),
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
             lex_tstring_error(r#"t"""""#),
-            UnterminatedTripleQuotedString
-        );
-        assert_eq!(
+            UnterminatedTripleQuotedString { .. }
+        ));
+        assert!(matches!(
             lex_tstring_error(r#"t""""""#),
-            UnterminatedTripleQuotedString
-        );
+            UnterminatedTripleQuotedString { .. }
+        ));
     }
 
     #[test]

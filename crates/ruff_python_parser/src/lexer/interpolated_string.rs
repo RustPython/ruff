@@ -1,4 +1,5 @@
 use ruff_python_ast::StringFlags;
+use ruff_text_size::TextSize;
 
 use crate::string::InterpolatedStringKind;
 
@@ -18,15 +19,19 @@ pub(crate) struct InterpolatedStringContext {
     /// there can be multiple format specs nested for the same f-string.
     /// For example, `{a:{b:{c}}}` has 3 format specs.
     format_spec_depth: u32,
+
+    /// The start of the f/t-string, including its prefix.
+    start: TextSize,
 }
 
 impl InterpolatedStringContext {
-    pub(crate) const fn new(flags: TokenFlags, nesting: u32) -> Option<Self> {
+    pub(crate) const fn new(flags: TokenFlags, nesting: u32, start: TextSize) -> Option<Self> {
         if flags.is_interpolated_string() {
             Some(Self {
                 flags,
                 nesting,
                 format_spec_depth: 0,
+                start,
             })
         } else {
             None
@@ -49,6 +54,11 @@ impl InterpolatedStringContext {
 
     pub(crate) const fn nesting(&self) -> u32 {
         self.nesting
+    }
+
+    /// Returns the start of the f/t-string, including its prefix.
+    pub(crate) const fn start(&self) -> TextSize {
+        self.start
     }
 
     /// Returns the quote character for the current f-string.

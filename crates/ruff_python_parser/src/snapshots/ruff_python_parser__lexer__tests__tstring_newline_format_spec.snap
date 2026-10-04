@@ -46,8 +46,12 @@ expression: "lex_invalid(source, Mode::Module)"
         location: 13..14,
     },
     LexicalError {
-        error: UnclosedStringError,
-        location: 18..19,
+        error: UnclosedStringError {
+            triple_quoted: false,
+            escaped_end_quote: false,
+            detected_line: 4,
+        },
+        location: 18..18,
     },
     LexicalError {
         error: TStringError(
@@ -56,8 +60,12 @@ expression: "lex_invalid(source, Mode::Module)"
         location: 32..33,
     },
     LexicalError {
-        error: UnclosedStringError,
-        location: 47..48,
+        error: UnclosedStringError {
+            triple_quoted: false,
+            escaped_end_quote: false,
+            detected_line: 8,
+        },
+        location: 47..47,
     },
 ]
 ```

@@ -436,7 +436,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |                     ^^ Syntax Error: missing closing quote in string literal
+  |                     ^ Syntax Error: unterminated string literal (detected at line 6)
 7 |
 8 | f'middle {'string':\\
   |
@@ -511,4 +511,4 @@ Module(
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |                     ^^ Syntax Error: missing closing quote in string literal
+   |                     ^ Syntax Error: unterminated string literal (detected at line 12)
