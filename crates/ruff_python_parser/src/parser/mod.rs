@@ -327,6 +327,13 @@ impl<'src> Parser<'src> {
         self.current_token_range().start()
     }
 
+    /// Returns the 1-based line number of `offset` in the source.
+    ///
+    /// `\n`, `\r\n`, and a lone `\r` each count as one line break.
+    pub(super) fn line_number(&self, offset: TextSize) -> u32 {
+        line_number(self.source, offset)
+    }
+
     fn node_range(&self, start: TextSize) -> TextRange {
         // It's possible during error recovery that the parsing didn't consume any tokens. In that
         // case, `last_token_end` still points to the end of the previous token but `start` is the
@@ -1786,6 +1793,16 @@ impl RecoveryContext {
     }
 }
 
+/// Returns the 1-based line number of `offset` in `source`.
+///
+/// `\n`, `\r\n`, and a lone `\r` each count as one line break.
+fn line_number(source: &str, offset: TextSize) -> u32 {
+    let text = &source[..offset.to_usize()];
+    let newlines =
+        text.matches('\n').count() + text.matches('\r').count() - text.matches("\r\n").count();
+    u32::try_from(newlines + 1).unwrap()
+}
+
 /// Moves the error that stops parsing first to the front of `errors`.
 ///
 /// The source is tokenized again without the parser's error recovery, and its first tokenizer
@@ -1851,14 +1868,9 @@ fn prioritize_tokenizer_error(
         || (!in_interpolated_string
             && match tokenizer_error.error() {
                 LexicalErrorType::UnclosedBracket { .. } => {
-                    let line = |offset: TextSize| {
-                        let text = &source[..offset.to_usize()];
-                        text.matches('\n').count() + text.matches('\r').count()
-                            - text.matches("\r\n").count()
-                    };
                     let bracket_start = tokenizer_error.location().start();
                     bracket_start <= error_start
-                        && (line(bracket_start) < line(error_start)
+                        && (line_number(source, bracket_start) < line_number(source, error_start)
                             || stops.iter().all(|stop| *stop < first_start))
                 }
                 _ => !matches!(first.error, ParseErrorType::UnexpectedIndentation),

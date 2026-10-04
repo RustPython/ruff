@@ -84,4 +84,4 @@ Module(
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b)
 3 | ?
-  | ^ Syntax Error: expected an indented block after `with` statement
+  | ^ Syntax Error: expected an indented block after 'with' statement on line 2
