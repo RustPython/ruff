@@ -467,11 +467,63 @@ pub enum LexicalErrorType {
     UnclosedBracket { opening: char, incomplete: bool },
     /// Brackets are nested too deeply.
     TooDeeplyNestedBrackets,
+    /// A malformed number literal, or one directly followed by a name.
+    InvalidNumberLiteral { kind: NumberLiteralKind },
+    /// A digit that is not valid in the octal or binary literal it appears in.
+    InvalidDigit {
+        digit: char,
+        kind: NumberLiteralKind,
+    },
+    /// A decimal integer literal with leading zeros.
+    LeadingZerosInDecimalInteger,
+    /// A string prefix that combines incompatible prefixes, such as `ub`.
+    IncompatibleStringPrefixes { first: char, second: char },
     /// An unexpected error occurred.
     OtherError(Box<str>),
 }
 
 impl std::error::Error for LexicalErrorType {}
+
+/// The kind of a number literal, as named in error messages.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, get_size2::GetSize)]
+pub enum NumberLiteralKind {
+    Decimal,
+    Hexadecimal,
+    Octal,
+    Binary,
+    Imaginary,
+}
+
+impl std::fmt::Display for NumberLiteralKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::Decimal => "decimal",
+            Self::Hexadecimal => "hexadecimal",
+            Self::Octal => "octal",
+            Self::Binary => "binary",
+            Self::Imaginary => "imaginary",
+        })
+    }
+}
+
+/// Whether `c` is printable: not a control, format, surrogate, private use, unassigned or
+/// separator character, other than the ASCII space.
+fn is_printable(c: char) -> bool {
+    use icu_properties::props::{EnumeratedProperty, GeneralCategory};
+
+    c == ' '
+        || !matches!(
+            GeneralCategory::for_char(c),
+            GeneralCategory::SpaceSeparator
+                | GeneralCategory::LineSeparator
+                | GeneralCategory::ParagraphSeparator
+                | GeneralCategory::Control
+                | GeneralCategory::Format
+                | GeneralCategory::Surrogate
+                | GeneralCategory::PrivateUse
+                | GeneralCategory::Unassigned
+        )
+}
 
 impl LexicalErrorType {
     /// Returns `true` if the error stops tokenization, as opposed to an error found while
@@ -485,7 +537,7 @@ impl LexicalErrorType {
             | Self::InvalidByteLiteral
             | Self::OtherError(_) => false,
             // An ASCII punctuation character is a token that the parser rejects.
-            Self::UnrecognizedToken { tok } => !tok.is_ascii() || tok.is_ascii_control(),
+            Self::UnrecognizedToken { tok } => !tok.is_ascii() || !is_printable(*tok),
             Self::FStringError(error) | Self::TStringError(error) => matches!(
                 error,
                 InterpolatedStringErrorType::UnterminatedString { .. }
@@ -502,7 +554,11 @@ impl LexicalErrorType {
             | Self::UnmatchedBracket { .. }
             | Self::MismatchedBracket { .. }
             | Self::UnclosedBracket { .. }
-            | Self::TooDeeplyNestedBrackets => true,
+            | Self::TooDeeplyNestedBrackets
+            | Self::InvalidNumberLiteral { .. }
+            | Self::InvalidDigit { .. }
+            | Self::LeadingZerosInDecimalInteger
+            | Self::IncompatibleStringPrefixes { .. } => true,
         }
     }
 
@@ -536,7 +592,7 @@ impl std::fmt::Display for LexicalErrorType {
             }
             Self::TabError => write!(f, "inconsistent use of tabs and spaces in indentation"),
             Self::TooDeepIndentation => write!(f, "too many levels of indentation"),
-            Self::UnrecognizedToken { tok } if tok.is_ascii_control() => {
+            Self::UnrecognizedToken { tok } if !is_printable(*tok) => {
                 write!(
                     f,
                     "invalid non-printable character U+{:04X}",
@@ -547,6 +603,16 @@ impl std::fmt::Display for LexicalErrorType {
                 write!(f, "invalid character '{tok}' (U+{:04X})", u32::from(*tok))
             }
             Self::UnrecognizedToken { .. } => f.write_str("invalid syntax"),
+            Self::InvalidNumberLiteral { kind } => write!(f, "invalid {kind} literal"),
+            Self::InvalidDigit { digit, kind } => {
+                write!(f, "invalid digit '{digit}' in {kind} literal")
+            }
+            Self::LeadingZerosInDecimalInteger => f.write_str(
+                "leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers",
+            ),
+            Self::IncompatibleStringPrefixes { first, second } => {
+                write!(f, "'{first}' and '{second}' prefixes are incompatible")
+            }
             Self::LineContinuationError => {
                 write!(f, "unexpected character after line continuation character")
             }

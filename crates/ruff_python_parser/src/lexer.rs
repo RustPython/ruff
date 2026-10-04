@@ -17,7 +17,9 @@ use ruff_python_trivia::is_python_whitespace;
 use ruff_text_size::{TextLen, TextRange, TextSize};
 
 use crate::Mode;
-use crate::error::{InterpolatedStringErrorType, LexicalError, LexicalErrorType};
+use crate::error::{
+    InterpolatedStringErrorType, LexicalError, LexicalErrorType, NumberLiteralKind,
+};
 use crate::lexer::cursor::{Cursor, EOF_CHAR};
 use crate::lexer::indentation::{
     Indentation, IndentationError, Indentations, IndentationsCheckpoint,
@@ -654,6 +656,14 @@ impl<'src> Lexer<'src> {
 
     /// Lex an identifier. Also used for keywords and string/bytes literals with a prefix.
     fn lex_identifier(&mut self, first: char) -> TokenKind {
+        if let Some(error) = self.incompatible_string_prefixes(first) {
+            self.cursor
+                .skip_bytes(error.location().len().to_usize() - first.len_utf8());
+            self.errors.push(error);
+            self.current_range = self.token_range();
+            return TokenKind::Unknown;
+        }
+
         // Detect potential string like rb'' b'' f'' t'' u'' r''
         let quote = if let Some(prefix) = single_char_prefix(first) {
             match self.cursor.first() {
@@ -754,6 +764,44 @@ impl<'src> Lexer<'src> {
             b"yield" => TokenKind::Yield,
             _ => TokenKind::Identifier,
         }
+    }
+
+    /// Returns the error for a string prefix starting with `first` that combines incompatible
+    /// prefixes, such as `ub''`. The error covers the prefix.
+    fn incompatible_string_prefixes(&self, first: char) -> Option<LexicalError> {
+        const PREFIXES: [char; 5] = ['u', 'b', 'r', 'f', 't'];
+        const INCOMPATIBLE: [(char, char); 7] = [
+            ('u', 'b'),
+            ('u', 'r'),
+            ('u', 'f'),
+            ('u', 't'),
+            ('b', 'f'),
+            ('b', 't'),
+            ('f', 't'),
+        ];
+
+        let mut seen = Vec::with_capacity(PREFIXES.len());
+        let mut len = TextSize::new(0);
+        let mut chars = std::iter::once(first).chain(self.cursor.rest().chars());
+        loop {
+            let c = chars.next()?;
+            if is_quote(c) {
+                break;
+            }
+            let prefix = c.to_ascii_lowercase();
+            if !PREFIXES.contains(&prefix) || seen.contains(&prefix) {
+                return None;
+            }
+            seen.push(prefix);
+            len += c.text_len();
+        }
+        let (first, second) = INCOMPATIBLE
+            .into_iter()
+            .find(|(first, second)| seen.contains(first) && seen.contains(second))?;
+        Some(LexicalError::new(
+            LexicalErrorType::IncompatibleStringPrefixes { first, second },
+            TextRange::at(self.token_range().start(), len),
+        ))
     }
 
     /// Try lexing the double character string prefix, updating the token flags accordingly.
@@ -1175,7 +1223,7 @@ impl<'src> Lexer<'src> {
         }
     }
 
-    /// Lex a hex/octal/decimal/binary number without a decimal point.
+    /// Lex a hex/octal/binary number after its `0x`, `0o` or `0b` prefix.
     fn lex_number_radix(&mut self, radix: Radix) -> TokenKind {
         #[cfg(debug_assertions)]
         {
@@ -1183,106 +1231,176 @@ impl<'src> Lexer<'src> {
             debug_assert_matches!(self.cursor.previous().to_ascii_lowercase(), 'x' | 'o' | 'b');
         }
 
-        let number = self.radix_run(radix);
-        if !number.has_digit {
-            let err = u64::from_str_radix("", radix.as_u32()).unwrap_err();
-            return self.push_error(LexicalError::new(
-                LexicalErrorType::OtherError({
-                    let msg = format!("{err:?}");
-                    let mut chars = msg.chars();
-                    match chars.next() {
-                        Some(first) => format!("{}{}", first.to_ascii_lowercase(), chars.as_str())
-                            .into_boxed_str(),
-                        None => msg.into_boxed_str(),
-                    }
-                }),
-                self.token_range(),
-            ));
-        }
-        TokenKind::Int
-    }
-
-    /// Lex a normal number, that is, no octal, hex or binary number.
-    fn lex_decimal_number(&mut self, first_digit_or_dot: char) -> TokenKind {
-        #[cfg(debug_assertions)]
-        debug_assert!(self.cursor.previous().is_ascii_digit() || self.cursor.previous() == '.');
-        let start_is_zero = first_digit_or_dot == '0';
-
-        let mut integer_part = RadixRun {
-            has_digit: first_digit_or_dot != '.',
-            has_nonzero_digit: first_digit_or_dot != '.' && first_digit_or_dot != '0',
-        };
-        if first_digit_or_dot != '.' {
-            integer_part.has_nonzero_digit |= self.radix_run(Radix::Decimal).has_nonzero_digit;
-        }
-
-        let is_float = if first_digit_or_dot == '.' || self.cursor.eat_char('.') {
-            if self.cursor.eat_char('_') {
-                return self.push_error(LexicalError::new(
-                    LexicalErrorType::OtherError("invalid syntax".to_string().into_boxed_str()),
-                    TextRange::new(self.offset() - TextSize::new(1), self.offset()),
-                ));
-            }
-
-            self.radix_run(Radix::Decimal);
-            true
-        } else {
-            // Normal number:
-            false
-        };
-
-        let is_float = match self.cursor.rest().as_bytes() {
-            [b'e' | b'E', b'0'..=b'9', ..] | [b'e' | b'E', b'-' | b'+', b'0'..=b'9', ..] => {
-                // 'e' | 'E'
-                self.cursor.bump();
-
-                self.cursor.eat_if(|c| matches!(c, '+' | '-'));
-
-                self.radix_run(Radix::Decimal);
-
-                true
-            }
-            _ => is_float,
-        };
-
-        if self.cursor.eat_if(|c| matches!(c, 'j' | 'J')).is_some() {
-            TokenKind::Complex
-        } else if is_float {
-            TokenKind::Float
-        } else if start_is_zero && integer_part.has_nonzero_digit {
-            // Leading zeros in decimal integer literals are not permitted.
-            self.push_error(LexicalError::new(
-                LexicalErrorType::OtherError(
-                    "invalid decimal integer literal"
-                        .to_string()
-                        .into_boxed_str(),
-                ),
-                self.token_range(),
-            ))
-        } else {
-            TokenKind::Int
-        }
-    }
-
-    /// Consume a sequence of numbers with the given radix,
-    /// the digits can be decorated with underscores
-    /// like this: '`1_2_3_4`' == '1234'
-    fn radix_run(&mut self, radix: Radix) -> RadixRun {
-        let mut run = RadixRun::default();
         loop {
-            if let Some(c) = self.cursor.eat_if(|c| radix.is_digit(c)) {
-                run.has_digit = true;
-                run.has_nonzero_digit |= c != '0';
+            self.cursor.eat_char('_');
+            if !radix.is_digit(self.cursor.first()) {
+                return self.push_invalid_radix_digit(radix);
             }
-            // Number that contains `_` separators.
-            else if self.cursor.first() == '_' && radix.is_digit(self.cursor.second()) {
-                // Skip over `_`
-                self.cursor.bump();
-            } else {
+            self.cursor.eat_while(|c| radix.is_digit(c));
+            if self.cursor.first() != '_' {
                 break;
             }
         }
-        run
+        if self.cursor.first().is_ascii_digit() && radix != Radix::Hex {
+            return self.push_invalid_radix_digit(radix);
+        }
+        self.verify_end_of_number(radix.kind());
+        TokenKind::Int
+    }
+
+    /// Pushes the error for a character after the prefix or an `_` of a hex/octal/binary number
+    /// that is not one of its digits.
+    fn push_invalid_radix_digit(&mut self, radix: Radix) -> TokenKind {
+        let kind = radix.kind();
+        let digit = self.cursor.first();
+        let error = if digit.is_ascii_digit() && radix != Radix::Hex {
+            self.cursor.bump();
+            LexicalErrorType::InvalidDigit { digit, kind }
+        } else {
+            LexicalErrorType::InvalidNumberLiteral { kind }
+        };
+        self.push_number_error(error)
+    }
+
+    /// Lex a decimal number, starting with a digit or with a `.` followed by a digit.
+    fn lex_decimal_number(&mut self, first_digit_or_dot: char) -> TokenKind {
+        #[cfg(debug_assertions)]
+        debug_assert!(self.cursor.previous().is_ascii_digit() || self.cursor.previous() == '.');
+
+        let mut fraction = first_digit_or_dot == '.';
+        if first_digit_or_dot == '0' {
+            // Zeros, which may be followed by other digits only in a float or imaginary literal.
+            loop {
+                if self.cursor.eat_char('_') && !self.cursor.first().is_ascii_digit() {
+                    return self.push_number_error(LexicalErrorType::InvalidNumberLiteral {
+                        kind: NumberLiteralKind::Decimal,
+                    });
+                }
+                if !self.cursor.eat_char('0') {
+                    break;
+                }
+            }
+            let nonzero_start = self.offset();
+            let nonzero = self.cursor.first().is_ascii_digit();
+            if nonzero && !self.decimal_tail() {
+                return TokenKind::Unknown;
+            }
+            match self.cursor.first() {
+                '.' => {
+                    self.cursor.bump();
+                    fraction = true;
+                }
+                'e' | 'E' | 'j' | 'J' => {}
+                _ if nonzero => {
+                    self.errors.push(LexicalError::new(
+                        LexicalErrorType::LeadingZerosInDecimalInteger,
+                        TextRange::new(self.token_range().start(), nonzero_start),
+                    ));
+                    self.current_range = self.token_range();
+                    return TokenKind::Unknown;
+                }
+                _ => {}
+            }
+        } else if first_digit_or_dot != '.' {
+            if !self.decimal_tail() {
+                return TokenKind::Unknown;
+            }
+            fraction = self.cursor.eat_char('.');
+        }
+
+        let mut is_float = fraction;
+        if fraction && self.cursor.first().is_ascii_digit() && !self.decimal_tail() {
+            return TokenKind::Unknown;
+        }
+
+        if matches!(self.cursor.first(), 'e' | 'E') {
+            match self.cursor.second() {
+                '+' | '-' => {
+                    self.cursor.bump();
+                    self.cursor.bump();
+                    if !self.cursor.first().is_ascii_digit() {
+                        return self.push_number_error(LexicalErrorType::InvalidNumberLiteral {
+                            kind: NumberLiteralKind::Decimal,
+                        });
+                    }
+                }
+                second if !second.is_ascii_digit() => {
+                    // The `e` isn't part of the number.
+                    self.verify_end_of_number(NumberLiteralKind::Decimal);
+                    return if is_float {
+                        TokenKind::Float
+                    } else {
+                        TokenKind::Int
+                    };
+                }
+                _ => {
+                    self.cursor.bump();
+                }
+            }
+            if !self.decimal_tail() {
+                return TokenKind::Unknown;
+            }
+            is_float = true;
+        }
+
+        if self.cursor.eat_if(|c| matches!(c, 'j' | 'J')).is_some() {
+            self.verify_end_of_number(NumberLiteralKind::Imaginary);
+            TokenKind::Complex
+        } else {
+            self.verify_end_of_number(NumberLiteralKind::Decimal);
+            if is_float {
+                TokenKind::Float
+            } else {
+                TokenKind::Int
+            }
+        }
+    }
+
+    /// Consumes decimal digits, which may be separated by single underscores. Pushes an error and
+    /// returns `false` for an underscore that is not followed by a digit.
+    fn decimal_tail(&mut self) -> bool {
+        loop {
+            self.cursor.eat_while(|c| c.is_ascii_digit());
+            if !self.cursor.eat_char('_') {
+                return true;
+            }
+            if !self.cursor.first().is_ascii_digit() {
+                self.push_number_error(LexicalErrorType::InvalidNumberLiteral {
+                    kind: NumberLiteralKind::Decimal,
+                });
+                return false;
+            }
+        }
+    }
+
+    /// Pushes an error for the number literal at its last consumed character, ending the token.
+    fn push_number_error(&mut self, error: LexicalErrorType) -> TokenKind {
+        self.errors.push(LexicalError::new(
+            error,
+            TextRange::empty(self.offset() - TextSize::new(1)),
+        ));
+        self.current_range = self.token_range();
+        TokenKind::Unknown
+    }
+
+    /// Pushes an error if the number literal is directly followed by a name, unless the name starts
+    /// with a keyword that can follow a number in valid code. The token is kept as a number.
+    fn verify_end_of_number(&mut self, kind: NumberLiteralKind) {
+        let rest = self.cursor.rest();
+        let before_keyword = ["and", "else", "for", "if", "in", "is", "not", "or"]
+            .iter()
+            .any(|keyword| rest.starts_with(keyword));
+        if !before_keyword
+            && rest
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
+        {
+            self.errors.push(LexicalError::new(
+                LexicalErrorType::InvalidNumberLiteral { kind },
+                TextRange::empty(self.offset() - TextSize::new(1)),
+            ));
+        }
     }
 
     /// Lex a single comment.
@@ -1726,21 +1844,19 @@ impl State {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Radix {
     Binary,
     Octal,
-    Decimal,
     Hex,
 }
 
 impl Radix {
-    const fn as_u32(self) -> u32 {
+    const fn kind(self) -> NumberLiteralKind {
         match self {
-            Radix::Binary => 2,
-            Radix::Octal => 8,
-            Radix::Decimal => 10,
-            Radix::Hex => 16,
+            Radix::Binary => NumberLiteralKind::Binary,
+            Radix::Octal => NumberLiteralKind::Octal,
+            Radix::Hex => NumberLiteralKind::Hexadecimal,
         }
     }
 
@@ -1748,16 +1864,9 @@ impl Radix {
         match self {
             Radix::Binary => matches!(c, '0'..='1'),
             Radix::Octal => matches!(c, '0'..='7'),
-            Radix::Decimal => c.is_ascii_digit(),
             Radix::Hex => c.is_ascii_hexdigit(),
         }
     }
-}
-
-#[derive(Default)]
-struct RadixRun {
-    has_digit: bool,
-    has_nonzero_digit: bool,
 }
 
 const fn is_quote(c: char) -> bool {
