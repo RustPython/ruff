@@ -183,6 +183,17 @@ impl<'src> Parser<'src> {
         &mut self,
         context: ExpressionContext,
     ) -> ParsedExpr {
+        let parsed_expr = self.parse_named_expression_without_assignment_check(context);
+        self.check_assignment_instead_of_comparison(&parsed_expr);
+        parsed_expr
+    }
+
+    /// Parses a named expression or higher without reporting an `=` after it, which starts a
+    /// keyword argument in a call.
+    fn parse_named_expression_without_assignment_check(
+        &mut self,
+        context: ExpressionContext,
+    ) -> ParsedExpr {
         let start = self.node_start();
         let parsed_expr = self.parse_conditional_expression_or_higher_impl(context);
 
@@ -213,9 +224,146 @@ impl<'src> Parser<'src> {
         &mut self,
         context: ExpressionContext,
     ) -> ParsedExpr {
+        if matches!(
+            self.current_token_kind(),
+            TokenKind::Pass | TokenKind::Break | TokenKind::Continue
+        ) {
+            self.check_statement_before_if_expression();
+        }
         let parsed_expr = self.parse_conditional_expression_without_comma_check(context);
-        self.check_missing_comma(&parsed_expr);
+        if !self.check_expression_between_strings(&parsed_expr) {
+            self.check_missing_comma(&parsed_expr);
+        }
         parsed_expr
+    }
+
+    /// Reports a `pass`, `break` or `continue` statement used as the body of an `if`
+    /// expression, as in `pass if x else y`.
+    pub(super) fn check_statement_before_if_expression(&mut self) {
+        // test_err statement_before_if_expression
+        // x = pass if 1 else 1
+        // pass if 1 else pass
+        if self.peek() != TokenKind::If {
+            return;
+        }
+        let statement_range = self.current_token_range();
+        let checkpoint = self.checkpoint();
+        self.bump(self.current_token_kind());
+        self.bump(TokenKind::If);
+        self.parse_simple_expression(ExpressionContext::default());
+        let found = self.eat(TokenKind::Else)
+            && (self.at_expr()
+                || matches!(
+                    self.current_token_kind(),
+                    TokenKind::Pass
+                        | TokenKind::Break
+                        | TokenKind::Continue
+                        | TokenKind::Return
+                        | TokenKind::Raise
+                        | TokenKind::Global
+                        | TokenKind::Nonlocal
+                        | TokenKind::Del
+                        | TokenKind::Assert
+                        | TokenKind::Import
+                        | TokenKind::From
+                ));
+        self.rewind(checkpoint);
+        if found {
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "expected expression before 'if', but statement is given".to_string(),
+                ),
+                statement_range,
+            );
+        }
+    }
+
+    /// Reports expressions between two string literals, as in `"a" b "c"`, and returns `true` if
+    /// it did.
+    fn check_expression_between_strings(&mut self, first: &ParsedExpr) -> bool {
+        // test_err expression_between_strings
+        // "a" b "c"
+        // x = "a" 1 + 2 c "d"
+        // ["a" b "c"]
+        let single_string = match &first.expr {
+            Expr::StringLiteral(string) => !string.value.is_implicit_concatenated(),
+            Expr::BytesLiteral(bytes) => !bytes.value.is_implicit_concatenated(),
+            _ => false,
+        };
+        if !single_string || first.is_parenthesized || !self.at_expr() || self.at(TokenKind::String)
+        {
+            return false;
+        }
+
+        let checkpoint = self.checkpoint();
+        let start = self.node_start();
+        let mut end = start;
+        while self.at_expr() && !self.at(TokenKind::String) {
+            end = self
+                .parse_conditional_expression_without_comma_check(ExpressionContext::default())
+                .end();
+        }
+        let found = self.at(TokenKind::String);
+        self.rewind(checkpoint);
+        if found {
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "invalid syntax. Is this intended to be part of the string?".to_string(),
+                ),
+                TextRange::new(start, end),
+            );
+        }
+        found
+    }
+
+    /// Reports an `=` after a named expression where `==` or `:=` may have been meant.
+    fn check_assignment_instead_of_comparison(&mut self, target: &ParsedExpr) {
+        // test_err assignment_instead_of_comparison
+        // if x = 3: ...
+        // while x.a = 3: ...
+        // [x, y = 1]
+        // if x = 3 = 4: ...
+        if !self.at(TokenKind::Equal)
+            || !self.is_bitwise_or(&target.expr)
+            || self.starts_with_display_or_constant(&target.expr)
+        {
+            return;
+        }
+
+        let checkpoint = self.checkpoint();
+        self.bump(TokenKind::Equal);
+        let value_end = if self.at_expr() {
+            let value = self.parse_simple_expression(ExpressionContext::default());
+            self.bitwise_or_prefix(&value.expr)
+                .filter(|value| {
+                    !matches!(
+                        self.token_kind_after(self.parenthesized_end(value.range())),
+                        TokenKind::Equal | TokenKind::ColonEqual
+                    )
+                })
+                .map(Ranged::end)
+        } else {
+            None
+        };
+        self.rewind(checkpoint);
+
+        let Some(value_end) = value_end else {
+            return;
+        };
+        if target.expr.is_name_expr() && !target.is_parenthesized {
+            self.add_error(
+                ParseErrorType::AssignmentInsteadOfComparison,
+                TextRange::new(target.start(), value_end),
+            );
+        } else {
+            self.add_error(
+                ParseErrorType::InvalidAssignmentTarget {
+                    kind: ExpressionKind::of(&target.expr),
+                    maybe_comparison: true,
+                },
+                target.expr.range(),
+            );
+        }
     }
 
     fn parse_conditional_expression_without_comma_check(
@@ -841,8 +989,9 @@ impl<'src> Parser<'src> {
                     seen_keyword_unpacking = true;
                 } else {
                     let start = parser.node_start();
-                    let mut parsed_expr = parser
-                        .parse_named_expression_or_higher(ExpressionContext::starred_conditional());
+                    let mut parsed_expr = parser.parse_named_expression_without_assignment_check(
+                        ExpressionContext::starred_conditional(),
+                    );
 
                     match parser.current_token_kind() {
                         TokenKind::Async | TokenKind::For => {
@@ -2646,6 +2795,7 @@ impl<'src> Parser<'src> {
                 .expr;
             parser.expr_scratch.push(element);
         });
+        self.check_unparenthesized_comprehension_target(start);
 
         self.expect(TokenKind::Rsqb);
 
@@ -2656,6 +2806,28 @@ impl<'src> Parser<'src> {
             node_index: AtomicNodeIndex::NONE,
             runtime_elts: None,
         }
+    }
+
+    /// Reports a comprehension whose target is an unparenthesized tuple, as in
+    /// `[x, y for x, y in z]`. The elements of the list or set starting at `start` have been
+    /// parsed.
+    fn check_unparenthesized_comprehension_target(&mut self, start: TextSize) {
+        // test_err comprehension_unparenthesized_target
+        // [x, y for x, y in z]
+        // {x, for x in z}
+        if !matches!(self.current_token_kind(), TokenKind::For | TokenKind::Async) {
+            return;
+        }
+        let first_start = self.token_after(start + TextSize::from(1)).1.start();
+        let end = self
+            .token_before(self.current_token_range().start())
+            .map_or(first_start, |(_, range)| range.end());
+        self.add_error(
+            ParseErrorType::OtherError(
+                "did you forget parentheses around the comprehension target?".to_string(),
+            ),
+            TextRange::new(first_start, end),
+        );
     }
 
     /// Parses a set expression.
@@ -2699,6 +2871,7 @@ impl<'src> Parser<'src> {
 
             parser.expr_scratch.push(parsed_expr.expr);
         });
+        self.check_unparenthesized_comprehension_target(start);
 
         self.expect(TokenKind::Rbrace);
 
@@ -2846,8 +3019,36 @@ impl<'src> Parser<'src> {
             self.bump(TokenKind::For);
         }
 
+        // The targets are a list of `bitwise_or` expressions that must be followed by `in`.
+        let checkpoint = self.checkpoint();
+        while self.at_expr() {
+            self.eat(TokenKind::Star);
+            self.parse_simple_expression(ExpressionContext::default().with_in_excluded());
+            if !self.eat(TokenKind::Comma) {
+                break;
+            }
+        }
+        let missing_in = (!self.at(TokenKind::In)).then(|| self.current_token_range());
+        self.rewind(checkpoint);
+        let errors_before_target = self.errors.len();
+
         let mut target =
             self.parse_expression_list(ExpressionContext::starred_conditional().with_in_excluded());
+
+        if let Some(range) = missing_in {
+            // test_err comprehension_missing_in
+            // [x for x if y]
+            // [x for a, b y]
+            self.errors.insert(
+                errors_before_target,
+                ParseError {
+                    error: ParseErrorType::OtherError(
+                        "'in' expected after for-loop variables".to_string(),
+                    ),
+                    location: range,
+                },
+            );
+        }
 
         helpers::set_expr_ctx(&mut target.expr, ExprContext::Store);
         self.validate_for_target(&target.expr);
@@ -3249,7 +3450,24 @@ impl<'src> Parser<'src> {
 
         let test = self.parse_simple_expression(ExpressionContext::default());
 
-        self.expect(TokenKind::Else);
+        if self.expect(TokenKind::Else)
+            && (!self.at_expr()
+                || matches!(
+                    self.current_token_kind(),
+                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Yield
+                ))
+        {
+            // test_err if_expr_statement_after_else
+            // x = 1 if 1 else pass
+            // x = 1 if 1 else
+            // x = 1 if 1 else yield 2
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "expected expression after 'else', but statement is given".to_string(),
+                ),
+                self.current_token_range(),
+            );
+        }
 
         // The binary-expression guard has already returned before parsing the `else` branch.
         let orelse = self.with_recursion(Self::parse_conditional_expression_or_higher);

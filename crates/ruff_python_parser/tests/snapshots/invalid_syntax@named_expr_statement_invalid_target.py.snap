@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/invalid/expressions/bin_op/named_expression.py
+input_file: crates/ruff_python_parser/resources/inline/err/named_expr_statement_invalid_target.py
 ---
 ## AST
 
@@ -8,7 +8,7 @@ input_file: crates/ruff_python_parser/resources/invalid/expressions/bin_op/named
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..26,
+        range: 0..20,
         body: [
             Expr(
                 StmtExpr {
@@ -26,7 +26,7 @@ Module(
                                     ctx: Load,
                                 },
                             ),
-                            op: Sub,
+                            op: Add,
                             right: Name(
                                 ExprName {
                                     node_index: NodeIndex(None),
@@ -42,77 +42,54 @@ Module(
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 9..15,
-                    value: Tuple(
-                        ExprTuple {
-                            node_index: NodeIndex(None),
-                            range: 9..15,
-                            elts: [
-                                NumberLiteral(
-                                    ExprNumberLiteral {
-                                        node_index: NodeIndex(None),
-                                        range: 10..11,
-                                        value: Int(
-                                            1,
-                                        ),
-                                    },
-                                ),
-                                NumberLiteral(
-                                    ExprNumberLiteral {
-                                        node_index: NodeIndex(None),
-                                        range: 13..14,
-                                        value: Int(
-                                            2,
-                                        ),
-                                    },
-                                ),
-                            ],
-                            ctx: Load,
-                            parenthesized: true,
-                            runtime_elts: None,
-                        },
-                    ),
-                },
-            ),
-            Expr(
-                StmtExpr {
-                    node_index: NodeIndex(None),
-                    range: 16..21,
-                    value: BinOp(
-                        ExprBinOp {
-                            node_index: NodeIndex(None),
-                            range: 16..21,
-                            left: Name(
-                                ExprName {
-                                    node_index: NodeIndex(None),
-                                    range: 16..17,
-                                    id: Name("x"),
-                                    ctx: Load,
-                                },
-                            ),
-                            op: Div,
-                            right: Name(
-                                ExprName {
-                                    node_index: NodeIndex(None),
-                                    range: 20..21,
-                                    id: Name("y"),
-                                    ctx: Load,
-                                },
-                            ),
-                        },
-                    ),
-                },
-            ),
-            Expr(
-                StmtExpr {
-                    node_index: NodeIndex(None),
-                    range: 25..26,
+                    range: 9..10,
                     value: NumberLiteral(
                         ExprNumberLiteral {
                             node_index: NodeIndex(None),
-                            range: 25..26,
+                            range: 9..10,
                             value: Int(
-                                2,
+                                1,
+                            ),
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 11..14,
+                    value: Attribute(
+                        ExprAttribute {
+                            node_index: NodeIndex(None),
+                            range: 11..14,
+                            value: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 11..12,
+                                    id: Name("a"),
+                                    ctx: Load,
+                                },
+                            ),
+                            attr: Identifier {
+                                id: Name("b"),
+                                range: 13..14,
+                                node_index: NodeIndex(None),
+                            },
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 18..19,
+                    value: NumberLiteral(
+                        ExprNumberLiteral {
+                            node_index: NodeIndex(None),
+                            range: 18..19,
+                            value: Int(
+                                1,
                             ),
                         },
                     ),
@@ -126,26 +103,26 @@ Module(
 ## Errors
 
   |
-1 | x - y := (1, 2)
+1 | x + y := 1
   | ^^^^^ Syntax Error: cannot use assignment expressions with expression
-2 | x / y := 2
+2 | a.b := 1
   |
 
 
   |
-1 | x - y := (1, 2)
+1 | x + y := 1
   |       ^^ Syntax Error: invalid syntax
-2 | x / y := 2
+2 | a.b := 1
   |
 
 
   |
-1 | x - y := (1, 2)
-2 | x / y := 2
-  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+1 | x + y := 1
+2 | a.b := 1
+  | ^^^ Syntax Error: cannot use assignment expressions with attribute
 
 
   |
-1 | x - y := (1, 2)
-2 | x / y := 2
-  |       ^^ Syntax Error: invalid syntax
+1 | x + y := 1
+2 | a.b := 1
+  |     ^^ Syntax Error: invalid syntax

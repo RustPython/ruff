@@ -248,6 +248,24 @@ Module(
 1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
 2 | lst[x:=1:-1]
 3 | lst[1:x:=1]
+  | ^^^^^^^ Syntax Error: cannot use assignment expressions with subscript
+4 | lst[1:3:x:=1]
+  |
+
+
+  |
+1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
+2 | lst[x:=1:-1]
+3 | lst[1:x:=1]
+  |        ^^ Syntax Error: invalid syntax
+4 | lst[1:3:x:=1]
+  |
+
+
+  |
+1 | # even after 3.9, an unparenthesized named expression is not allowed in a slice
+2 | lst[x:=1:-1]
+3 | lst[1:x:=1]
   |           ^ Syntax Error: invalid syntax
 4 | lst[1:3:x:=1]
   |
@@ -260,6 +278,20 @@ Module(
   |            ^ Syntax Error: invalid syntax
 4 | lst[1:3:x:=1]
   |
+
+
+  |
+2 | lst[x:=1:-1]
+3 | lst[1:x:=1]
+4 | lst[1:3:x:=1]
+  |          ^^ Syntax Error: invalid syntax
+
+
+  |
+2 | lst[x:=1:-1]
+3 | lst[1:x:=1]
+4 | lst[1:3:x:=1]
+  | ^^^^^^^^^ Syntax Error: cannot use assignment expressions with subscript
 
 
   |

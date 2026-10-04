@@ -55,4 +55,9 @@ Module(
 
   |
 1 | not x := 1
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+
+
+  |
+1 | not x := 1
   |       ^^ Syntax Error: invalid syntax

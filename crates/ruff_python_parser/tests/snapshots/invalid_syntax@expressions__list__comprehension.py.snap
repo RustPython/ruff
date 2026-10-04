@@ -1234,6 +1234,15 @@ Module(
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
+   |  ^^^ Syntax Error: did you forget parentheses around the comprehension target?
+14 | [*x, *y for x in y]
+   |
+
+
+   |
+11 | [x for x in lambda y: y]
+12 | [**x for x in [{1: 2}]]
+13 | [*x, for x in y]
    |      ^^^ Syntax Error: invalid syntax
 14 | [*x, *y for x in y]
    |
@@ -1254,6 +1263,16 @@ Module(
 13 | [*x, for x in y]
    |                 ^ Syntax Error: invalid syntax
 14 | [*x, *y for x in y]
+15 |
+16 | # Invalid if
+   |
+
+
+   |
+12 | [**x for x in [{1: 2}]]
+13 | [*x, for x in y]
+14 | [*x, *y for x in y]
+   |  ^^^^^^ Syntax Error: did you forget parentheses around the comprehension target?
 15 |
 16 | # Invalid if
    |
@@ -1342,7 +1361,7 @@ Module(
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
 22 | [x if x else *y for x in z]
-   |              ^ Syntax Error: invalid syntax
+   |              ^ Syntax Error: expected expression after 'else', but statement is given
 
 
 ## Unsupported Syntax Errors
