@@ -151,6 +151,16 @@ Module(
 1 | # Unparenthesized named expression not allowed in key
 2 |
 3 | {x := 1: y, z := 2: a}
+  |             ^ Syntax Error: ':' expected after dictionary key
+4 |
+5 | x + y
+  |
+
+
+  |
+1 | # Unparenthesized named expression not allowed in key
+2 |
+3 | {x := 1: y, z := 2: a}
   |               ^^ Syntax Error: invalid syntax
 4 |
 5 | x + y

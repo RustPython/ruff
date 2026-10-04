@@ -8,7 +8,7 @@ use ruff_python_ast::token::TokenKind;
 use ruff_python_ast::{
     self as ast, AnyStringFlags, AtomicNodeIndex, BoolOp, CmpOp, ConversionFlag, Expr, ExprContext,
     FString, InterpolatedStringElement, InterpolatedStringElements, IpyEscapeKind, Number,
-    Operator, OperatorPrecedence, StringFlags, TString, UnaryOp,
+    Operator, OperatorPrecedence, PythonVersion, StringFlags, TString, UnaryOp,
 };
 use ruff_text_size::{Ranged, TextLen, TextRange, TextSize};
 
@@ -23,11 +23,15 @@ use crate::string::{
 };
 use crate::token_set::TokenSet;
 use crate::{
-    ExpressionKind, InterpolatedStringErrorType, Mode, ParseErrorType, UnsupportedSyntaxError,
-    UnsupportedSyntaxErrorKind,
+    ExpressionKind, InterpolatedStringErrorType, Mode, ParseError, ParseErrorType,
+    UnsupportedSyntaxError, UnsupportedSyntaxErrorKind,
 };
 
-use super::{InterpolatedStringElementsKind, Parenthesized, RecoveryContextKind};
+use super::{Bracket, InterpolatedStringElementsKind, Parenthesized, RecoveryContextKind};
+
+/// The message for a keyword argument whose name is not a plain name.
+const EXPRESSION_CONTAINS_ASSIGNMENT: &str =
+    "expression cannot contain assignment, perhaps you meant \"==\"?";
 
 /// A token set consisting of a newline or end of file.
 const NEWLINE_EOF_SET: TokenSet = TokenSet::new([TokenKind::Newline, TokenKind::EndOfFile]);
@@ -209,6 +213,15 @@ impl<'src> Parser<'src> {
         &mut self,
         context: ExpressionContext,
     ) -> ParsedExpr {
+        let parsed_expr = self.parse_conditional_expression_without_comma_check(context);
+        self.check_missing_comma(&parsed_expr);
+        parsed_expr
+    }
+
+    fn parse_conditional_expression_without_comma_check(
+        &mut self,
+        context: ExpressionContext,
+    ) -> ParsedExpr {
         if self.at(TokenKind::Lambda) {
             Expr::Lambda(self.parse_lambda_expr()).into()
         } else {
@@ -221,6 +234,62 @@ impl<'src> Parser<'src> {
                 parsed_expr
             }
         }
+    }
+
+    /// Reports a missing comma when an expression inside brackets is directly followed by
+    /// another expression.
+    ///
+    /// The error is not reported when the first expression is a name followed by a string (an
+    /// invalid string prefix), starts with a soft keyword (including `_`), or is the name `print`
+    /// or `exec`.
+    fn check_missing_comma(&mut self, first: &ParsedExpr) {
+        // test_err missing_comma_between_expressions
+        // [a b]
+        // f(x, a.b c)
+        // x[1 + 2 3]
+        // f"{a b}"
+        if !self.at_expr()
+            || self.at(TokenKind::Yield)
+            || matches!(
+                first.expr,
+                Expr::Starred(_)
+                    | Expr::Yield(_)
+                    | Expr::YieldFrom(_)
+                    | Expr::Lambda(_)
+                    | Expr::If(_)
+                    | Expr::Named(_)
+            )
+        {
+            return;
+        }
+        if let Expr::Name(name) = &first.expr {
+            if !first.is_parenthesized
+                && (matches!(name.id.as_str(), "print" | "exec")
+                    || matches!(
+                        self.current_token_kind(),
+                        TokenKind::String | TokenKind::FStringStart | TokenKind::TStringStart
+                    ))
+            {
+                return;
+            }
+        }
+        // Soft keywords are bumped as names.
+        let (first_kind, first_range) = self.token_after(first.start());
+        if (first_kind == TokenKind::Identifier
+            && matches!(self.src_text(first_range), "_" | "case" | "match" | "type"))
+            || self.bracket_level() == 0
+        {
+            return;
+        }
+
+        let checkpoint = self.checkpoint();
+        let second = self.parse_conditional_expression_or_higher();
+        let range = TextRange::new(first.start(), second.end());
+        self.rewind(checkpoint);
+        self.add_error(
+            ParseErrorType::OtherError("invalid syntax. Perhaps you forgot a comma?".to_string()),
+            range,
+        );
     }
 
     /// Parses every Python expression except unparenthesized tuples, named expressions,
@@ -433,7 +502,8 @@ impl<'src> Parser<'src> {
     ///
     /// [Python grammar]: https://docs.python.org/3/reference/grammar.html
     fn parse_expression_with_bitwise_or_precedence(&mut self) -> ParsedExpr {
-        let parsed_expr = self.parse_conditional_expression_or_higher();
+        let parsed_expr =
+            self.parse_conditional_expression_without_comma_check(ExpressionContext::default());
 
         if parsed_expr.is_parenthesized {
             // Parentheses resets the precedence, so we don't need to validate it.
@@ -739,12 +809,27 @@ impl<'src> Parser<'src> {
         let keywords_snapshot = self.keyword_scratch.snapshot();
         let mut seen_keyword_argument = false; // foo = 1
         let mut seen_keyword_unpacking = false; // **foo
+        // The first positional argument after a keyword argument, reported where the arguments
+        // end, and the number of errors before it.
+        let mut positional_after_keyword: Option<(ParseErrorType, usize)> = None;
 
         let has_trailing_comma =
             self.parse_comma_separated_list(RecoveryContextKind::Arguments, |parser| {
                 let argument_start = parser.node_start();
                 if parser.eat(TokenKind::DoubleStar) {
-                    let value = parser.parse_conditional_expression_or_higher();
+                    let mut value = parser.parse_conditional_expression_or_higher();
+
+                    if parser.eat(TokenKind::Equal) {
+                        // test_err args_keyword_unpacking_assignment
+                        // f(**a=1)
+                        value = parser.parse_conditional_expression_or_higher();
+                        parser.add_error(
+                            ParseErrorType::OtherError(
+                                "cannot assign to keyword argument unpacking".to_string(),
+                            ),
+                            TextRange::new(argument_start, value.end()),
+                        );
+                    }
 
                     parser.keyword_scratch.push(ast::Keyword {
                         arg: None,
@@ -781,17 +866,39 @@ impl<'src> Parser<'src> {
                             if seen_keyword_unpacking
                                 && parsed_expr.is_unparenthesized_starred_expr()
                             {
+                                // The error starts at the comma before the argument.
+                                let start = parser
+                                    .token_before(parsed_expr.start())
+                                    .filter(|(kind, _)| *kind == TokenKind::Comma)
+                                    .map_or(parsed_expr.start(), |(_, range)| range.start());
                                 parser.add_error(
                                     ParseErrorType::InvalidArgumentUnpackingOrder,
-                                    &parsed_expr,
+                                    TextRange::new(start, parsed_expr.end()),
                                 );
                             }
                         }
                     }
 
                     let arg_range = parser.node_range(start);
+                    let equal_range = parser.current_token_range();
                     if parser.eat(TokenKind::Equal) {
                         seen_keyword_argument = true;
+                        let keyword_target_range =
+                            TextRange::new(parsed_expr.start(), equal_range.end());
+                        if parsed_expr.is_parenthesized
+                            && parsed_expr.is_name_expr()
+                            && parser.options.target_version >= PythonVersion::PY38
+                        {
+                            // test_err args_parenthesized_keyword_name
+                            // f((a)=1)
+                            parser.add_error(
+                                ParseErrorType::OtherError(
+                                    EXPRESSION_CONTAINS_ASSIGNMENT.to_string(),
+                                ),
+                                keyword_target_range,
+                            );
+                        }
+                        let unpacking = parsed_expr.is_unparenthesized_starred_expr();
                         let arg = if let ParsedExpr {
                             expr: Expr::Name(ident_expr),
                             is_parenthesized,
@@ -823,10 +930,29 @@ impl<'src> Parser<'src> {
                             // TODO(dhruvmanila): Parser shouldn't drop the `parsed_expr` if it's
                             // not a name expression. We could add the expression into `args` but
                             // that means the error is a missing comma instead.
-                            parser.add_error(
-                                ParseErrorType::OtherError("expected a parameter name".to_string()),
-                                &parsed_expr,
-                            );
+
+                            // test_err args_invalid_keyword_name
+                            // f(a.b=1)
+                            // f(True=1)
+                            // f(*a=1)
+                            let message = match &parsed_expr.expr {
+                                _ if unpacking => None,
+                                Expr::BooleanLiteral(_) | Expr::NoneLiteral(_)
+                                    if !parsed_expr.is_parenthesized =>
+                                {
+                                    Some(format!(
+                                        "cannot assign to {}",
+                                        ExpressionKind::of(&parsed_expr.expr)
+                                    ))
+                                }
+                                _ => Some(EXPRESSION_CONTAINS_ASSIGNMENT.to_string()),
+                            };
+                            if let Some(message) = message {
+                                parser.add_error(
+                                    ParseErrorType::OtherError(message),
+                                    keyword_target_range,
+                                );
+                            }
                             ast::Identifier {
                                 id: Name::empty(),
                                 range: parsed_expr.range(),
@@ -834,7 +960,42 @@ impl<'src> Parser<'src> {
                             }
                         };
 
+                        if arg.is_valid()
+                            && (parser.at(TokenKind::Comma) || parser.at(TokenKind::Rpar))
+                        {
+                            // test_err args_missing_keyword_value
+                            // f(a=)
+                            // f(a, b=, c)
+                            parser.add_error(
+                                ParseErrorType::OtherError(
+                                    "expected argument value expression".to_string(),
+                                ),
+                                TextRange::new(arg.start(), equal_range.end()),
+                            );
+                        }
+
                         let value = parser.parse_conditional_expression_or_higher();
+
+                        if unpacking {
+                            parser.add_error(
+                                ParseErrorType::OtherError(
+                                    "cannot assign to iterable argument unpacking".to_string(),
+                                ),
+                                TextRange::new(arg.start(), value.end()),
+                            );
+                        } else if arg.is_valid()
+                            && matches!(
+                                parser.current_token_kind(),
+                                TokenKind::For | TokenKind::Async
+                            )
+                        {
+                            // test_err args_keyword_generator
+                            // f(a=x for x in y)
+                            parser.add_error(
+                                ParseErrorType::AssignmentInsteadOfComparison,
+                                TextRange::new(arg.start(), equal_range.end()),
+                            );
+                        }
 
                         parser.keyword_scratch.push(ast::Keyword {
                             arg: Some(arg),
@@ -843,23 +1004,38 @@ impl<'src> Parser<'src> {
                             node_index: AtomicNodeIndex::NONE,
                         });
                     } else {
-                        if !parsed_expr.is_unparenthesized_starred_expr() {
+                        if !parsed_expr.is_unparenthesized_starred_expr()
+                            && positional_after_keyword.is_none()
+                        {
                             if seen_keyword_unpacking {
-                                parser.add_error(
+                                positional_after_keyword = Some((
                                     ParseErrorType::PositionalAfterKeywordUnpacking,
-                                    &parsed_expr,
-                                );
+                                    parser.errors.len(),
+                                ));
                             } else if seen_keyword_argument {
-                                parser.add_error(
+                                positional_after_keyword = Some((
                                     ParseErrorType::PositionalAfterKeywordArgument,
-                                    &parsed_expr,
-                                );
+                                    parser.errors.len(),
+                                ));
                             }
                         }
                         parser.expr_scratch.push(parsed_expr.expr);
                     }
                 }
             });
+
+        if let Some((error, index)) = positional_after_keyword {
+            // test_err args_positional_after_keyword
+            // f(a=1, b)
+            // f(**a, b, **c)
+            self.errors.insert(
+                index,
+                ParseError {
+                    error,
+                    location: self.current_token_range(),
+                },
+            );
+        }
 
         self.expect(TokenKind::Rpar);
 
@@ -2262,6 +2438,7 @@ impl<'src> Parser<'src> {
                     }
                 }
 
+                let colon_range = self.current_token_range();
                 self.bump(TokenKind::Colon);
                 let value = if self.at(TokenKind::DoubleStar) {
                     let unpack_start = self.node_start();
@@ -2273,7 +2450,7 @@ impl<'src> Parser<'src> {
                     );
                     value
                 } else {
-                    self.parse_conditional_expression_or_higher()
+                    self.parse_dictionary_value(colon_range)
                 };
 
                 if matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For) {
@@ -2325,6 +2502,28 @@ impl<'src> Parser<'src> {
             .into();
         }
 
+        if self.at(TokenKind::DoubleStar) {
+            let double_star_range = self.current_token_range();
+            let checkpoint = self.checkpoint();
+            self.bump(TokenKind::DoubleStar);
+            if self.at_expr() {
+                let mut parsed_expr = self.parse_conditional_expression_or_higher();
+                if self.eat(TokenKind::Rpar) {
+                    // test_err parenthesized_double_starred_expr
+                    // (**x)
+                    self.add_error(
+                        ParseErrorType::OtherError(
+                            "cannot use double starred expression here".to_string(),
+                        ),
+                        double_star_range,
+                    );
+                    parsed_expr.is_parenthesized = true;
+                    return parsed_expr;
+                }
+            }
+            self.rewind(checkpoint);
+        }
+
         // Use the more general rule of the three to parse the first element
         // and limit it later.
         let mut parsed_expr = self.parse_named_expression_or_higher(
@@ -2369,7 +2568,18 @@ impl<'src> Parser<'src> {
             _ => {
                 // grammar: `group`
                 if parsed_expr.expr.is_starred_expr() {
-                    self.add_error(ParseErrorType::InvalidStarredExpressionUsage, &parsed_expr);
+                    if self.at(TokenKind::Rpar) {
+                        // test_err parenthesized_starred_expr
+                        // (*x)
+                        self.add_error(
+                            ParseErrorType::OtherError(
+                                "cannot use starred expression here".to_string(),
+                            ),
+                            &parsed_expr,
+                        );
+                    } else {
+                        self.add_error(ParseErrorType::InvalidStarredExpressionUsage, &parsed_expr);
+                    }
                 }
 
                 self.expect(TokenKind::Rpar);
@@ -2524,12 +2734,29 @@ impl<'src> Parser<'src> {
                     value: parser.parse_expression_with_bitwise_or_precedence().expr,
                 });
             } else {
-                let key = parser.parse_conditional_expression_or_higher().expr;
+                // A missing comma is not reported in a key after the first item.
+                let key = parser
+                    .parse_conditional_expression_without_comma_check(ExpressionContext::default())
+                    .expr;
+                if !parser.at(TokenKind::Colon) {
+                    // test_err dict_missing_colon_after_key
+                    // {a: 1, b}
+                    // {a: 1, b c: 2}
+                    // {**a, b + c}
+                    let end = key.end();
+                    let last_char = parser.src_text(key.range()).chars().last();
+                    let start = end - last_char.map_or(TextSize::default(), TextSize::of);
+                    parser.add_error(
+                        ParseErrorType::ExpectedColonAfterDictionaryKey,
+                        TextRange::new(start, end),
+                    );
+                }
+                let colon_range = parser.current_token_range();
                 parser.expect(TokenKind::Colon);
 
                 items.push(ast::DictItem {
                     key: Some(key),
-                    value: parser.parse_conditional_expression_or_higher().expr,
+                    value: parser.parse_dictionary_value(colon_range).expr,
                 });
             }
         });
@@ -2544,6 +2771,36 @@ impl<'src> Parser<'src> {
             items,
             runtime_values: None,
         }
+    }
+
+    /// Parses the value of a dictionary item after the `:` at `colon_range`.
+    fn parse_dictionary_value(&mut self, colon_range: TextRange) -> ParsedExpr {
+        if self.at_ts(TokenSet::new([TokenKind::Rbrace, TokenKind::Comma])) {
+            // test_err dict_missing_value
+            // {a: }
+            // {a: 1, b: , c: 2}
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "expression expected after dictionary key and ':'".to_string(),
+                ),
+                colon_range,
+            );
+        } else if self.at(TokenKind::Star) {
+            // test_err dict_starred_value
+            // {a: *b}
+            // {a: 1, b: *c}
+            let star_start = self.node_start();
+            self.bump(TokenKind::Star);
+            let value = self.parse_expression_with_bitwise_or_precedence();
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "cannot use a starred expression in a dictionary value".to_string(),
+                ),
+                TextRange::new(star_start, value.end()),
+            );
+            return value;
+        }
+        self.parse_conditional_expression_or_higher()
     }
 
     /// Parses a list of comprehension generators.
@@ -2710,6 +2967,21 @@ impl<'src> Parser<'src> {
         }
     }
 
+    /// Returns `true` if a `*` starting at `star_start` is at the start of a parenthesized
+    /// expression, list, set or dictionary, or of a call argument or subscript slice.
+    fn is_star_expression_position(&self, star_start: TextSize) -> bool {
+        let previous = self.token_before(star_start).map(|(kind, _)| kind);
+        match self.innermost_bracket() {
+            Some(bracket) => {
+                matches!(
+                    previous,
+                    Some(TokenKind::Lpar | TokenKind::Lsqb | TokenKind::Lbrace)
+                ) || (bracket == Bracket::CallOrSubscript && previous == Some(TokenKind::Comma))
+            }
+            None => false,
+        }
+    }
+
     /// Parses a starred expression with the given precedence.
     ///
     /// The expression is parsed with the highest precedence. If the precedence
@@ -2729,6 +3001,17 @@ impl<'src> Parser<'src> {
     fn parse_starred_expression(&mut self, context: ExpressionContext) -> ast::ExprStarred {
         let start = self.node_start();
         self.bump(TokenKind::Star);
+
+        if (!self.at_expr() || self.at(TokenKind::Star)) && self.is_star_expression_position(start)
+        {
+            // test_err starred_missing_expression_in_brackets
+            // f(x, *)
+            // [*, 1]
+            self.add_error(
+                ParseErrorType::OtherError("Invalid star expression".to_string()),
+                self.current_token_range(),
+            );
+        }
 
         let parsed_expr = match context.starred_expression_precedence() {
             StarredExpressionPrecedence::Conditional => self
@@ -3042,15 +3325,23 @@ impl<'src> Parser<'src> {
                     // sum(x for x in range(10), 5)
                     // total(1, 2, x for x in range(5), 6)
                     // sum(x for x in range(10),)
-                    let error = match context {
-                        ArgumentsContext::Call => {
-                            ParseErrorType::UnparenthesizedGeneratorExpression
-                        }
-                        ArgumentsContext::ClassDefinition => {
-                            ParseErrorType::OtherError("invalid syntax".to_owned())
-                        }
-                    };
-                    self.add_error(error, range);
+                    if matches!(context, ArgumentsContext::ClassDefinition)
+                        && !has_trailing_comma
+                        && arguments.len() == 1
+                    {
+                        // A class definition with only the generator expression is reported at
+                        // its `for`.
+                        let elt_end = arg.as_generator_expr().map_or(range.start(), |generator| {
+                            self.parenthesized_end(generator.elt.range())
+                        });
+                        let (_, for_range) = self.token_after(elt_end);
+                        self.add_error(
+                            ParseErrorType::OtherError("invalid syntax".to_owned()),
+                            for_range,
+                        );
+                    } else {
+                        self.add_error(ParseErrorType::UnparenthesizedGeneratorExpression, range);
+                    }
                 }
             }
         }

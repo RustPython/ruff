@@ -314,6 +314,15 @@ Module(
    |
  9 | # Missing comma
 10 | [1 2]
+   |  ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+11 |
+12 | # Dictionary element in a list
+   |
+
+
+   |
+ 9 | # Missing comma
+10 | [1 2]
    |    ^ Syntax Error: invalid syntax
 11 |
 12 | # Dictionary element in a list
@@ -352,4 +361,4 @@ Module(
 18 | [1; 2]
 19 |
 20 | [*]
-   |   ^ Syntax Error: invalid syntax
+   |   ^ Syntax Error: Invalid star expression

@@ -180,6 +180,14 @@ Module(
   |
 1 | call( = 1)
 2 | call(x = )
+  |      ^^^ Syntax Error: expected argument value expression
+3 | call(*, y)
+  |
+
+
+  |
+1 | call( = 1)
+2 | call(x = )
   |          ^ Syntax Error: invalid syntax
 3 | call(*, y)
   |
@@ -189,7 +197,7 @@ Module(
 1 | call( = 1)
 2 | call(x = )
 3 | call(*, y)
-  |       ^ Syntax Error: invalid syntax
+  |       ^ Syntax Error: Invalid star expression
 4 |
 5 | foo
   |

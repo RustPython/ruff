@@ -64,4 +64,9 @@ Module(
 
   |
 1 | call(x y)
+  |      ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+1 | call(x y)
   |        ^ Syntax Error: invalid syntax

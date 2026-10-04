@@ -167,7 +167,7 @@ Module(
   |
 1 | @*x
 2 | @(*x)
-  |   ^ Syntax Error: invalid syntax
+  |   ^^ Syntax Error: cannot use starred expression here
 3 | @((*x))
 4 | @yield x
   |
@@ -177,7 +177,7 @@ Module(
 1 | @*x
 2 | @(*x)
 3 | @((*x))
-  |    ^ Syntax Error: invalid syntax
+  |    ^^ Syntax Error: cannot use starred expression here
 4 | @yield x
 5 | @yield from x
   |

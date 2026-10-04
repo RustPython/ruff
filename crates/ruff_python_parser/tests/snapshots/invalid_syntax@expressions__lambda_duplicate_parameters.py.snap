@@ -364,7 +364,7 @@ Module(
 7 | lambda a, *a: 1
 8 |
 9 | lambda a, *, **a: 1
-  |              ^^^ Syntax Error: named arguments must follow bare *
+  |              ^^ Syntax Error: named arguments must follow bare *
 
 
 ## Semantic Syntax Errors

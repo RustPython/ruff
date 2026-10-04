@@ -383,6 +383,18 @@ Module(
 
 
   |
+1 |   f"hello
+2 |   1 + 1
+3 |   f"hello {x
+  |  __________^
+4 | | 2 + 2
+  | |_____^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 |   f"hello {x:
+6 |   3 + 3
+  |
+
+
+  |
 2 | 1 + 1
 3 | f"hello {x
 4 | 2 + 2

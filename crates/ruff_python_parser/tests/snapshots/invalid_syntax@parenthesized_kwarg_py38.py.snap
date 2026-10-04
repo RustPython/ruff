@@ -162,6 +162,33 @@ Module(
     },
 )
 ```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.8"}
+2 | f((a)=1)
+  |    ^^^ Syntax Error: expression cannot contain assignment, perhaps you meant "=="?
+3 | f((a) = 1)
+4 | f( ( a ) = 1)
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.8"}
+2 | f((a)=1)
+3 | f((a) = 1)
+  |    ^^^^ Syntax Error: expression cannot contain assignment, perhaps you meant "=="?
+4 | f( ( a ) = 1)
+  |
+
+
+  |
+2 | f((a)=1)
+3 | f((a) = 1)
+4 | f( ( a ) = 1)
+  |      ^^^^^ Syntax Error: expression cannot contain assignment, perhaps you meant "=="?
+
+
 ## Unsupported Syntax Errors
 
   |

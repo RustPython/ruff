@@ -286,6 +286,15 @@ Module(
 
 
   |
+2 |   def foo():
+3 |       return 42
+4 |   def foo(a: int, b: str
+  |  ____________________^
+5 | | x = 10
+  | |_^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
 3 |     return 42
 4 | def foo(a: int, b: str
 5 | x = 10
