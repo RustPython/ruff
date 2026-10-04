@@ -19,7 +19,9 @@ use ruff_text_size::{TextLen, TextRange, TextSize};
 use crate::Mode;
 use crate::error::{InterpolatedStringErrorType, LexicalError, LexicalErrorType};
 use crate::lexer::cursor::{Cursor, EOF_CHAR};
-use crate::lexer::indentation::{Indentation, Indentations, IndentationsCheckpoint};
+use crate::lexer::indentation::{
+    Indentation, IndentationError, Indentations, IndentationsCheckpoint,
+};
 use crate::lexer::interpolated_string::{
     InterpolatedStringContext, InterpolatedStrings, InterpolatedStringsCheckpoint,
 };
@@ -138,6 +140,29 @@ impl<'src> Lexer<'src> {
         TokenKind::Unknown
     }
 
+    /// Pushes an indentation error for the current line.
+    ///
+    /// An unmatched dedent is reported at the end of the line, tab and depth errors at its start.
+    fn push_indentation_error(&mut self, error: IndentationError) -> TokenKind {
+        let offset = self.offset().to_usize();
+        let line_start = self.source[..offset]
+            .rfind(['\n', '\r'])
+            .map_or(0, |index| index + 1);
+        let line_end = self.source[offset..]
+            .find(['\n', '\r'])
+            .map_or(self.source.len(), |index| offset + index);
+        let (error, position) = match error {
+            IndentationError::UnmatchedDedent => (LexicalErrorType::IndentationError, line_end),
+            IndentationError::InconsistentTabs => (LexicalErrorType::TabError, line_start),
+            IndentationError::TooDeep => (LexicalErrorType::TooDeepIndentation, line_start),
+        };
+        let range = TextRange::empty(TextSize::try_from(position).unwrap());
+        self.push_error(LexicalError::new(error, range));
+        // The token keeps covering the indentation.
+        self.current_range = self.token_range();
+        TokenKind::Unknown
+    }
+
     /// Lex the next token.
     pub fn next_token(&mut self) -> TokenKind {
         // `lex_token` marks the start on the path that lexes each token.
@@ -171,21 +196,13 @@ impl<'src> Lexer<'src> {
             match self.indentations.current().try_compare(indentation) {
                 Ok(Ordering::Greater) => {
                     self.pending_indentation = Some(indentation);
-                    if self.indentations.dedent_one(indentation).is_err() {
-                        return self.push_error(LexicalError::new(
-                            LexicalErrorType::IndentationError,
-                            self.token_range(),
-                        ));
+                    if let Err(error) = self.indentations.dedent_one(indentation) {
+                        return self.push_indentation_error(error);
                     }
                     return TokenKind::Dedent;
                 }
                 Ok(_) => {}
-                Err(_) => {
-                    return self.push_error(LexicalError::new(
-                        LexicalErrorType::IndentationError,
-                        self.token_range(),
-                    ));
-                }
+                Err(error) => return self.push_indentation_error(error),
             }
         }
 
@@ -245,7 +262,7 @@ impl<'src> Lexer<'src> {
                     } else if !self.cursor.eat_char('\n') {
                         return Some(self.push_error(LexicalError::new(
                             LexicalErrorType::LineContinuationError,
-                            TextRange::at(self.offset() - '\\'.text_len(), '\\'.text_len()),
+                            TextRange::empty(self.offset()),
                         )));
                     }
                     if self.cursor.is_eof() {
@@ -310,11 +327,8 @@ impl<'src> Lexer<'src> {
             Ok(Ordering::Greater) => {
                 self.pending_indentation = Some(indentation);
 
-                if self.indentations.dedent_one(indentation).is_err() {
-                    return Some(self.push_error(LexicalError::new(
-                        LexicalErrorType::IndentationError,
-                        self.token_range(),
-                    )));
+                if let Err(error) = self.indentations.dedent_one(indentation) {
+                    return Some(self.push_indentation_error(error));
                 }
 
                 // The lexer might've eaten some whitespaces to calculate the `indentation`. For
@@ -339,13 +353,12 @@ impl<'src> Lexer<'src> {
 
             // Indent
             Ok(Ordering::Less) => {
-                self.indentations.indent(indentation);
+                if let Err(error) = self.indentations.indent(indentation) {
+                    return Some(self.push_indentation_error(error));
+                }
                 Some(TokenKind::Indent)
             }
-            Err(_) => Some(self.push_error(LexicalError::new(
-                LexicalErrorType::IndentationError,
-                self.token_range(),
-            ))),
+            Err(error) => Some(self.push_indentation_error(error)),
         }
     }
 
@@ -371,7 +384,7 @@ impl<'src> Lexer<'src> {
                     } else if !self.cursor.eat_char('\n') {
                         return Err(LexicalError::new(
                             LexicalErrorType::LineContinuationError,
-                            TextRange::at(self.offset() - '\\'.text_len(), '\\'.text_len()),
+                            TextRange::empty(self.offset()),
                         ));
                     }
                     if self.cursor.is_eof() {

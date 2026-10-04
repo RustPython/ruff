@@ -2,7 +2,9 @@ use std::assert_matches;
 
 use ruff_python_ast::{Expr, InterpolatedStringElement, IpyEscapeKind, Number, Stmt};
 
-use crate::{Mode, ParseOptions, parse, parse_expression, parse_module};
+use crate::{
+    LexicalErrorType, Mode, ParseErrorType, ParseOptions, parse, parse_expression, parse_module,
+};
 
 // Keep recursive ASTs shallow enough for Windows's 1 MiB test-thread stacks.
 const RECURSIVE_AST_TEST_DEPTH: usize = 1_000;
@@ -375,6 +377,7 @@ fn deep_nesting_preserves_surrounding_statements() {
 #[test]
 fn nested_def_blocks_grow_stack() {
     // Each nested function crosses the suite boundary where the parser rechecks the stack.
+    // Indentation stops at 99 levels, so the deeper blocks are reported instead of parsed.
     let depth = RECURSIVE_AST_TEST_DEPTH;
     let mut src = String::new();
     for i in 0..depth {
@@ -383,7 +386,11 @@ fn nested_def_blocks_grow_stack() {
     }
     src.push_str(&"\t".repeat(depth));
     src.push_str("pass\n");
-    parse_module(&src).unwrap();
+    let error = parse_module(&src).unwrap_err();
+    assert_eq!(
+        error.error,
+        ParseErrorType::Lexical(LexicalErrorType::TooDeepIndentation)
+    );
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]

@@ -75,4 +75,4 @@ Module(
 1 | # FIXME(micha): This creates two syntax errors instead of just one (and overlapping ones)
 2 | if True)):
 3 |     pass
-  | ^^^^ Syntax Error: unexpected indentation
+  |    ^ Syntax Error: unexpected indent

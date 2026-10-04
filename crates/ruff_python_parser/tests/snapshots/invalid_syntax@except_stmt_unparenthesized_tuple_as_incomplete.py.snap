@@ -209,7 +209,7 @@ Module(
 2 |     pass
 3 | except x, y as (exc):
 4 |     pass
-  | ^^^^ Syntax Error: unexpected indentation
+  |    ^ Syntax Error: unexpected indent
 5 | try:
 6 |     pass
   |

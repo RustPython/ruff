@@ -228,7 +228,7 @@ Module(
 2 |     pass
 3 | exept:  # spellchecker:disable-line
 4 |     pass
-  | ^^^^ Syntax Error: unexpected indentation
+  |    ^ Syntax Error: unexpected indent
 5 | finally:
 6 |     pass
   |
@@ -269,7 +269,7 @@ Module(
 4 |     pass
 5 | finally:
 6 |     pass
-  | ^^^^ Syntax Error: unexpected indentation
+  |    ^ Syntax Error: unexpected indent
 7 | a = 1
 8 | try:
   |
@@ -289,6 +289,6 @@ Module(
 11 |     pass
 12 | exept:  # spellchecker:disable-line
 13 |     pass
-   | ^^^^ Syntax Error: unexpected indentation
+   |    ^ Syntax Error: unexpected indent
 14 | b = 1
    |

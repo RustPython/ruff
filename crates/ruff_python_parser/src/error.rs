@@ -321,7 +321,7 @@ impl std::fmt::Display for ParseErrorType {
                 f.write_str("expected an imaginary number in complex literal pattern")
             }
             ParseErrorType::ExpectedExpression => f.write_str("invalid syntax"),
-            ParseErrorType::UnexpectedIndentation => f.write_str("unexpected indentation"),
+            ParseErrorType::UnexpectedIndentation => f.write_str("unexpected indent"),
             ParseErrorType::InvalidAssignmentTarget => f.write_str("invalid assignment target"),
             ParseErrorType::InvalidAnnotatedAssignmentTarget => {
                 f.write_str("illegal target for annotation")
@@ -419,8 +419,12 @@ pub enum LexicalErrorType {
     MissingUnicodeLbrace,
     /// Missing the `}` for unicode escape sequence.
     MissingUnicodeRbrace,
-    /// The indentation is not consistent.
+    /// A dedent does not match any outer indentation level.
     IndentationError,
+    /// Tabs and spaces are mixed in a way that makes the indentation depend on the tab size.
+    TabError,
+    /// The indentation is nested too deeply.
+    TooDeepIndentation,
     /// An unrecognized token was encountered.
     UnrecognizedToken { tok: char },
     /// An f-string error containing the [`InterpolatedStringErrorType`].
@@ -468,6 +472,8 @@ impl std::fmt::Display for LexicalErrorType {
             Self::IndentationError => {
                 write!(f, "unindent does not match any outer indentation level")
             }
+            Self::TabError => write!(f, "inconsistent use of tabs and spaces in indentation"),
+            Self::TooDeepIndentation => write!(f, "too many levels of indentation"),
             Self::UnrecognizedToken { .. } => f.write_str("invalid syntax"),
             Self::LineContinuationError => {
                 write!(f, "unexpected character after line continuation character")
