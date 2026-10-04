@@ -4,7 +4,7 @@ use ruff_python_ast::name::Name;
 use ruff_python_ast::token::TokenKind;
 use ruff_python_ast::{
     self as ast, AtomicNodeIndex, DecoratorList, ExceptHandler, Expr, ExprContext, IpyEscapeKind,
-    Operator, PythonVersion, Stmt, Suite, WithItem,
+    Operator, PythonVersion, Stmt, Suite, UnaryOp, WithItem,
 };
 use ruff_text_size::{Ranged, TextRange, TextSize};
 
@@ -16,7 +16,7 @@ use crate::parser::{
     helpers,
 };
 use crate::token_set::TokenSet;
-use crate::{BlockClause, Mode, ParseErrorType, UnsupportedSyntaxErrorKind};
+use crate::{BlockClause, ExpressionKind, Mode, ParseErrorType, UnsupportedSyntaxErrorKind};
 
 use super::Parenthesized;
 use super::expression::ExpressionContext;
@@ -796,13 +796,32 @@ impl<'src> Parser<'src> {
         };
 
         let asname = if self.eat(TokenKind::As) {
-            if self.at_identifier_or_soft_keyword() {
+            if self.at_identifier_or_soft_keyword()
+                && matches!(
+                    self.peek(),
+                    TokenKind::Comma
+                        | TokenKind::Rpar
+                        | TokenKind::Semi
+                        | TokenKind::Newline
+                        | TokenKind::EndOfFile
+                )
+            {
                 // test_ok import_as_name_soft_keyword
                 // import foo as match
                 // import bar as case
                 // import baz as type
                 // import qux as lazy
                 Some(self.parse_identifier())
+            } else if self.at_expr() {
+                // test_err import_alias_invalid_asname
+                // import x as y.z
+                // from x import (y as z())
+                let target = self.parse_conditional_expression_or_higher();
+                self.add_error(
+                    ParseErrorType::InvalidImportTarget(ExpressionKind::of(&target.expr)),
+                    &target,
+                );
+                Some(invalid_target_identifier(&target.expr))
             } else {
                 // test_err import_alias_missing_asname
                 // import x as
@@ -1232,6 +1251,8 @@ impl<'src> Parser<'src> {
         self.bump(TokenKind::Equal);
 
         let mut targets = vec![target.expr];
+        // Errors in the targets are reported before the errors in the expressions after them.
+        let value_errors_start = self.errors.len();
 
         // test_err assign_stmt_missing_rhs
         // x =
@@ -1273,12 +1294,53 @@ impl<'src> Parser<'src> {
 
         for target in &mut targets {
             helpers::set_expr_ctx(target, ExprContext::Store);
-            // test_err assign_stmt_invalid_target
-            // 1 = 1
-            // x = 1 = 2
-            // x = 1 = y = 2 = z
-            // ["a", "b"] = ["a", "b"]
-            self.validate_assignment_target(target);
+        }
+
+        // test_err assign_stmt_invalid_target
+        // 1 = 1
+        // x = 1 = 2
+        // x = 1 = y = 2 = z
+        // ["a", "b"] = ["a", "b"]
+        if targets
+            .iter()
+            .any(|target| invalid_assignment_target(target).is_some())
+        {
+            let value_errors = self.errors.split_off(value_errors_start);
+            if let Some((target, rhs_end)) = self.comparison_like_assignment(&targets, &value.expr)
+            {
+                // test_err assign_stmt_comparison_like_target
+                // f() = 1
+                // f(), b = 1
+                // a, (x < y) = 1 if z else 2
+                if target.is_name_expr() {
+                    self.add_error(
+                        ParseErrorType::AssignmentInsteadOfComparison,
+                        TextRange::new(target.start(), rhs_end),
+                    );
+                } else {
+                    self.add_error(
+                        ParseErrorType::InvalidAssignmentTarget {
+                            kind: ExpressionKind::of(target),
+                            maybe_comparison: true,
+                        },
+                        target.range(),
+                    );
+                }
+            } else {
+                for target in &targets {
+                    // test_err assign_stmt_yield_target
+                    // yield x = 1
+                    // y = yield = 1
+                    if matches!(target, Expr::Yield(_) | Expr::YieldFrom(_))
+                        && !self.is_parenthesized(target.range())
+                    {
+                        self.add_error(ParseErrorType::AssignmentToYield, target);
+                    } else {
+                        self.validate_assignment_target(target);
+                    }
+                }
+            }
+            self.errors.extend(value_errors);
         }
 
         ast::StmtAssign {
@@ -1400,7 +1462,10 @@ impl<'src> Parser<'src> {
             // pass += 1
             // x += pass
             // (x + y) += 1
-            self.add_error(ParseErrorType::InvalidAugmentedAssignmentTarget, &target);
+            self.add_error(
+                ParseErrorType::InvalidAugmentedAssignmentTarget(ExpressionKind::of(&target.expr)),
+                &target,
+            );
         }
 
         helpers::set_expr_ctx(&mut target.expr, ExprContext::Store);
@@ -1796,7 +1861,36 @@ impl<'src> Parser<'src> {
         };
 
         let name = if self.eat(TokenKind::As) {
-            if self.at_identifier_or_soft_keyword() {
+            let checkpoint = self.checkpoint();
+            // An unparenthesized tuple of exception types is reported on its own.
+            let invalid_target = if unparenthesized_types_start.is_none()
+                && self.at_expr()
+                && !(self.at_identifier_or_soft_keyword() && self.peek() == TokenKind::Colon)
+            {
+                let target = self.parse_conditional_expression_or_higher();
+                if self.at(TokenKind::Colon) {
+                    Some(target.expr)
+                } else {
+                    self.rewind(checkpoint);
+                    None
+                }
+            } else {
+                None
+            };
+            if let Some(target) = invalid_target {
+                // test_err except_stmt_invalid_as_name
+                // try: ...
+                // except Exception as x.y: ...
+                // except* Exception as f(): ...
+                self.add_error(
+                    ParseErrorType::InvalidExceptTarget {
+                        kind: ExpressionKind::of(&target),
+                        star: block_kind.is_star(),
+                    },
+                    &target,
+                );
+                Some(invalid_target_identifier(&target))
+            } else if self.at_identifier_or_soft_keyword() {
                 // test_ok except_stmt_as_name_soft_keyword
                 // try: ...
                 // except Exception as match: ...
@@ -1923,7 +2017,7 @@ impl<'src> Parser<'src> {
         // for await x in z: ...
         // for yield x in y: ...
         // for [x, 1, y, *["a"]] in z: ...
-        self.validate_assignment_target(&target.expr);
+        self.validate_for_target(&target.expr);
 
         // test_err for_stmt_missing_in_keyword
         // for a b: ...
@@ -3889,6 +3983,96 @@ impl<'src> Parser<'src> {
         }
     }
 
+    /// Returns the target of an invalid assignment that is reported as a possible comparison, and
+    /// the end of the expression it would be compared with.
+    ///
+    /// This is the last element of the first target (or the first target itself) when it is a
+    /// `bitwise_or` expression directly followed by `=`, and the expression after that `=` starts
+    /// with a `bitwise_or` expression that is not followed by `=` or `:=`.
+    fn comparison_like_assignment<'a>(
+        &self,
+        targets: &'a [Expr],
+        value: &Expr,
+    ) -> Option<(&'a Expr, TextSize)> {
+        let first = targets.first()?;
+        let target = match first {
+            Expr::Tuple(tuple) if !tuple.parenthesized => tuple.elts.last()?,
+            _ => first,
+        };
+        if self.token_kind_after(self.parenthesized_end(target.range())) != TokenKind::Equal
+            || !self.is_bitwise_or(target)
+            || self.starts_with_display_or_constant(target)
+        {
+            return None;
+        }
+        let rhs = self.bitwise_or_prefix(targets.get(1).unwrap_or(value))?;
+        if matches!(
+            self.token_kind_after(self.parenthesized_end(rhs.range())),
+            TokenKind::Equal | TokenKind::ColonEqual
+        ) {
+            return None;
+        }
+        Some((target, rhs.end()))
+    }
+
+    /// Returns `true` if `expr` is a `bitwise_or` expression or any parenthesized expression.
+    fn is_bitwise_or(&self, expr: &Expr) -> bool {
+        if self.is_parenthesized(expr.range()) {
+            return true;
+        }
+        match expr {
+            Expr::Compare(_)
+            | Expr::BoolOp(_)
+            | Expr::Lambda(_)
+            | Expr::If(_)
+            | Expr::Named(_)
+            | Expr::Yield(_)
+            | Expr::YieldFrom(_)
+            | Expr::Starred(_) => false,
+            Expr::UnaryOp(unary) => unary.op != UnaryOp::Not,
+            Expr::Tuple(tuple) => tuple.parenthesized,
+            Expr::Generator(generator) => generator.parenthesized,
+            _ => true,
+        }
+    }
+
+    /// Returns `true` if `expr` starts with a list or tuple display, a parenthesized generator
+    /// expression, `True`, `False` or `None`.
+    fn starts_with_display_or_constant(&self, mut expr: &Expr) -> bool {
+        loop {
+            if self.is_parenthesized(expr.range()) {
+                return false;
+            }
+            expr = match expr {
+                Expr::Call(call) => &call.func,
+                Expr::Attribute(attribute) => &attribute.value,
+                Expr::Subscript(subscript) => &subscript.value,
+                Expr::BinOp(bin_op) => &bin_op.left,
+                Expr::List(_) | Expr::BooleanLiteral(_) | Expr::NoneLiteral(_) => return true,
+                Expr::Tuple(tuple) => return tuple.parenthesized,
+                Expr::Generator(generator) => return generator.parenthesized,
+                _ => return false,
+            };
+        }
+    }
+
+    /// Returns the `bitwise_or` expression that `expr` starts with, if any.
+    fn bitwise_or_prefix<'a>(&self, mut expr: &'a Expr) -> Option<&'a Expr> {
+        loop {
+            if self.is_parenthesized(expr.range()) {
+                return Some(expr);
+            }
+            expr = match expr {
+                Expr::Tuple(tuple) if !tuple.parenthesized => tuple.elts.first()?,
+                Expr::Compare(compare) => compare.operands.first()?,
+                Expr::BoolOp(bool_op) => bool_op.values.first()?,
+                Expr::If(if_expr) => &if_expr.body,
+                _ if self.is_bitwise_or(expr) => return Some(expr),
+                _ => return None,
+            };
+        }
+    }
+
     /// Validate that the given expression is a valid assignment target.
     ///
     /// If the expression is a list or tuple, then validate each element in the list.
@@ -3904,7 +4088,63 @@ impl<'src> Parser<'src> {
                 }
             }
             Expr::Name(_) | Expr::Attribute(_) | Expr::Subscript(_) => {}
-            _ => self.add_error(ParseErrorType::InvalidAssignmentTarget, expr.range()),
+            _ => self.add_error(
+                ParseErrorType::InvalidAssignmentTarget {
+                    kind: ExpressionKind::of(expr),
+                    maybe_comparison: false,
+                },
+                expr.range(),
+            ),
+        }
+    }
+
+    /// Validate that the given expression is a valid target of a `for` statement or
+    /// comprehension.
+    ///
+    /// A comparison is not reported as an invalid target, because the `in` that follows the
+    /// target could belong to it. Without an invalid target, the token where the target stops
+    /// being one is reported instead.
+    pub(super) fn validate_for_target(&mut self, target: &Expr) {
+        let elements = match target {
+            Expr::Tuple(tuple) if !tuple.parenthesized => &tuple.elts[..],
+            _ => std::slice::from_ref(target),
+        };
+        let mut comparison_end = None;
+        for element in elements {
+            match invalid_for_target(element) {
+                ForTarget::Valid => {}
+                ForTarget::Invalid(expr) => {
+                    self.add_error(
+                        ParseErrorType::InvalidAssignmentTarget {
+                            kind: ExpressionKind::of(expr),
+                            maybe_comparison: false,
+                        },
+                        expr,
+                    );
+                    return;
+                }
+                ForTarget::Comparison(compare) => {
+                    // test_err for_stmt_comparison_target
+                    // for x == y in z: ...
+                    // for (x in y), z in w: ...
+                    comparison_end.get_or_insert_with(|| match &compare.operands[..] {
+                        [left, ..]
+                            if compare.range() == element.range()
+                                && !self.is_parenthesized(element.range()) =>
+                        {
+                            self.parenthesized_end(left.range())
+                        }
+                        _ => self.parenthesized_end(element.range()),
+                    });
+                }
+            }
+        }
+        if let Some(end) = comparison_end {
+            let (_, range) = self.token_after(end);
+            self.add_error(
+                ParseErrorType::OtherError("invalid syntax".to_string()),
+                range,
+            );
         }
     }
 
@@ -3920,11 +4160,15 @@ impl<'src> Parser<'src> {
                 ),
                 expr,
             ),
-            Expr::Tuple(_) => self.add_error(
+            // An unparenthesized tuple is reported at its first element.
+            Expr::Tuple(tuple) => self.add_error(
                 ParseErrorType::OtherError(
                     "only single target (not tuple) can be annotated".to_string(),
                 ),
-                expr,
+                match tuple.elts.first() {
+                    Some(first) if !tuple.parenthesized => first.range(),
+                    _ => tuple.range(),
+                },
             ),
             Expr::Name(_) | Expr::Attribute(_) | Expr::Subscript(_) => {}
             _ => self.add_error(ParseErrorType::InvalidAnnotatedAssignmentTarget, expr),
@@ -3944,7 +4188,10 @@ impl<'src> Parser<'src> {
                 }
             }
             Expr::Name(_) | Expr::Attribute(_) | Expr::Subscript(_) => {}
-            _ => self.add_error(ParseErrorType::InvalidDeleteTarget, expr),
+            _ => self.add_error(
+                ParseErrorType::InvalidDeleteTarget(ExpressionKind::of(expr)),
+                expr,
+            ),
         }
     }
 
@@ -4109,6 +4356,71 @@ impl<'src> Parser<'src> {
         }
 
         self.recovery_context = saved_context;
+    }
+}
+
+/// Returns the identifier that stands in for an invalid binding target expression.
+pub(super) fn invalid_target_identifier(target: &Expr) -> ast::Identifier {
+    ast::Identifier {
+        id: match target {
+            Expr::Name(name) => name.id.clone(),
+            _ => Name::empty(),
+        },
+        range: target.range(),
+        node_index: AtomicNodeIndex::NONE,
+    }
+}
+
+/// How an expression stands as the target of a `for` statement or comprehension.
+enum ForTarget<'a> {
+    Valid,
+    Invalid(&'a Expr),
+    /// The target has no invalid expression, but contains this comparison.
+    Comparison(&'a ast::ExprCompare),
+}
+
+/// Returns the first expression in `expr` that is not a valid `for` target.
+///
+/// A comparison whose first operator is `in` is checked through its left operand.
+fn invalid_for_target(expr: &Expr) -> ForTarget<'_> {
+    match expr {
+        Expr::Starred(ast::ExprStarred { value, .. }) => invalid_for_target(value),
+        Expr::List(ast::ExprList { elts, .. }) | Expr::Tuple(ast::ExprTuple { elts, .. }) => {
+            let mut result = ForTarget::Valid;
+            for elt in elts {
+                match invalid_for_target(elt) {
+                    ForTarget::Valid => {}
+                    invalid @ ForTarget::Invalid(_) => return invalid,
+                    comparison @ ForTarget::Comparison(_) => {
+                        if matches!(result, ForTarget::Valid) {
+                            result = comparison;
+                        }
+                    }
+                }
+            }
+            result
+        }
+        Expr::Compare(compare) => match (compare.ops.first(), compare.operands.first()) {
+            (Some(ast::CmpOp::In), Some(left)) => match invalid_for_target(left) {
+                ForTarget::Valid => ForTarget::Comparison(compare),
+                other => other,
+            },
+            _ => ForTarget::Comparison(compare),
+        },
+        Expr::Name(_) | Expr::Attribute(_) | Expr::Subscript(_) => ForTarget::Valid,
+        _ => ForTarget::Invalid(expr),
+    }
+}
+
+/// Returns the first expression in `expr` that is not a valid assignment target.
+fn invalid_assignment_target(expr: &Expr) -> Option<&Expr> {
+    match expr {
+        Expr::Starred(ast::ExprStarred { value, .. }) => invalid_assignment_target(value),
+        Expr::List(ast::ExprList { elts, .. }) | Expr::Tuple(ast::ExprTuple { elts, .. }) => {
+            elts.iter().find_map(invalid_assignment_target)
+        }
+        Expr::Name(_) | Expr::Attribute(_) | Expr::Subscript(_) => None,
+        _ => Some(expr),
     }
 }
 

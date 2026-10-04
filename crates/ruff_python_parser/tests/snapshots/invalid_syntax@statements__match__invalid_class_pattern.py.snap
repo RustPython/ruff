@@ -409,6 +409,16 @@ Module(
 1 | # Invalid keyword pattern in class argument
 2 | match subject:
 3 |     case Foo(x as y = 1):
+  |                   ^ Syntax Error: cannot use name as pattern target
+4 |         pass
+5 |     case Foo(x | y = 1):
+  |
+
+
+  |
+1 | # Invalid keyword pattern in class argument
+2 | match subject:
+3 |     case Foo(x as y = 1):
   |              ^^^^^^ Syntax Error: invalid syntax
 4 |         pass
 5 |     case Foo(x | y = 1):

@@ -536,4 +536,4 @@ Module(
  8 | [*x if True else y, z]
  9 | [*lambda x: x, z]
 10 | [*x := 2, z]
-   |  ^^ Syntax Error: assignment expression target must be an identifier
+   |  ^^ Syntax Error: cannot use assignment expressions with starred

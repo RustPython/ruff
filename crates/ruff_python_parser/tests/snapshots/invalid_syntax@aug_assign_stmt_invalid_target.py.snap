@@ -207,7 +207,7 @@ Module(
 
   |
 1 | 1 += 1
-  | ^ Syntax Error: invalid augmented assignment target
+  | ^ Syntax Error: 'literal' is an illegal expression for augmented assignment
 2 | "a" += "b"
 3 | *x += 1
   |
@@ -216,7 +216,7 @@ Module(
   |
 1 | 1 += 1
 2 | "a" += "b"
-  | ^^^ Syntax Error: invalid augmented assignment target
+  | ^^^ Syntax Error: 'literal' is an illegal expression for augmented assignment
 3 | *x += 1
 4 | pass += 1
   |
@@ -226,7 +226,7 @@ Module(
 1 | 1 += 1
 2 | "a" += "b"
 3 | *x += 1
-  | ^^ Syntax Error: invalid augmented assignment target
+  | ^^ Syntax Error: 'starred' is an illegal expression for augmented assignment
 4 | pass += 1
 5 | x += pass
   |
@@ -255,4 +255,4 @@ Module(
 4 | pass += 1
 5 | x += pass
 6 | (x + y) += 1
-  |  ^^^^^ Syntax Error: invalid augmented assignment target
+  |  ^^^^^ Syntax Error: 'expression' is an illegal expression for augmented assignment
