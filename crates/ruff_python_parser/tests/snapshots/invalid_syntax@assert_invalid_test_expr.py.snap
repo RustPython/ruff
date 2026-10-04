@@ -123,7 +123,7 @@ Module(
 
   |
 1 | assert *x
-  |        ^^ Syntax Error: invalid syntax
+  |        ^ Syntax Error: invalid syntax
 2 | assert assert x
 3 | assert yield x
   |

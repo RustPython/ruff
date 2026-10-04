@@ -183,7 +183,7 @@ Module(
 
   |
 1 | x >= *y
-  |      ^^ Syntax Error: invalid syntax
+  |      ^ Syntax Error: invalid syntax
 2 | x not in *y
   |
 
@@ -191,7 +191,7 @@ Module(
   |
 1 | x >= *y
 2 | x not in *y
-  |          ^^ Syntax Error: invalid syntax
+  |          ^ Syntax Error: invalid syntax
 3 |
 4 | *x < y
   |

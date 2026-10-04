@@ -228,7 +228,7 @@ Module(
   |
 1 | call(**yield x)
 2 | call(** *x)
-  |         ^^ Syntax Error: invalid syntax
+  |         ^ Syntax Error: invalid syntax
 3 | call(***x)
   |
 
@@ -237,7 +237,7 @@ Module(
 1 | call(**yield x)
 2 | call(** *x)
 3 | call(***x)
-  |        ^^ Syntax Error: invalid syntax
+  |        ^ Syntax Error: invalid syntax
 4 |
 5 | call(**x := 1)
   |

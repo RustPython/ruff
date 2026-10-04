@@ -674,7 +674,15 @@ impl<'src> Parser<'src> {
             }
         }
 
-        inner(&mut self.errors, error, ranged.range());
+        let mut range = ranged.range();
+        // A misplaced starred expression or star pattern is reported at its `*`.
+        if matches!(
+            error,
+            ParseErrorType::InvalidStarredExpressionUsage | ParseErrorType::InvalidStarPatternUsage
+        ) {
+            range = TextRange::at(range.start(), TextSize::new(1));
+        }
+        inner(&mut self.errors, error, range);
     }
 
     /// Add an [`UnsupportedSyntaxError`] with the given [`UnsupportedSyntaxErrorKind`] and

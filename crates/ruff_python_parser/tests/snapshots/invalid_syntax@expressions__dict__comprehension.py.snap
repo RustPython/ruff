@@ -925,7 +925,7 @@ Module(
    |
  7 | # Invalid iter
  8 | {x: y for x in *y}
-   |                ^^ Syntax Error: invalid syntax
+   |                ^ Syntax Error: invalid syntax
  9 | {x: y for x in yield y}
 10 | {x: y for x in yield from y}
    |
@@ -963,7 +963,7 @@ Module(
    |
 13 | # Invalid if
 14 | {x: y for x in data if *y}
-   |                        ^^ Syntax Error: invalid syntax
+   |                        ^ Syntax Error: invalid syntax
 15 | {x: y for x in data if yield y}
 16 | {x: y for x in data if yield from y}
    |

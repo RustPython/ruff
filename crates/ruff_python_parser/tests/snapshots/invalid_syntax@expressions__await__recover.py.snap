@@ -301,7 +301,7 @@ Module(
   |
 7 | # Starred expressions
 8 | await *x
-  |       ^^ Syntax Error: invalid syntax
+  |       ^ Syntax Error: invalid syntax
 9 | await (*x)
   |
 
@@ -310,7 +310,7 @@ Module(
  7 | # Starred expressions
  8 | await *x
  9 | await (*x)
-   |        ^^ Syntax Error: invalid syntax
+   |        ^ Syntax Error: invalid syntax
 10 |
 11 | # Invalid expression as per precedence
    |

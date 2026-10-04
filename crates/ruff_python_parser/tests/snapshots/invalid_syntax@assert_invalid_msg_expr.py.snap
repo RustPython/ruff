@@ -147,7 +147,7 @@ Module(
 
   |
 1 | assert False, *x
-  |               ^^ Syntax Error: invalid syntax
+  |               ^ Syntax Error: invalid syntax
 2 | assert False, assert x
 3 | assert False, yield x
   |

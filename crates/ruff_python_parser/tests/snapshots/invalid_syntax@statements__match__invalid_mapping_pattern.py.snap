@@ -557,7 +557,7 @@ Module(
 1 | # Starred expression is not allowed as a mapping pattern key
 2 | match subject:
 3 |     case {*key}:
-  |           ^^^^ Syntax Error: cannot use starred expression here
+  |           ^ Syntax Error: cannot use starred expression here
 4 |         pass
 5 |     case {*key: 1}:
   |
@@ -577,7 +577,7 @@ Module(
 3 |     case {*key}:
 4 |         pass
 5 |     case {*key: 1}:
-  |           ^^^^ Syntax Error: cannot use starred expression here
+  |           ^ Syntax Error: cannot use starred expression here
 6 |         pass
 7 |     case {*key 1}:
   |
@@ -587,7 +587,7 @@ Module(
 5 |     case {*key: 1}:
 6 |         pass
 7 |     case {*key 1}:
-  |           ^^^^ Syntax Error: cannot use starred expression here
+  |           ^ Syntax Error: cannot use starred expression here
 8 |         pass
 9 |     case {*key, None: 1}:
   |
@@ -607,7 +607,7 @@ Module(
  7 |     case {*key 1}:
  8 |         pass
  9 |     case {*key, None: 1}:
-   |           ^^^^ Syntax Error: cannot use starred expression here
+   |           ^ Syntax Error: cannot use starred expression here
 10 |         pass
    |
 

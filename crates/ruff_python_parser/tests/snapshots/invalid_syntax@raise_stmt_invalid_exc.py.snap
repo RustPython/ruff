@@ -100,7 +100,7 @@ Module(
 
   |
 1 | raise *x
-  |       ^^ Syntax Error: invalid syntax
+  |       ^ Syntax Error: invalid syntax
 2 | raise yield x
 3 | raise x := 1
   |
