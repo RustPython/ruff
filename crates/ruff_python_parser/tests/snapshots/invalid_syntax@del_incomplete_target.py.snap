@@ -137,6 +137,9 @@ Module(
 
 
   |
+1 | del x, y.
+2 | z
 3 | del x, y[
+  |         ^ Syntax Error: '[' was never closed
 4 | z
-  |  ^ Syntax Error: unexpected EOF while parsing
+  |

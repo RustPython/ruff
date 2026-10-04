@@ -97,6 +97,14 @@ Module(
 
   |
 1 | x[::
+  |  ^ Syntax Error: '[' was never closed
+2 |
+3 | def foo():
+  |
+
+
+  |
+1 | x[::
 2 |
 3 | def foo():
   | ^^^ Syntax Error: invalid syntax
@@ -122,4 +130,4 @@ Module(
   |
 3 | def foo():
 4 |     pass
-  |         ^ Syntax Error: unexpected EOF while parsing
+  |         ^ Syntax Error: invalid syntax

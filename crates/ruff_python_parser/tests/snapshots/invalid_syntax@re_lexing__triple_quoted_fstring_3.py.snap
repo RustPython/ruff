@@ -17,7 +17,7 @@ Module(
                     test: Call(
                         ExprCall {
                             node_index: NodeIndex(None),
-                            range: 234..253,
+                            range: 234..258,
                             func: Name(
                                 ExprName {
                                     node_index: NodeIndex(None),
@@ -27,7 +27,7 @@ Module(
                                 },
                             ),
                             arguments: Arguments {
-                                range: 238..253,
+                                range: 238..258,
                                 node_index: NodeIndex(None),
                                 args: [
                                     FString(
@@ -115,6 +115,16 @@ Module(
 ## Errors
 
   |
+3 | # within an f-string but the lexer shouldn't go back.
+4 |
+5 | if call(f'''{x:.3f
+  |        ^ Syntax Error: '(' was never closed
+6 | '''
+7 |     pass
+  |
+
+
+  |
 5 | if call(f'''{x:.3f
 6 | '''
   | ^^^ Syntax Error: f-string: expecting '}'
@@ -128,3 +138,24 @@ Module(
   |    ^ Syntax Error: invalid syntax
 7 |     pass
   |
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  | ^^^^ Syntax Error: invalid syntax
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  |     ^^^^ Syntax Error: invalid syntax
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  |         ^ Syntax Error: invalid syntax

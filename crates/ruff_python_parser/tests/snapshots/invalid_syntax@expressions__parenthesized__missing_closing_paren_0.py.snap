@@ -35,4 +35,11 @@ Module(
 1 | # Missing closing parentheses 0: No elements
 2 |
 3 | (
-  |  ^ Syntax Error: unexpected EOF while parsing
+  | ^ Syntax Error: '(' was never closed
+
+
+  |
+1 | # Missing closing parentheses 0: No elements
+2 |
+3 | (
+  |  ^ Syntax Error: invalid syntax

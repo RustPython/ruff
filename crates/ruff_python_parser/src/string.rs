@@ -585,7 +585,11 @@ mod tests {
 
     #[test]
     fn parse_fstring_nested_spec_grows_stack() {
-        assert!(parse_suite(&nested_format_spec('f', 200)).is_ok());
+        let error = parse_suite(&nested_format_spec('f', 200)).unwrap_err();
+        assert_eq!(
+            error.error,
+            ParseErrorType::Lexical(LexicalErrorType::TooDeeplyNestedBrackets)
+        );
     }
 
     #[test]
@@ -702,7 +706,11 @@ mod tests {
 
     #[test]
     fn parse_tstring_nested_spec_grows_stack() {
-        assert!(parse_suite(&nested_format_spec('t', 200)).is_ok());
+        let error = parse_suite(&nested_format_spec('t', 200)).unwrap_err();
+        assert_eq!(
+            error.error,
+            ParseErrorType::Lexical(LexicalErrorType::TooDeeplyNestedBrackets)
+        );
     }
 
     #[test]

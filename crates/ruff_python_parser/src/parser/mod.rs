@@ -16,7 +16,8 @@ use rustc_hash::FxBuildHasher;
 use thin_vec::ThinVec;
 use unicode_normalization::UnicodeNormalization;
 
-use crate::error::UnsupportedSyntaxError;
+use crate::error::{LexicalError, LexicalErrorType, UnsupportedSyntaxError};
+use crate::lexer::Lexer;
 use crate::parser::expression::ExpressionContext;
 use crate::parser::progress::{ParserProgress, TokenId};
 use crate::parser::scratch_buffer::ScratchBuffer;
@@ -98,6 +99,11 @@ pub(crate) struct Parser<'src> {
     /// The start offset in the source code from which to start parsing at.
     start_offset: TextSize,
 
+    /// The start of the token at which the parser first recovered from an unclosed bracket, if
+    /// that happened before any error was found. The error itself is reported at the end of the
+    /// bracket's logical line.
+    first_unclosed_bracket_recovery: Option<TextSize>,
+
     /// Number of active recursive statement, expression, and pattern parsing operations.
     recursion_depth: usize,
 
@@ -145,6 +151,7 @@ impl<'src> Parser<'src> {
             recovery_context: RecoveryContext::empty(),
             prev_token_end: TextSize::new(0),
             start_offset,
+            first_unclosed_bracket_recovery: None,
             recursion_depth: 0,
             current_token_id: TokenId::default(),
             expr_scratch: ScratchBuffer::with_capacity(16),
@@ -254,13 +261,20 @@ impl<'src> Parser<'src> {
             "Parser should be at the end of the file."
         );
         // TODO consider re-integrating lexical error handling into the parser?
-        let parse_errors = self.errors;
+        let mut parse_errors = self.errors;
         let (tokens, lex_errors) = self.tokens.finish();
 
         // Fast path for when there are no lex errors.
         // There's no fast path for when there are no parse errors because a lex error
         // always results in a parse error.
         if lex_errors.is_empty() {
+            prioritize_tokenizer_error(
+                &mut parse_errors,
+                self.source,
+                self.options.mode,
+                self.start_offset,
+                self.first_unclosed_bracket_recovery,
+            );
             return Parsed {
                 syntax,
                 tokens: Tokens::new(tokens),
@@ -292,6 +306,13 @@ impl<'src> Parser<'src> {
 
         merged.extend(parse_errors);
         merged.extend(lex_errors.map(ParseError::from));
+        prioritize_tokenizer_error(
+            &mut merged,
+            self.source,
+            self.options.mode,
+            self.start_offset,
+            self.first_unclosed_bracket_recovery,
+        );
 
         Parsed {
             syntax,
@@ -656,6 +677,15 @@ impl<'src> Parser<'src> {
         false
     }
 
+    /// Re-lexes the current token in the context of a logical line to recover from an unclosed
+    /// bracket.
+    fn re_lex_logical_token(&mut self) {
+        if self.errors.is_empty() && self.first_unclosed_bracket_recovery.is_none() {
+            self.first_unclosed_bracket_recovery = Some(self.current_token_range().start());
+        }
+        self.tokens.re_lex_logical_token();
+    }
+
     fn add_error<T>(&mut self, error: ParseErrorType, ranged: T)
     where
         T: Ranged,
@@ -771,7 +801,7 @@ impl<'src> Parser<'src> {
                 // of an enclosing list, then we try to re-lex in the context of a logical line and
                 // break out of list parsing.
                 if self.is_enclosing_list_element_or_terminator() {
-                    self.tokens.re_lex_logical_token();
+                    self.re_lex_logical_token();
                     break;
                 }
 
@@ -892,7 +922,7 @@ impl<'src> Parser<'src> {
             // enclosing list, then we try to re-lex in the context of a logical line and break out
             // of list parsing.
             if self.is_enclosing_list_element_or_terminator() {
-                self.tokens.re_lex_logical_token();
+                self.re_lex_logical_token();
                 break;
             }
 
@@ -1754,4 +1784,112 @@ impl RecoveryContext {
                 .expect("Expected context to be of a single kind.")
         })
     }
+}
+
+/// Moves the error that stops parsing first to the front of `errors`.
+///
+/// The source is tokenized again without the parser's error recovery, and its first tokenizer
+/// error is compared with the first error found by the parser, other than a tokenizer error. A
+/// tokenizer error detected before that error stops parsing there. One detected after it is still
+/// reported, because the rest of the source is tokenized once parsing failed, except:
+/// - an error detected inside an f-string or t-string keeps the parser's error;
+/// - an unexpected indent is reported without tokenizing the rest of the source;
+/// - a bracket that is never closed wins over an error on a later line. On the same line, it wins
+///   over an error at or after it when parsing reads ahead from the error to the end of the
+///   source, which it does unless a `:`, a `;` or an unknown token follows. An error found by
+///   recovering from an unclosed bracket is placed at the token that started the recovery,
+///   `unclosed_bracket_recovery`.
+fn prioritize_tokenizer_error(
+    errors: &mut Vec<ParseError>,
+    source: &str,
+    mode: Mode,
+    start_offset: TextSize,
+    unclosed_bracket_recovery: Option<TextSize>,
+) {
+    let is_tokenizer_error = |error: &ParseError| matches!(&error.error, ParseErrorType::Lexical(lexical) if lexical.is_tokenizer_error());
+    let first = errors
+        .iter()
+        .find(|error| !is_tokenizer_error(error))
+        .cloned();
+
+    let mut lexer = Lexer::new(source, mode, start_offset);
+    // The starts of the tokens at which parsing stops without reading ahead.
+    let mut stops = Vec::new();
+    let (tokenizer_error, in_interpolated_string, detected) = loop {
+        let in_interpolated_string = lexer.in_interpolated_string();
+        let previous_errors = lexer.errors().len();
+        let kind = lexer.next_token();
+        if let Some(error) = lexer.errors()[previous_errors..]
+            .iter()
+            .find(|error| error.error().is_tokenizer_error())
+        {
+            break (error.clone(), in_interpolated_string, lexer.offset());
+        }
+        if matches!(
+            kind,
+            TokenKind::Colon | TokenKind::Semi | TokenKind::Unknown
+        ) {
+            stops.push(lexer.current_range().start());
+        }
+        if kind == TokenKind::EndOfFile {
+            return;
+        }
+    };
+
+    let Some(first) = first else {
+        move_to_front(errors, ParseError::from(tokenizer_error));
+        return;
+    };
+    let first_start = first.location.start();
+    let error_start = match tokenizer_error.error() {
+        LexicalErrorType::UnclosedBracket { .. } => {
+            unclosed_bracket_recovery.map_or(first_start, |start| start.max(first_start))
+        }
+        _ => first_start,
+    };
+    let wins = detected <= first_start
+        || (!in_interpolated_string
+            && match tokenizer_error.error() {
+                LexicalErrorType::UnclosedBracket { .. } => {
+                    let line = |offset: TextSize| {
+                        let text = &source[..offset.to_usize()];
+                        text.matches('\n').count() + text.matches('\r').count()
+                            - text.matches("\r\n").count()
+                    };
+                    let bracket_start = tokenizer_error.location().start();
+                    bracket_start <= error_start
+                        && (line(bracket_start) < line(error_start)
+                            || stops.iter().all(|stop| *stop < first_start))
+                }
+                _ => !matches!(first.error, ParseErrorType::UnexpectedIndentation),
+            });
+    if !wins {
+        move_to_front(errors, first);
+        return;
+    }
+    // A bracket reported in place of an error before the end of the source can't be closed by
+    // more input.
+    let front = match *tokenizer_error.error() {
+        LexicalErrorType::UnclosedBracket {
+            opening,
+            incomplete: true,
+        } if error_start.to_usize() < source.trim_end().len() => {
+            errors.retain(|error| *error != ParseError::from(tokenizer_error.clone()));
+            LexicalError::new(
+                LexicalErrorType::UnclosedBracket {
+                    opening,
+                    incomplete: false,
+                },
+                tokenizer_error.location(),
+            )
+        }
+        _ => tokenizer_error,
+    };
+    move_to_front(errors, ParseError::from(front));
+}
+
+/// Moves `error` to the front of `errors`, removing an equal error elsewhere.
+fn move_to_front(errors: &mut Vec<ParseError>, error: ParseError) {
+    errors.retain(|other| *other != error);
+    errors.insert(0, error);
 }

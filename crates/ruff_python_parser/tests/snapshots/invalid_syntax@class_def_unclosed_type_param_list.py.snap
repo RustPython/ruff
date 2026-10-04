@@ -134,3 +134,11 @@ Module(
 2 |     pass
 3 | x = 10
   |
+
+
+  |
+1 | class Foo[T1, *T2(a, b):
+  |                       ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '['
+2 |     pass
+3 | x = 10
+  |

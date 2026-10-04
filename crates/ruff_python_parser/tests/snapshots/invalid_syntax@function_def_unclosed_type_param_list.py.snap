@@ -181,3 +181,11 @@ Module(
 2 |     return a + b
 3 | x = 10
   |
+
+
+  |
+1 | def foo[T1, *T2(a, b):
+  |                     ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '['
+2 |     return a + b
+3 | x = 10
+  |

@@ -85,6 +85,16 @@ Module(
 ## Errors
 
   |
+1 | # Missing expression, instead there's a function definition
+2 |
+3 | (x :=
+  | ^ Syntax Error: '(' was never closed
+4 |
+5 | def foo():
+  |
+
+
+  |
 3 | (x :=
 4 |
 5 | def foo():
@@ -111,4 +121,4 @@ Module(
   |
 5 | def foo():
 6 |     pass
-  |         ^ Syntax Error: unexpected EOF while parsing
+  |         ^ Syntax Error: invalid syntax

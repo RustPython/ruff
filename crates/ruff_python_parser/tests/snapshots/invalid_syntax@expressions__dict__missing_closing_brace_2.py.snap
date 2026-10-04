@@ -92,6 +92,14 @@ Module(
 
   |
 1 | {x: 1,
+  | ^ Syntax Error: '{' was never closed
+2 |
+3 | def foo():
+  |
+
+
+  |
+1 | {x: 1,
   |       ^ Syntax Error: invalid syntax
 2 |
 3 | def foo():

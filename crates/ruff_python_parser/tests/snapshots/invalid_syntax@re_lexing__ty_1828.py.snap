@@ -181,6 +181,15 @@ Module(
   |
 1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
 2 | (c: int = 1,f"""{d=[
+  | ^ Syntax Error: '(' was never closed
+3 | def a(
+4 | class A:
+  |
+
+
+  |
+1 | # Regression test for https://github.com/astral-sh/ty/issues/1828
+2 | (c: int = 1,f"""{d=[
   |                    ^ Syntax Error: f-string: expecting '}'
 3 | def a(
 4 | class A:
@@ -229,4 +238,4 @@ Module(
   |
 4 | class A:
 5 |     pass
-  |         ^ Syntax Error: unexpected EOF while parsing
+  |         ^ Syntax Error: invalid syntax

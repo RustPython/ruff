@@ -101,6 +101,14 @@ Module(
 
   |
 1 | call(a, b, # comment \
+  |     ^ Syntax Error: '(' was never closed
+2 |
+3 | def bar():
+  |
+
+
+  |
+1 | call(a, b, # comment \
   |                       ^ Syntax Error: invalid syntax
 2 |
 3 | def bar():

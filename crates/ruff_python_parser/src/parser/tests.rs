@@ -1,11 +1,11 @@
 use std::assert_matches;
 
-use ruff_python_ast::{Expr, InterpolatedStringElement, IpyEscapeKind, Number, Stmt};
+use ruff_python_ast::{Expr, InterpolatedStringElement, IpyEscapeKind, ModModule, Number, Stmt};
 use ruff_text_size::{Ranged, TextRange, TextSize};
 
 use crate::{
-    LexicalErrorType, Mode, ParseErrorType, ParseOptions, parse, parse_cells_unchecked,
-    parse_expression, parse_module,
+    LexicalErrorType, Mode, ParseErrorType, ParseOptions, Parsed, parse, parse_cells_unchecked,
+    parse_expression, parse_module, parse_unchecked,
 };
 
 // Keep recursive ASTs shallow enough for Windows's 1 MiB test-thread stacks.
@@ -347,12 +347,27 @@ fn test_tstring_fstring_middle_fuzzer() {
     insta::assert_debug_snapshot!(error);
 }
 
+/// Parses the module `source`, which nests brackets deeper than allowed, and asserts that this is
+/// its only error.
+fn parse_too_deeply_nested(source: &str) -> Parsed<ModModule> {
+    let parsed = parse_unchecked(source, ParseOptions::from(Mode::Module))
+        .try_into_module()
+        .unwrap();
+    assert!(!parsed.errors().is_empty());
+    for error in parsed.errors() {
+        assert_eq!(
+            error.error,
+            ParseErrorType::Lexical(LexicalErrorType::TooDeeplyNestedBrackets)
+        );
+    }
+    parsed
+}
+
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
 #[test]
 fn nested_parens_grow_stack() {
     let src = format!("{}1{}", "(".repeat(1_000), ")".repeat(1_000));
-    let parsed = stacker::grow(32 * 1024, || parse_module(&src));
-    assert!(parsed.is_ok());
+    stacker::grow(32 * 1024, || parse_too_deeply_nested(&src));
 }
 
 #[test]
@@ -369,7 +384,7 @@ fn deep_nesting_preserves_surrounding_statements() {
         "(".repeat(1_000),
         ")".repeat(1_000),
     );
-    let parsed = parse_module(&src).unwrap();
+    let parsed = parse_too_deeply_nested(&src);
 
     assert_matches!(parsed.suite().first(), Some(Stmt::Assign(_)));
     assert_matches!(parsed.suite().last(), Some(Stmt::Assign(_)));
@@ -399,21 +414,21 @@ fn nested_def_blocks_grow_stack() {
 #[test]
 fn nested_lists_grow_stack() {
     let src = format!("{}1{}", "[".repeat(1_000), "]".repeat(1_000));
-    parse_module(&src).unwrap();
+    parse_too_deeply_nested(&src);
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
 #[test]
 fn nested_calls_grow_stack() {
     let src = format!("x = {}1{}", "f(".repeat(1_000), ")".repeat(1_000));
-    parse_module(&src).unwrap();
+    parse_too_deeply_nested(&src);
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
 #[test]
 fn nested_subscripts_grow_stack() {
     let src = format!("x = {}1{}", "a[".repeat(1_000), "]".repeat(1_000));
-    parse_module(&src).unwrap();
+    parse_too_deeply_nested(&src);
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
@@ -430,7 +445,7 @@ fn nested_match_patterns_grow_stack() {
         src.push(')');
     }
     src.push_str(": pass\n");
-    parse_module(&src).unwrap();
+    parse_too_deeply_nested(&src);
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
@@ -461,7 +476,7 @@ fn binary_paren_interplay_grows_stack() {
     for _ in 0..depth {
         src.push(')');
     }
-    parse_module(&src).unwrap();
+    parse_too_deeply_nested(&src);
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
@@ -548,4 +563,37 @@ fn cells_module_range_spans_source() {
         parsed.syntax().range(),
         parse_module(source).unwrap().syntax().range()
     );
+}
+
+fn first_error(source: &str) -> ParseErrorType {
+    parse_unchecked(source, ParseOptions::from(Mode::Module)).errors()[0]
+        .error
+        .clone()
+}
+
+#[test]
+fn unclosed_bracket_at_end_is_incomplete() {
+    assert_eq!(
+        first_error("x = [\n1,\n"),
+        ParseErrorType::Lexical(LexicalErrorType::UnclosedBracket {
+            opening: '[',
+            incomplete: true,
+        })
+    );
+}
+
+#[test]
+fn unclosed_bracket_in_place_of_earlier_error_is_complete() {
+    assert_eq!(
+        first_error("x = [\nx for x\nin raise(3)\nof x\n"),
+        ParseErrorType::Lexical(LexicalErrorType::UnclosedBracket {
+            opening: '[',
+            incomplete: false,
+        })
+    );
+}
+
+#[test]
+fn unclosed_bracket_after_same_line_error() {
+    assert_eq!(first_error("def f(:\n").to_string(), "invalid syntax");
 }

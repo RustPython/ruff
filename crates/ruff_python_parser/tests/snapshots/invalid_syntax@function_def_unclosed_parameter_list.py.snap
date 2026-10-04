@@ -277,6 +277,15 @@ Module(
 
 
   |
+2 | def foo():
+3 |     return 42
+4 | def foo(a: int, b: str
+  |        ^ Syntax Error: '(' was never closed
+5 | x = 10
+  |
+
+
+  |
 3 |     return 42
 4 | def foo(a: int, b: str
 5 | x = 10
@@ -286,4 +295,4 @@ Module(
   |
 4 | def foo(a: int, b: str
 5 | x = 10
-  |       ^ Syntax Error: unexpected EOF while parsing
+  |       ^ Syntax Error: invalid syntax

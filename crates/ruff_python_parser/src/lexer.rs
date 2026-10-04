@@ -58,6 +58,11 @@ pub struct Lexer<'src> {
     /// The lexer is within a parenthesized context if the value is greater than 0.
     nesting: u32,
 
+    /// The opening brackets that are not closed yet, innermost last. It holds the innermost
+    /// `nesting` brackets; the implicit outer parentheses of
+    /// [`Mode::ParenthesizedExpression`] have no entry.
+    brackets: Vec<OpenBracket>,
+
     /// A stack of indentation representing the current indentation level.
     indentations: Indentations,
     pending_indentation: Option<Indentation>,
@@ -98,6 +103,7 @@ impl<'src> Lexer<'src> {
             current_range: TextRange::empty(start_offset),
             current_flags: TokenFlags::empty(),
             nesting,
+            brackets: Vec::new(),
             indentations: Indentations::default(),
             pending_indentation: None,
             mode,
@@ -178,9 +184,12 @@ impl<'src> Lexer<'src> {
     fn lex_token(&mut self) -> TokenKind {
         if let Some(interpolated_string) = self.interpolated_strings.current() {
             if !interpolated_string.is_in_interpolation(self.nesting) {
+                let nesting = interpolated_string.nesting();
                 self.cursor.start_token();
                 if let Some(token) = self.lex_interpolated_string_middle_or_end() {
                     if token.is_interpolated_string_end() {
+                        // Brackets left open in a replacement field end with the string.
+                        self.reset_nesting(nesting);
                         self.interpolated_strings.pop();
                     }
                     return token;
@@ -266,10 +275,8 @@ impl<'src> Lexer<'src> {
                         )));
                     }
                     if self.cursor.is_eof() {
-                        return Some(self.push_error(LexicalError::new(
-                            LexicalErrorType::Eof,
-                            self.token_range(),
-                        )));
+                        let error = self.eof_error(self.token_range());
+                        return Some(self.push_error(error));
                     }
                     // test_ok backslash_continuation_indentation
                     // if True:
@@ -388,10 +395,7 @@ impl<'src> Lexer<'src> {
                         ));
                     }
                     if self.cursor.is_eof() {
-                        return Err(LexicalError::new(
-                            LexicalErrorType::Eof,
-                            TextRange::new(whitespace_start, self.offset()),
-                        ));
+                        return Err(self.eof_error(TextRange::new(whitespace_start, self.offset())));
                     }
                 }
                 // Form feed
@@ -523,23 +527,23 @@ impl<'src> Lexer<'src> {
             }
             '~' => TokenKind::Tilde,
             '(' => {
-                self.nesting += 1;
+                self.open_bracket('(');
                 TokenKind::Lpar
             }
             ')' => {
-                self.nesting = self.nesting.saturating_sub(1);
+                self.close_bracket(')');
                 TokenKind::Rpar
             }
             '[' => {
-                self.nesting += 1;
+                self.open_bracket('[');
                 TokenKind::Lsqb
             }
             ']' => {
-                self.nesting = self.nesting.saturating_sub(1);
+                self.close_bracket(']');
                 TokenKind::Rsqb
             }
             '{' => {
-                self.nesting += 1;
+                self.open_bracket('{');
                 TokenKind::Lbrace
             }
             '}' => {
@@ -553,7 +557,7 @@ impl<'src> Lexer<'src> {
                     }
                     interpolated_string.try_end_format_spec(self.nesting);
                 }
-                self.nesting = self.nesting.saturating_sub(1);
+                self.close_bracket('}');
                 TokenKind::Rbrace
             }
             ':' => {
@@ -845,7 +849,7 @@ impl<'src> Lexer<'src> {
                         InterpolatedStringErrorType::UnterminatedString { detected_line }
                     };
 
-                    self.nesting = interpolated_string.nesting();
+                    self.reset_nesting(interpolated_string.nesting());
                     self.interpolated_strings.pop();
                     self.current_flags |= TokenFlags::UNCLOSED_STRING;
                     self.push_error(LexicalError::new(
@@ -872,7 +876,7 @@ impl<'src> Lexer<'src> {
                         )
                     };
 
-                    self.nesting = interpolated_string.nesting();
+                    self.reset_nesting(interpolated_string.nesting());
                     self.interpolated_strings.pop();
                     self.current_flags |= TokenFlags::UNCLOSED_STRING;
 
@@ -1074,12 +1078,17 @@ impl<'src> Lexer<'src> {
     /// Returns the one-based line number of the cursor, where a newline that ends the source
     /// belongs to the line it terminates.
     fn detected_line(&self) -> u32 {
-        let source = self.source.as_bytes();
-        let mut offset = self.offset().to_usize();
-        if offset == source.len() && matches!(source.last(), Some(b'\n' | b'\r')) {
-            offset -= 1;
+        let mut offset = self.offset();
+        if offset.to_usize() == self.source.len() && self.source.ends_with(['\n', '\r']) {
+            offset -= TextSize::new(1);
         }
-        let newlines = source[..offset]
+        self.line_number(offset)
+    }
+
+    /// Returns the one-based line number of `offset`.
+    fn line_number(&self, offset: TextSize) -> u32 {
+        let source = self.source.as_bytes();
+        let newlines = source[..offset.to_usize()]
             .iter()
             .enumerate()
             .filter(|&(index, &byte)| {
@@ -1087,6 +1096,66 @@ impl<'src> Lexer<'src> {
             })
             .count();
         u32::try_from(newlines + 1).unwrap()
+    }
+
+    /// Returns the error for reaching the end of the source unexpectedly at `range`: the innermost
+    /// bracket that is not closed, if any.
+    fn eof_error(&self, range: TextRange) -> LexicalError {
+        match self.brackets.last() {
+            Some(bracket) => LexicalError::new(
+                LexicalErrorType::UnclosedBracket {
+                    opening: bracket.kind,
+                    incomplete: true,
+                },
+                TextRange::empty(bracket.start),
+            ),
+            None => LexicalError::new(LexicalErrorType::Eof, range),
+        }
+    }
+
+    /// Enters the opening bracket `kind` at the current token.
+    fn open_bracket(&mut self, kind: char) {
+        let start = self.token_range().start();
+        if self.nesting >= MAX_NESTING {
+            self.errors.push(LexicalError::new(
+                LexicalErrorType::TooDeeplyNestedBrackets,
+                TextRange::empty(start),
+            ));
+        }
+        self.nesting += 1;
+        self.brackets.push(OpenBracket { kind, start });
+    }
+
+    /// Leaves the innermost bracket at the closing bracket `closing`, reporting a closing bracket
+    /// that has no opening bracket or does not match it.
+    fn close_bracket(&mut self, closing: char) {
+        let start = self.token_range().start();
+        let error = match self.brackets.pop() {
+            Some(open) if open.kind == opening_bracket(closing) => None,
+            Some(open) => {
+                let opening_line = self.line_number(open.start);
+                Some(LexicalErrorType::MismatchedBracket {
+                    closing,
+                    opening: open.kind,
+                    opening_line: (opening_line != self.line_number(start)).then_some(opening_line),
+                })
+            }
+            None if self.nesting == 0 => Some(LexicalErrorType::UnmatchedBracket { closing }),
+            None => None,
+        };
+        if let Some(error) = error {
+            self.errors
+                .push(LexicalError::new(error, TextRange::empty(start)));
+        }
+        self.nesting = self.nesting.saturating_sub(1);
+    }
+
+    /// Sets the nesting level to `nesting`, dropping the brackets inside it.
+    fn reset_nesting(&mut self, nesting: u32) {
+        let implicit = self.nesting as usize - self.brackets.len();
+        self.brackets
+            .truncate((nesting as usize).saturating_sub(implicit));
+        self.nesting = nesting;
     }
 
     /// Numeric lexing. The feast can start!
@@ -1252,15 +1321,27 @@ impl<'src> Lexer<'src> {
 
         // First, finish any unterminated interpolated-strings.
         while let Some(interpolated_string) = self.interpolated_strings.pop() {
-            self.nesting = interpolated_string.nesting();
-            let detected_line = self.detected_line();
-            self.push_error(LexicalError::new(
-                LexicalErrorType::from_interpolated_string_error(
-                    InterpolatedStringErrorType::UnterminatedString { detected_line },
-                    interpolated_string.kind(),
+            // An unterminated replacement field reports its innermost open bracket.
+            let error = match self.brackets.last() {
+                Some(bracket) if self.nesting > interpolated_string.nesting() => LexicalError::new(
+                    LexicalErrorType::UnclosedBracket {
+                        opening: bracket.kind,
+                        incomplete: true,
+                    },
+                    TextRange::empty(bracket.start),
                 ),
-                TextRange::empty(interpolated_string.start()),
-            ));
+                _ => LexicalError::new(
+                    LexicalErrorType::from_interpolated_string_error(
+                        InterpolatedStringErrorType::UnterminatedString {
+                            detected_line: self.detected_line(),
+                        },
+                        interpolated_string.kind(),
+                    ),
+                    TextRange::empty(interpolated_string.start()),
+                ),
+            };
+            self.reset_nesting(interpolated_string.nesting());
+            self.push_error(error);
         }
 
         // Second, finish all nestings.
@@ -1269,9 +1350,13 @@ impl<'src> Lexer<'src> {
         let init_nesting = u32::from(self.mode == Mode::ParenthesizedExpression);
 
         if self.nesting > init_nesting {
+            let error = self.eof_error(self.token_range());
             // Reset the nesting to avoid going into infinite loop.
             self.nesting = 0;
-            return self.push_error(LexicalError::new(LexicalErrorType::Eof, self.token_range()));
+            self.brackets.clear();
+            self.push_error(error);
+            self.current_range = self.token_range();
+            return TokenKind::Unknown;
         }
 
         // Next, insert a trailing newline, if required.
@@ -1353,6 +1438,7 @@ impl<'src> Lexer<'src> {
         // Reduce the nesting level because the parser recovered from an error inside list parsing
         // i.e., it recovered from an unclosed parenthesis (`(`, `[`, or `{`).
         self.nesting -= 1;
+        let unclosed = self.brackets.pop();
 
         // The lexer can't be moved back for a triple-quoted f/t-string because the newlines are
         // part of the f/t-string itself, so there is no newline token to be emitted.
@@ -1382,6 +1468,7 @@ impl<'src> Lexer<'src> {
             TokenKind::Rpar | TokenKind::Rsqb | TokenKind::Rbrace
         ) {
             self.nesting += 1;
+            self.brackets.extend(unclosed);
         }
 
         self.cursor = Cursor::new(self.source);
@@ -1447,7 +1534,7 @@ impl<'src> Lexer<'src> {
         self.current_kind = kind.end_token();
         self.current_flags = TokenFlags::empty();
 
-        self.nesting = interpolated_string.nesting();
+        self.reset_nesting(interpolated_string.nesting());
         self.interpolated_strings.pop();
 
         self.cursor = Cursor::new(self.source);
@@ -1507,7 +1594,7 @@ impl<'src> Lexer<'src> {
     // SAFETY: Lexer doesn't allow files larger than 4GB
     #[expect(clippy::cast_possible_truncation)]
     #[inline]
-    fn offset(&self) -> TextSize {
+    pub(crate) fn offset(&self) -> TextSize {
         TextSize::new(self.source.len() as u32) - self.cursor.text_len()
     }
 
@@ -1520,6 +1607,7 @@ impl<'src> Lexer<'src> {
             cursor_offset: self.offset(),
             state: self.state,
             nesting: self.nesting,
+            brackets: self.brackets.clone(),
             indentations_checkpoint: self.indentations.checkpoint(),
             pending_indentation: self.pending_indentation,
             interpolated_strings_checkpoint: self.interpolated_strings.checkpoint(),
@@ -1536,6 +1624,7 @@ impl<'src> Lexer<'src> {
             cursor_offset,
             state,
             nesting,
+            brackets,
             indentations_checkpoint,
             pending_indentation,
             interpolated_strings_checkpoint,
@@ -1552,6 +1641,7 @@ impl<'src> Lexer<'src> {
         self.cursor = cursor;
         self.state = state;
         self.nesting = nesting;
+        self.brackets = brackets;
         self.indentations.rewind(indentations_checkpoint);
         self.pending_indentation = pending_indentation;
         self.interpolated_strings
@@ -1562,6 +1652,35 @@ impl<'src> Lexer<'src> {
     pub(crate) fn finish(self) -> Vec<LexicalError> {
         self.errors
     }
+
+    /// Returns the errors found so far.
+    pub(crate) fn errors(&self) -> &[LexicalError] {
+        &self.errors
+    }
+
+    /// Returns `true` if the lexer is inside an f-string or t-string.
+    pub(crate) fn in_interpolated_string(&self) -> bool {
+        self.interpolated_strings.current().is_some()
+    }
+}
+
+/// The maximum number of nested brackets.
+const MAX_NESTING: u32 = 200;
+
+/// An opening bracket that is not closed yet.
+#[derive(Copy, Clone, Debug)]
+struct OpenBracket {
+    kind: char,
+    start: TextSize,
+}
+
+/// Returns the opening bracket for the closing bracket `closing`.
+const fn opening_bracket(closing: char) -> char {
+    match closing {
+        ')' => '(',
+        ']' => '[',
+        _ => '{',
+    }
 }
 
 pub(crate) struct LexerCheckpoint {
@@ -1571,6 +1690,7 @@ pub(crate) struct LexerCheckpoint {
     cursor_offset: TextSize,
     state: State,
     nesting: u32,
+    brackets: Vec<OpenBracket>,
     indentations_checkpoint: IndentationsCheckpoint,
     pending_indentation: Option<Indentation>,
     interpolated_strings_checkpoint: InterpolatedStringsCheckpoint,
@@ -2790,12 +2910,11 @@ t"{(lambda x:{x})}"
                 location: 3..3,
             },
             LexicalError {
-                error: FStringError(
-                    UnterminatedString {
-                        detected_line: 1,
-                    },
-                ),
-                location: 0..0,
+                error: UnclosedBracket {
+                    opening: '{',
+                    incomplete: true,
+                },
+                location: 2..2,
             },
         ]
         ```
@@ -2830,12 +2949,11 @@ t"{(lambda x:{x})}"
                 location: 7..7,
             },
             LexicalError {
-                error: FStringError(
-                    UnterminatedString {
-                        detected_line: 1,
-                    },
-                ),
-                location: 0..0,
+                error: UnclosedBracket {
+                    opening: '{',
+                    incomplete: true,
+                },
+                location: 2..2,
             },
         ]
         ```

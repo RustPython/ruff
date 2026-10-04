@@ -93,6 +93,14 @@ Module(
 
   |
 1 | call(x
+  |     ^ Syntax Error: '(' was never closed
+2 |
+3 | def foo():
+  |
+
+
+  |
+1 | call(x
   |       ^ Syntax Error: invalid syntax
 2 |
 3 | def foo():

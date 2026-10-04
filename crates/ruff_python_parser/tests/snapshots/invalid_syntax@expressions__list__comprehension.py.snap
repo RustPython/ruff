@@ -1243,7 +1243,7 @@ Module(
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
-   |                ^ Syntax Error: invalid syntax
+   |                ^ Syntax Error: unmatched ']'
 14 | [*x, *y for x in y]
    |
 
@@ -1273,7 +1273,7 @@ Module(
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
-   |                   ^ Syntax Error: invalid syntax
+   |                   ^ Syntax Error: unmatched ']'
 15 |
 16 | # Invalid if
    |
