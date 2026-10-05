@@ -161,6 +161,6 @@ Module(
 1 | match value:
 2 |     case 1 as _: ...
 3 |     case {**_}: ...
-  |             ^ Syntax Error: cannot use '_' as a target
+  |             ^ Syntax Error: invalid syntax
 4 | after = 1
   |
