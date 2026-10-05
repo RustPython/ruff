@@ -418,7 +418,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |         ^ Syntax Error: f-string: expecting '}'
+  |         ^ Syntax Error: f-string: expecting '}', or format specs
 7 |
 8 | f'middle {'string':\\
   |
@@ -457,7 +457,7 @@ Module(
 6 |         'format spec'}
 7 |
 8 | f'middle {'string':\\
-  |                    ^^ Syntax Error: f-string: newlines are not allowed in format specifiers when using single quotes
+  |                    ^^ Syntax Error: f-string: newlines are not allowed in format specifiers for single quoted f-strings
 9 |         'format spec'}
   |
 
@@ -466,7 +466,7 @@ Module(
  6 |         'format spec'}
  7 |
  8 | f'middle {'string':\\
-   |                      ^ Syntax Error: f-string: expecting '}'
+   |                      ^ Syntax Error: f-string: expecting '}', or format specs
  9 |         'format spec'}
 10 |
 11 | f'middle {'string':\\\
@@ -504,7 +504,7 @@ Module(
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |         ^ Syntax Error: f-string: expecting '}'
+   |         ^ Syntax Error: f-string: expecting '}', or format specs
 
 
    |

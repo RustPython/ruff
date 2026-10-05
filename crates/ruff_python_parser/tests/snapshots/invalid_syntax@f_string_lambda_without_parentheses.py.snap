@@ -112,17 +112,12 @@ Module(
 
   |
 1 | f"{lambda x: x}"
-  |             ^^ Syntax Error: invalid syntax
-
-
-  |
-1 | f"{lambda x: x}"
   |    ^^^^^^^^^ Syntax Error: f-string: lambda expressions are not allowed without parentheses
 
 
   |
 1 | f"{lambda x: x}"
-  |             ^^ Syntax Error: f-string: expecting '}'
+  |             ^^ Syntax Error: invalid syntax
 
 
   |

@@ -218,6 +218,16 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | # Starred expression inside t-string has a minimum precedence of bitwise or.
 3 | t"{*}"
+  |    ^ Syntax Error: t-string: expecting a valid expression after '{'
+4 | t"{*x and y}"
+5 | t"{*yield x}"
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.14"}
+2 | # Starred expression inside t-string has a minimum precedence of bitwise or.
+3 | t"{*}"
   |     ^ Syntax Error: invalid syntax
 4 | t"{*x and y}"
 5 | t"{*yield x}"

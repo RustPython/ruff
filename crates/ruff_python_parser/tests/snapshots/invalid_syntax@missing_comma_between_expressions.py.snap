@@ -8,7 +8,7 @@ input_file: crates/ruff_python_parser/resources/inline/err/missing_comma_between
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..38,
+        range: 0..108,
         body: [
             Expr(
                 StmtExpr {
@@ -237,6 +237,178 @@ Module(
                     ),
                 },
             ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 38..39,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 38..39,
+                            id: Name("A"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 40..49,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 40..49,
+                            id: Name("tokenizer"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 50..61,
+                    value: Compare(
+                        ExprCompare {
+                            node_index: NodeIndex(None),
+                            range: 50..61,
+                            ops: [
+                                In,
+                            ],
+                            operands: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 50..55,
+                                        id: Name("error"),
+                                        ctx: Load,
+                                    },
+                                ),
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 59..61,
+                                        id: Name("or"),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            runtime_comparators: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 62..67,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 62..67,
+                            id: Name("right"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 68..73,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 68..73,
+                            id: Name("after"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 74..77,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 74..77,
+                            id: Name("the"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 78..83,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 78..83,
+                            id: Name("first"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 84..94,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 84..94,
+                            id: Name("expression"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 95..100,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 95..100,
+                            id: Name("comes"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 101..107,
+                    value: Attribute(
+                        ExprAttribute {
+                            node_index: NodeIndex(None),
+                            range: 101..107,
+                            value: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 101..106,
+                                    id: Name("first"),
+                                    ctx: Load,
+                                },
+                            ),
+                            attr: Identifier {
+                                id: Name(""),
+                                range: 107..107,
+                                node_index: NodeIndex(None),
+                            },
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
         ],
         runtime_body: None,
     },
@@ -284,6 +456,7 @@ Module(
 3 | x[1 + 2 3]
   |   ^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
 4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
   |
 
 
@@ -293,6 +466,7 @@ Module(
 3 | x[1 + 2 3]
   |         ^ Syntax Error: invalid syntax
 4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
   |
 
 
@@ -301,6 +475,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |    ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -308,6 +484,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |      ^ Syntax Error: f-string: expecting '}'
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -315,6 +493,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   | ^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -322,6 +502,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |      ^ Syntax Error: invalid syntax
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -329,6 +511,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |       ^ Syntax Error: f-string: single '}' is not allowed
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -336,6 +520,8 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |        ^ Syntax Error: invalid syntax
+5 | A tokenizer error in or right after the first expression comes first.
+  |
 
 
   |
@@ -343,3 +529,96 @@ Module(
 3 | x[1 + 2 3]
 4 | f"{a b}"
   |         ^ Syntax Error: invalid syntax
+5 | A tokenizer error in or right after the first expression comes first.
+  |
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  | ^^^^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |   ^^^^^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |             ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                      ^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |             ^^^^^^^^^^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                         ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                               ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                     ^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                         ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                               ^^^^^^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                                          ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                                                ^^^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | x[1 + 2 3]
+4 | f"{a b}"
+5 | A tokenizer error in or right after the first expression comes first.
+  |                                                                      ^ Syntax Error: invalid syntax

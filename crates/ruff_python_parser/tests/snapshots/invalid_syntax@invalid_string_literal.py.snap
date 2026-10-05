@@ -73,7 +73,7 @@ Module(
 
   |
 1 | 'hello \N{INVALID} world'
-  |           ^^^^^^^ Syntax Error: got unexpected unicode
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 6-16: unknown Unicode character name
 2 | """hello \N{INVALID} world"""
   |
 
@@ -81,4 +81,4 @@ Module(
   |
 1 | 'hello \N{INVALID} world'
 2 | """hello \N{INVALID} world"""
-  |             ^^^^^^^ Syntax Error: got unexpected unicode
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 6-16: unknown Unicode character name

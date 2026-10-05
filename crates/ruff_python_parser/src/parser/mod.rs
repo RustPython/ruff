@@ -16,7 +16,9 @@ use rustc_hash::FxBuildHasher;
 use thin_vec::ThinVec;
 use unicode_normalization::UnicodeNormalization;
 
-use crate::error::{LexicalError, LexicalErrorType, UnsupportedSyntaxError};
+use crate::error::{
+    InterpolatedStringErrorType, LexicalError, LexicalErrorType, UnsupportedSyntaxError,
+};
 use crate::lexer::Lexer;
 use crate::parser::expression::ExpressionContext;
 use crate::parser::progress::{ParserProgress, TokenId};
@@ -104,6 +106,14 @@ pub(crate) struct Parser<'src> {
     /// bracket's logical line.
     first_unclosed_bracket_recovery: Option<TextSize>,
 
+    /// The first escape sequence error in a literal part of the f-string or t-string being
+    /// parsed. It is reported at the closing quote once the string ends.
+    interpolated_string_escape_error: Option<LexicalErrorType>,
+
+    /// The kind of the innermost f-string or t-string whose replacement field expression is
+    /// being parsed, and the bracket level inside its brace, where a `:` starts the format spec.
+    replacement_field: Option<(InterpolatedStringKind, usize)>,
+
     /// Number of active recursive statement, expression, and pattern parsing operations.
     recursion_depth: usize,
 
@@ -161,6 +171,8 @@ impl<'src> Parser<'src> {
             prev_token_end: TextSize::new(0),
             start_offset,
             first_unclosed_bracket_recovery: None,
+            interpolated_string_escape_error: None,
+            replacement_field: None,
             recursion_depth: 0,
             current_token_id: TokenId::default(),
             expr_scratch: ScratchBuffer::with_capacity(16),
@@ -304,6 +316,17 @@ impl<'src> Parser<'src> {
                 .cmp(&lex_error.location().start())
             {
                 Ordering::Less => merged.push(parse_errors.next().unwrap()),
+                // A replacement field error at a token the tokenizer accepts replaces the lex
+                // error of that token.
+                Ordering::Equal
+                    if matches!(
+                        parse_error.error,
+                        ParseErrorType::FStringError(_) | ParseErrorType::TStringError(_)
+                    ) && !lex_error.error().is_tokenizer_error() =>
+                {
+                    lex_errors.next().unwrap();
+                    merged.push(parse_errors.next().unwrap());
+                }
                 Ordering::Equal => {
                     // Skip the parse error if we already have a lex error at the same location..
                     parse_errors.next().unwrap();
@@ -1983,7 +2006,20 @@ fn prioritize_tokenizer_error(
             .iter()
             .find(|error| error.error().is_tokenizer_error())
         {
-            break (error.clone(), in_interpolated_string, lexer.offset());
+            // A missing closing brace or a bracket that closes a replacement field is found at
+            // the token that shows it.
+            let detected = match error.error() {
+                LexicalErrorType::FStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnmatchedBracket(_),
+                )
+                | LexicalErrorType::TStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnmatchedBracket(_),
+                ) => error.location().start(),
+                _ => lexer.offset(),
+            };
+            break (error.clone(), in_interpolated_string, detected);
         }
         if matches!(
             kind,

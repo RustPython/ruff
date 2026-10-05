@@ -977,7 +977,7 @@ Module(
 49 | # F-strings uses normal list parsing, so test those as well
 50 | if call(f"hello {x
 51 |     def bar():
-   |     ^^^ Syntax Error: f-string: expecting '}'
+   |     ^^^ Syntax Error: f-string: expecting '=', or '!', or ':', or '}'
 52 |         pass
    |
 
