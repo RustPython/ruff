@@ -288,6 +288,8 @@ pub enum ParseErrorType {
     ExpectedImaginaryNumber,
     /// Expected an expression at the current parser location.
     ExpectedExpression,
+    /// Expected an identifier at the current parser location.
+    ExpectedIdentifier,
     /// The parser expected a specific token that was not found.
     ExpectedToken {
         expected: TokenKind,
@@ -579,7 +581,9 @@ impl std::fmt::Display for ParseErrorType {
             ParseErrorType::ExpectedImaginaryNumber => {
                 f.write_str("expected an imaginary number in complex literal pattern")
             }
-            ParseErrorType::ExpectedExpression => f.write_str("invalid syntax"),
+            ParseErrorType::ExpectedExpression | ParseErrorType::ExpectedIdentifier => {
+                f.write_str("invalid syntax")
+            }
             ParseErrorType::UnexpectedIndentation => f.write_str("unexpected indent"),
             ParseErrorType::InvalidAssignmentTarget {
                 kind,
