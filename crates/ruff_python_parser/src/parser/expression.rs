@@ -439,10 +439,18 @@ impl<'src> Parser<'src> {
             return;
         }
 
+        // test_err missing_comma_before_invalid_expression
+        // [a ~]
+        // [a b +]
         let checkpoint = self.checkpoint();
+        let errors_before = self.errors.len();
         let second = self.parse_conditional_expression_or_higher();
-        let range = TextRange::new(first.start(), second.end());
+        let second_end = self.complete_prefix_end(&second.expr, errors_before);
         self.rewind(checkpoint);
+        let Some(second_end) = second_end else {
+            return;
+        };
+        let range = TextRange::new(first.start(), second_end);
         self.add_error(
             ParseErrorType::OtherError("invalid syntax. Perhaps you forgot a comma?".to_string()),
             range,
@@ -798,7 +806,7 @@ impl<'src> Parser<'src> {
 
         if self.current_token_kind().is_keyword() {
             // Non-soft keyword
-            self.add_error(ParseErrorType::OtherError("invalid syntax".into()), range);
+            self.add_error(ParseErrorType::ExpectedIdentifier, range);
 
             let text = self.src_text(range);
             let id = self.intern_name(text);
@@ -814,10 +822,7 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_missing_identifier(&mut self) -> ast::Identifier {
-        self.add_error(
-            ParseErrorType::OtherError("invalid syntax".into()),
-            self.current_token_range(),
-        );
+        self.add_error(ParseErrorType::ExpectedIdentifier, self.current_token_range());
 
         ast::Identifier {
             id: Name::empty(),
@@ -2119,7 +2124,12 @@ impl<'src> Parser<'src> {
             return;
         }
         let (error, range) = match self.errors.get(errors_before) {
-            Some(first) if matches!(first.error, ParseErrorType::ExpectedExpression) => {
+            Some(first)
+                if matches!(
+                    first.error,
+                    ParseErrorType::ExpectedExpression | ParseErrorType::ExpectedIdentifier
+                ) =>
+            {
                 match self.complete_prefix_end(expr, errors_before) {
                     None => (
                         InterpolatedStringErrorType::ExpectedExpressionAfterLbrace,
@@ -2148,13 +2158,16 @@ impl<'src> Parser<'src> {
     }
 
     /// Returns the end of the longest prefix of `expr` that is a complete expression, where an
-    /// expression is incomplete if one of the errors after the first `errors_before` errors is
-    /// inside it, or `None` if no prefix is complete.
+    /// expression is incomplete if a missing expression or identifier after the first
+    /// `errors_before` errors is inside it, or `None` if no prefix is complete.
     fn complete_prefix_end(&self, expr: &Expr, errors_before: usize) -> Option<TextSize> {
         let is_complete = |expr: &Expr| {
-            !self.errors[errors_before..]
-                .iter()
-                .any(|error| expr.range().contains_inclusive(error.location.start()))
+            !self.errors[errors_before..].iter().any(|error| {
+                matches!(
+                    error.error,
+                    ParseErrorType::ExpectedExpression | ParseErrorType::ExpectedIdentifier
+                ) && expr.range().contains_inclusive(error.location.start())
+            })
         };
         if is_complete(expr) {
             return Some(expr.end());

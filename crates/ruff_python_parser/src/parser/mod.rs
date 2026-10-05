@@ -885,8 +885,9 @@ impl<'src> Parser<'src> {
             }
         }
 
-        // The lexer already reported an error for the current token, which comes first.
-        if self.at(TokenKind::Unknown) {
+        // The lexer already reported an error for the current token, which comes first. A
+        // string literal that fails to decode was read before it.
+        if self.at(TokenKind::Unknown) && !matches!(error, ParseErrorType::Lexical(_)) {
             return;
         }
 
@@ -2043,8 +2044,17 @@ fn prioritize_tokenizer_error(
         }
         _ => first_start,
     };
+    // An escape sequence error is found when its string is parsed, before the end of the
+    // source shows an unclosed bracket.
+    let escape_error = matches!(
+        first.error,
+        ParseErrorType::Lexical(
+            LexicalErrorType::UnicodeEscapeError { .. } | LexicalErrorType::BytesEscapeError { .. }
+        )
+    );
     let wins = detected <= first_start
         || (!in_interpolated_string
+            && !escape_error
             && match tokenizer_error.error() {
                 LexicalErrorType::UnclosedBracket { .. } => {
                     let bracket_start = tokenizer_error.location().start();
