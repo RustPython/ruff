@@ -55,6 +55,36 @@ impl ParseError {
     }
 }
 
+/// The reason an escape sequence in a string literal cannot be decoded.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, get_size2::GetSize)]
+pub enum UnicodeEscapeErrorKind {
+    /// `\x` is not followed by two hexadecimal digits.
+    TruncatedHexByte,
+    /// `\u` is not followed by four hexadecimal digits.
+    TruncatedShortUnicode,
+    /// `\U` is not followed by eight hexadecimal digits.
+    TruncatedLongUnicode,
+    /// `\U` names a code point above `U+10FFFF`.
+    IllegalCharacter,
+    /// `\N` is not followed by a non-empty name in braces.
+    MalformedName,
+    /// `\N{...}` names no Unicode character.
+    UnknownName,
+}
+
+impl Display for UnicodeEscapeErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::TruncatedHexByte => "truncated \\xXX escape",
+            Self::TruncatedShortUnicode => "truncated \\uXXXX escape",
+            Self::TruncatedLongUnicode => "truncated \\UXXXXXXXX escape",
+            Self::IllegalCharacter => "illegal Unicode character",
+            Self::MalformedName => "malformed \\N character escape",
+            Self::UnknownName => "unknown Unicode character name",
+        })
+    }
+}
+
 /// Represents the different types of errors that can occur during parsing of an f-string or t-string.
 #[derive(Debug, Clone, PartialEq, Eq, get_size2::GetSize)]
 pub enum InterpolatedStringErrorType {
@@ -74,6 +104,22 @@ pub enum InterpolatedStringErrorType {
     ConversionFlagNotImmediatelyAfterExclamation,
     /// Newline inside of a format spec for a single quoted f- or t-string.
     NewlineInFormatSpec,
+    /// A replacement field has no expression before the given separator.
+    ExpressionRequiredBefore(char),
+    /// A replacement field does not start with an expression.
+    ExpectedExpressionAfterLbrace,
+    /// The expression of a replacement field is not followed by `=`, `!`, `:` or `}`.
+    ExpectedSeparatorAfterExpression,
+    /// The `=` of a replacement field is not followed by `!`, `:` or `}`.
+    ExpectedSeparatorAfterDebug,
+    /// The conversion of a replacement field is not followed by `:` or `}`.
+    ExpectedSeparatorAfterConversion,
+    /// The format spec of a replacement field is not followed by `}`.
+    UnclosedFormatSpec,
+    /// A `!` is directly followed by `:` or `}`.
+    MissingConversionFlag,
+    /// A closing bracket closes the brace that opens a replacement field.
+    UnmatchedBracket(char),
 }
 
 impl std::fmt::Display for InterpolatedStringErrorType {
@@ -99,6 +145,20 @@ impl std::fmt::Display for InterpolatedStringErrorType {
                     "newlines are not allowed in format specifiers when using single quotes"
                 )
             }
+            Self::ExpressionRequiredBefore(separator) => {
+                write!(f, "valid expression required before '{separator}'")
+            }
+            Self::ExpectedExpressionAfterLbrace => {
+                f.write_str("expecting a valid expression after '{'")
+            }
+            Self::ExpectedSeparatorAfterExpression => {
+                f.write_str("expecting '=', or '!', or ':', or '}'")
+            }
+            Self::ExpectedSeparatorAfterDebug => f.write_str("expecting '!', or ':', or '}'"),
+            Self::ExpectedSeparatorAfterConversion => f.write_str("expecting ':' or '}'"),
+            Self::UnclosedFormatSpec => f.write_str("expecting '}', or format specs"),
+            Self::MissingConversionFlag => f.write_str("missing conversion character"),
+            Self::UnmatchedBracket(closing) => write!(f, "unmatched '{closing}'"),
         }
     }
 }
@@ -121,6 +181,10 @@ fn write_interpolated_string_error(
                 "unterminated triple-quoted {kind} literal (detected at line {detected_line})"
             )
         }
+        InterpolatedStringErrorType::NewlineInFormatSpec => write!(
+            f,
+            "{kind}: newlines are not allowed in format specifiers for single quoted {kind}s"
+        ),
         _ => write!(f, "{kind}: {error}"),
     }
 }
@@ -642,12 +706,17 @@ pub enum LexicalErrorType {
         escaped_end_quote: bool,
         detected_line: u32,
     },
-    /// Decoding of a unicode escape sequence in a string literal failed.
-    UnicodeError,
-    /// Missing the `{` for unicode escape sequence.
-    MissingUnicodeLbrace,
-    /// Missing the `}` for unicode escape sequence.
-    MissingUnicodeRbrace,
+    /// An escape sequence in a string literal cannot be decoded. `start` and `end` are the
+    /// inclusive positions of the escape sequence in the string content, where a non-ASCII
+    /// character counts as its ten-character `\U` escape.
+    UnicodeEscapeError {
+        kind: UnicodeEscapeErrorKind,
+        start: u32,
+        end: u32,
+    },
+    /// A `\x` escape in a bytes literal at the given position of its content is not followed by
+    /// two hexadecimal digits.
+    BytesEscapeError { position: u32 },
     /// A dedent does not match any outer indentation level.
     IndentationError,
     /// Tabs and spaces are mixed in a way that makes the indentation depend on the tab size.
@@ -742,14 +811,23 @@ fn is_printable(c: char) -> bool {
 }
 
 impl LexicalErrorType {
+    /// Returns `true` if the error reports a string literal without its closing quotes.
+    pub(crate) fn is_unclosed_string_error(&self) -> bool {
+        matches!(
+            self,
+            Self::UnclosedStringError { .. }
+                | Self::FStringError(InterpolatedStringErrorType::UnclosedLbrace)
+                | Self::TStringError(InterpolatedStringErrorType::UnclosedLbrace)
+        )
+    }
+
     /// Returns `true` if the error stops tokenization, as opposed to an error found while
     /// decoding the content of a token.
     pub fn is_tokenizer_error(&self) -> bool {
         match self {
             Self::StringError
-            | Self::UnicodeError
-            | Self::MissingUnicodeLbrace
-            | Self::MissingUnicodeRbrace
+            | Self::UnicodeEscapeError { .. }
+            | Self::BytesEscapeError { .. }
             | Self::InvalidByteLiteral
             | Self::OtherError(_) => false,
             // An ASCII punctuation character is a token that the parser rejects.
@@ -760,6 +838,8 @@ impl LexicalErrorType {
                     | InterpolatedStringErrorType::UnterminatedTripleQuotedString { .. }
                     | InterpolatedStringErrorType::SingleRbrace
                     | InterpolatedStringErrorType::NewlineInFormatSpec
+                    | InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnmatchedBracket(_)
             ),
             Self::UnclosedStringError { .. }
             | Self::IndentationError
@@ -802,7 +882,13 @@ impl std::fmt::Display for LexicalErrorType {
             Self::InvalidByteLiteral => {
                 write!(f, "bytes can only contain ASCII literal characters")
             }
-            Self::UnicodeError => write!(f, "got unexpected unicode"),
+            Self::UnicodeEscapeError { kind, start, end } => write!(
+                f,
+                "(unicode error) 'unicodeescape' codec can't decode bytes in position {start}-{end}: {kind}"
+            ),
+            Self::BytesEscapeError { position } => {
+                write!(f, "(value error) invalid \\x escape at position {position}")
+            }
             Self::IndentationError => {
                 write!(f, "unindent does not match any outer indentation level")
             }
@@ -872,12 +958,6 @@ impl std::fmt::Display for LexicalErrorType {
                     f.write_str("; perhaps you escaped the end quote?")?;
                 }
                 Ok(())
-            }
-            Self::MissingUnicodeLbrace => {
-                write!(f, "missing `{{` in Unicode escape sequence")
-            }
-            Self::MissingUnicodeRbrace => {
-                write!(f, "missing `}}` in Unicode escape sequence")
             }
         }
     }

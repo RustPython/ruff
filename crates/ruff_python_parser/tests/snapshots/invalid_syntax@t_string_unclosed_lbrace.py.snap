@@ -276,6 +276,24 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"{"
+  |    ^ Syntax Error: t-string: expecting '}'
+3 | t"{foo!r"
+4 | t"{foo="
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.14"}
+2 | t"{"
+  |    ^ Syntax Error: t-string: expecting a valid expression after '{'
+3 | t"{foo!r"
+4 | t"{foo="
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.14"}
+2 | t"{"
   |    ^ Syntax Error: invalid syntax
 3 | t"{foo!r"
 4 | t"{foo="
@@ -306,9 +324,25 @@ Module(
 3 | t"{foo!r"
 4 | t"{foo="
 5 | t"{"
+  |    ^ Syntax Error: t-string: expecting a valid expression after '{'
+6 | t"""{"""
+  |
+
+
+  |
+3 | t"{foo!r"
+4 | t"{foo="
+5 | t"{"
   |    ^ Syntax Error: invalid syntax
 6 | t"""{"""
   |
+
+
+  |
+4 | t"{foo="
+5 | t"{"
+6 | t"""{"""
+  |      ^^^ Syntax Error: t-string: expecting a valid expression after '{'
 
 
   |

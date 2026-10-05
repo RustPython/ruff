@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_unclosed_lbrace_in_format_spec.py
+input_file: crates/ruff_python_parser/resources/inline/err/f_string_missing_conversion_flag.py
 ---
 ## AST
 
@@ -8,46 +8,95 @@ input_file: crates/ruff_python_parser/resources/inline/err/t_string_unclosed_lbr
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..73,
+        range: 0..18,
         body: [
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 44..56,
-                    value: TString(
-                        ExprTString {
+                    range: 0..7,
+                    value: FString(
+                        ExprFString {
                             node_index: NodeIndex(None),
-                            range: 44..56,
-                            value: TStringValue {
+                            range: 0..7,
+                            value: FStringValue {
                                 inner: Single(
-                                    TString {
-                                        range: 44..56,
+                                    FString {
+                                        range: 0..7,
                                         node_index: NodeIndex(None),
                                         elements: [
-                                            Literal(
-                                                InterpolatedStringLiteralElement {
-                                                    range: 46..52,
-                                                    node_index: NodeIndex(None),
-                                                    value: "hello ",
-                                                },
-                                            ),
                                             Interpolation(
                                                 InterpolatedElement {
-                                                    range: 52..55,
+                                                    range: 2..6,
                                                     node_index: NodeIndex(None),
                                                     expression: Name(
                                                         ExprName {
                                                             node_index: NodeIndex(None),
-                                                            range: 53..54,
+                                                            range: 3..4,
                                                             id: Name("x"),
                                                             ctx: Load,
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
+                                                    format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
+                                                },
+                                            ),
+                                        ],
+                                        flags: FStringFlags {
+                                            quote_style: Double,
+                                            prefix: Regular,
+                                            triple_quoted: false,
+                                            unclosed: false,
+                                        },
+                                    },
+                                ),
+                            },
+                            runtime_joined_str: None,
+                            runtime_values: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 8..17,
+                    value: FString(
+                        ExprFString {
+                            node_index: NodeIndex(None),
+                            range: 8..17,
+                            value: FStringValue {
+                                inner: Single(
+                                    FString {
+                                        range: 8..17,
+                                        node_index: NodeIndex(None),
+                                        elements: [
+                                            Interpolation(
+                                                InterpolatedElement {
+                                                    range: 10..16,
+                                                    node_index: NodeIndex(None),
+                                                    expression: Name(
+                                                        ExprName {
+                                                            node_index: NodeIndex(None),
+                                                            range: 11..12,
+                                                            id: Name("x"),
+                                                            ctx: Load,
+                                                        },
+                                                    ),
+                                                    debug_text: Some(
+                                                        DebugText {
+                                                            leading: "",
+                                                            expression: "x",
+                                                            trailing: "=",
+                                                        },
+                                                    ),
+                                                    conversion: None,
                                                     format_spec: Some(
                                                         InterpolatedStringFormatSpec {
-                                                            range: 55..55,
+                                                            range: 15..15,
                                                             node_index: NodeIndex(None),
                                                             elements: [],
                                                         },
@@ -58,7 +107,7 @@ Module(
                                                 },
                                             ),
                                         ],
-                                        flags: TStringFlags {
+                                        flags: FStringFlags {
                                             quote_style: Double,
                                             prefix: Regular,
                                             triple_quoted: false,
@@ -67,78 +116,7 @@ Module(
                                     },
                                 ),
                             },
-                            runtime_template_str: None,
-                            runtime_values: None,
-                        },
-                    ),
-                },
-            ),
-            Expr(
-                StmtExpr {
-                    node_index: NodeIndex(None),
-                    range: 57..72,
-                    value: TString(
-                        ExprTString {
-                            node_index: NodeIndex(None),
-                            range: 57..72,
-                            value: TStringValue {
-                                inner: Single(
-                                    TString {
-                                        range: 57..72,
-                                        node_index: NodeIndex(None),
-                                        elements: [
-                                            Literal(
-                                                InterpolatedStringLiteralElement {
-                                                    range: 59..65,
-                                                    node_index: NodeIndex(None),
-                                                    value: "hello ",
-                                                },
-                                            ),
-                                            Interpolation(
-                                                InterpolatedElement {
-                                                    range: 65..71,
-                                                    node_index: NodeIndex(None),
-                                                    expression: Name(
-                                                        ExprName {
-                                                            node_index: NodeIndex(None),
-                                                            range: 66..67,
-                                                            id: Name("x"),
-                                                            ctx: Load,
-                                                        },
-                                                    ),
-                                                    debug_text: None,
-                                                    conversion: None,
-                                                    format_spec: Some(
-                                                        InterpolatedStringFormatSpec {
-                                                            range: 68..71,
-                                                            node_index: NodeIndex(None),
-                                                            elements: [
-                                                                Literal(
-                                                                    InterpolatedStringLiteralElement {
-                                                                        range: 68..71,
-                                                                        node_index: NodeIndex(None),
-                                                                        value: ".3f",
-                                                                    },
-                                                                ),
-                                                            ],
-                                                        },
-                                                    ),
-                                                    runtime_str: None,
-                                                    runtime_interpolation_format_spec: None,
-                                                    runtime_formatted_value_format_spec: None,
-                                                },
-                                            ),
-                                        ],
-                                        flags: TStringFlags {
-                                            quote_style: Double,
-                                            prefix: Regular,
-                                            triple_quoted: false,
-                                            unclosed: false,
-                                        },
-                                    },
-                                ),
-                            },
-                            runtime_template_str: None,
+                            runtime_joined_str: None,
                             runtime_values: None,
                         },
                     ),
@@ -152,15 +130,13 @@ Module(
 ## Errors
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"hello {x:"
-  |            ^ Syntax Error: t-string: expecting '}', or format specs
-3 | t"hello {x:.3f"
+1 | f"{x!}"
+  |      ^ Syntax Error: f-string: missing conversion character
+2 | f"{x=!:}"
   |
 
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"hello {x:"
-3 | t"hello {x:.3f"
-  |               ^ Syntax Error: t-string: expecting '}', or format specs
+1 | f"{x!}"
+2 | f"{x=!:}"
+  |       ^ Syntax Error: f-string: missing conversion character

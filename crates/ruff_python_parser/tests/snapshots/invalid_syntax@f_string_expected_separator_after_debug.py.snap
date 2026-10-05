@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_invalid_conversion_flag_name_tok.py
+input_file: crates/ruff_python_parser/resources/inline/err/f_string_expected_separator_after_debug.py
 ---
 ## AST
 
@@ -8,35 +8,41 @@ input_file: crates/ruff_python_parser/resources/inline/err/t_string_invalid_conv
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..53,
+        range: 0..9,
         body: [
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 44..52,
-                    value: TString(
-                        ExprTString {
+                    range: 0..5,
+                    value: FString(
+                        ExprFString {
                             node_index: NodeIndex(None),
-                            range: 44..52,
-                            value: TStringValue {
+                            range: 0..5,
+                            value: FStringValue {
                                 inner: Single(
-                                    TString {
-                                        range: 44..52,
+                                    FString {
+                                        range: 0..5,
                                         node_index: NodeIndex(None),
                                         elements: [
                                             Interpolation(
                                                 InterpolatedElement {
-                                                    range: 46..51,
+                                                    range: 2..5,
                                                     node_index: NodeIndex(None),
                                                     expression: Name(
                                                         ExprName {
                                                             node_index: NodeIndex(None),
-                                                            range: 47..48,
+                                                            range: 3..4,
                                                             id: Name("x"),
                                                             ctx: Load,
                                                         },
                                                     ),
-                                                    debug_text: None,
+                                                    debug_text: Some(
+                                                        DebugText {
+                                                            leading: "",
+                                                            expression: "x",
+                                                            trailing: "=",
+                                                        },
+                                                    ),
                                                     conversion: None,
                                                     format_spec: None,
                                                     runtime_str: None,
@@ -45,17 +51,31 @@ Module(
                                                 },
                                             ),
                                         ],
-                                        flags: TStringFlags {
+                                        flags: FStringFlags {
                                             quote_style: Double,
                                             prefix: Regular,
                                             triple_quoted: false,
-                                            unclosed: false,
+                                            unclosed: true,
                                         },
                                     },
                                 ),
                             },
-                            runtime_template_str: None,
+                            runtime_joined_str: None,
                             runtime_values: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 5..6,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 5..6,
+                            id: Name("y"),
+                            ctx: Load,
                         },
                     ),
                 },
@@ -68,6 +88,30 @@ Module(
 ## Errors
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"{x!z}"
-  |      ^ Syntax Error: t-string: invalid conversion character 'z': expected 's', 'r', or 'a'
+1 | f"{x=y}"
+  |      ^ Syntax Error: f-string: expecting '!', or ':', or '}'
+
+
+  |
+1 | f"{x=y}"
+  | ^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+1 | f"{x=y}"
+  |      ^ Syntax Error: invalid syntax
+
+
+  |
+1 | f"{x=y}"
+  |       ^ Syntax Error: f-string: single '}' is not allowed
+
+
+  |
+1 | f"{x=y}"
+  |        ^ Syntax Error: invalid syntax
+
+
+  |
+1 | f"{x=y}"
+  |         ^ Syntax Error: invalid syntax

@@ -1115,10 +1115,24 @@ impl<'src> Lexer<'src> {
                 break;
             }
         }
-        let error = LexicalErrorType::UnclosedStringError {
-            triple_quoted: self.current_flags.is_triple_quoted(),
-            escaped_end_quote,
-            detected_line: self.detected_line(),
+        let error = match self.interpolated_strings.current() {
+            // A string in a replacement field that opens with the quotes of the enclosing
+            // f-string or t-string is its end without the closing brace.
+            Some(interpolated_string)
+                if interpolated_string.quote_char() == quote
+                    && interpolated_string.is_triple_quoted()
+                        == self.current_flags.is_triple_quoted() =>
+            {
+                LexicalErrorType::from_interpolated_string_error(
+                    InterpolatedStringErrorType::UnclosedLbrace,
+                    interpolated_string.kind(),
+                )
+            }
+            _ => LexicalErrorType::UnclosedStringError {
+                triple_quoted: self.current_flags.is_triple_quoted(),
+                escaped_end_quote,
+                detected_line: self.detected_line(),
+            },
         };
         self.push_error(LexicalError::new(error, TextRange::empty(range.start())));
     }
@@ -1178,8 +1192,18 @@ impl<'src> Lexer<'src> {
     /// that has no opening bracket or does not match it.
     fn close_bracket(&mut self, closing: char) {
         let start = self.token_range().start();
+        let at_interpolation_brace = self
+            .interpolated_strings
+            .current()
+            .filter(|interpolated_string| interpolated_string.is_at_interpolation_brace(self.nesting));
         let error = match self.brackets.pop() {
             Some(open) if open.kind == opening_bracket(closing) => None,
+            Some(open) if open.kind == '{' && at_interpolation_brace.is_some() => {
+                Some(LexicalErrorType::from_interpolated_string_error(
+                    InterpolatedStringErrorType::UnmatchedBracket(closing),
+                    at_interpolation_brace.unwrap().kind(),
+                ))
+            }
             Some(open) => {
                 let opening_line = self.line_number(open.start);
                 Some(LexicalErrorType::MismatchedBracket {
@@ -1642,7 +1666,7 @@ impl<'src> Lexer<'src> {
 
         if self.errors.last().is_some_and(|error| {
             error.location().start() == self.current_range.start()
-                && matches!(error.error(), LexicalErrorType::UnclosedStringError { .. })
+                && error.error().is_unclosed_string_error()
         }) {
             self.errors.pop();
         }
@@ -1682,7 +1706,7 @@ impl<'src> Lexer<'src> {
         {
             if self.errors.last().is_some_and(|error| {
                 error.location().start() == self.current_range.start()
-                    && matches!(error.error(), LexicalErrorType::UnclosedStringError { .. })
+                    && error.error().is_unclosed_string_error()
             }) {
                 self.errors.pop();
             }
@@ -3011,11 +3035,9 @@ t"{(lambda x:{x})}"
         ```
         [
             LexicalError {
-                error: UnclosedStringError {
-                    triple_quoted: false,
-                    escaped_end_quote: false,
-                    detected_line: 1,
-                },
+                error: FStringError(
+                    UnclosedLbrace,
+                ),
                 location: 3..3,
             },
             LexicalError {
@@ -3050,11 +3072,9 @@ t"{(lambda x:{x})}"
         ```
         [
             LexicalError {
-                error: UnclosedStringError {
-                    triple_quoted: false,
-                    escaped_end_quote: false,
-                    detected_line: 1,
-                },
+                error: FStringError(
+                    UnclosedLbrace,
+                ),
                 location: 7..7,
             },
             LexicalError {

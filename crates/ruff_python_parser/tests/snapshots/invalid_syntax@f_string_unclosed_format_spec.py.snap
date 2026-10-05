@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_invalid_conversion_flag_name_tok.py
+input_file: crates/ruff_python_parser/resources/inline/err/f_string_unclosed_format_spec.py
 ---
 ## AST
 
@@ -8,44 +8,50 @@ input_file: crates/ruff_python_parser/resources/inline/err/t_string_invalid_conv
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..53,
+        range: 0..9,
         body: [
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 44..52,
-                    value: TString(
-                        ExprTString {
+                    range: 0..8,
+                    value: FString(
+                        ExprFString {
                             node_index: NodeIndex(None),
-                            range: 44..52,
-                            value: TStringValue {
+                            range: 0..8,
+                            value: FStringValue {
                                 inner: Single(
-                                    TString {
-                                        range: 44..52,
+                                    FString {
+                                        range: 0..8,
                                         node_index: NodeIndex(None),
                                         elements: [
                                             Interpolation(
                                                 InterpolatedElement {
-                                                    range: 46..51,
+                                                    range: 2..7,
                                                     node_index: NodeIndex(None),
                                                     expression: Name(
                                                         ExprName {
                                                             node_index: NodeIndex(None),
-                                                            range: 47..48,
+                                                            range: 3..4,
                                                             id: Name("x"),
                                                             ctx: Load,
                                                         },
                                                     ),
                                                     debug_text: None,
-                                                    conversion: None,
-                                                    format_spec: None,
+                                                    conversion: Str,
+                                                    format_spec: Some(
+                                                        InterpolatedStringFormatSpec {
+                                                            range: 7..7,
+                                                            node_index: NodeIndex(None),
+                                                            elements: [],
+                                                        },
+                                                    ),
                                                     runtime_str: None,
                                                     runtime_interpolation_format_spec: None,
                                                     runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
-                                        flags: TStringFlags {
+                                        flags: FStringFlags {
                                             quote_style: Double,
                                             prefix: Regular,
                                             triple_quoted: false,
@@ -54,7 +60,7 @@ Module(
                                     },
                                 ),
                             },
-                            runtime_template_str: None,
+                            runtime_joined_str: None,
                             runtime_values: None,
                         },
                     ),
@@ -68,6 +74,5 @@ Module(
 ## Errors
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"{x!z}"
-  |      ^ Syntax Error: t-string: invalid conversion character 'z': expected 's', 'r', or 'a'
+1 | f"{x!s:"
+  |        ^ Syntax Error: f-string: expecting '}', or format specs

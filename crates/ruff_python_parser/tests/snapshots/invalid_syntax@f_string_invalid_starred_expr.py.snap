@@ -217,6 +217,15 @@ Module(
   |
 1 | # Starred expression inside f-string has a minimum precedence of bitwise or.
 2 | f"{*}"
+  |    ^ Syntax Error: f-string: expecting a valid expression after '{'
+3 | f"{*x and y}"
+4 | f"{*yield x}"
+  |
+
+
+  |
+1 | # Starred expression inside f-string has a minimum precedence of bitwise or.
+2 | f"{*}"
   |     ^ Syntax Error: invalid syntax
 3 | f"{*x and y}"
 4 | f"{*yield x}"

@@ -65,7 +65,8 @@
 
 pub use crate::error::{
     BlockClause, ExpressionKind, InterpolatedStringErrorType, LexicalErrorType, NumberLiteralKind,
-    ParseError, ParseErrorType, UnsupportedSyntaxError, UnsupportedSyntaxErrorKind,
+    ParseError, ParseErrorType, UnicodeEscapeErrorKind, UnsupportedSyntaxError,
+    UnsupportedSyntaxErrorKind,
 };
 pub use crate::parser::ParseOptions;
 

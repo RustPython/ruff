@@ -1,6 +1,6 @@
 ---
 source: crates/ruff_python_parser/tests/fixtures.rs
-input_file: crates/ruff_python_parser/resources/inline/err/t_string_unclosed_lbrace_in_format_spec.py
+input_file: crates/ruff_python_parser/resources/inline/err/f_string_expected_separator_after_conversion.py
 ---
 ## AST
 
@@ -8,57 +8,44 @@ input_file: crates/ruff_python_parser/resources/inline/err/t_string_unclosed_lbr
 Module(
     ModModule {
         node_index: NodeIndex(None),
-        range: 0..73,
+        range: 0..22,
         body: [
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 44..56,
-                    value: TString(
-                        ExprTString {
+                    range: 0..9,
+                    value: FString(
+                        ExprFString {
                             node_index: NodeIndex(None),
-                            range: 44..56,
-                            value: TStringValue {
+                            range: 0..9,
+                            value: FStringValue {
                                 inner: Single(
-                                    TString {
-                                        range: 44..56,
+                                    FString {
+                                        range: 0..9,
                                         node_index: NodeIndex(None),
                                         elements: [
-                                            Literal(
-                                                InterpolatedStringLiteralElement {
-                                                    range: 46..52,
-                                                    node_index: NodeIndex(None),
-                                                    value: "hello ",
-                                                },
-                                            ),
                                             Interpolation(
                                                 InterpolatedElement {
-                                                    range: 52..55,
+                                                    range: 2..6,
                                                     node_index: NodeIndex(None),
                                                     expression: Name(
                                                         ExprName {
                                                             node_index: NodeIndex(None),
-                                                            range: 53..54,
+                                                            range: 3..4,
                                                             id: Name("x"),
                                                             ctx: Load,
                                                         },
                                                     ),
                                                     debug_text: None,
-                                                    conversion: None,
-                                                    format_spec: Some(
-                                                        InterpolatedStringFormatSpec {
-                                                            range: 55..55,
-                                                            node_index: NodeIndex(None),
-                                                            elements: [],
-                                                        },
-                                                    ),
+                                                    conversion: Str,
+                                                    format_spec: None,
                                                     runtime_str: None,
                                                     runtime_interpolation_format_spec: None,
                                                     runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
-                                        flags: TStringFlags {
+                                        flags: FStringFlags {
                                             quote_style: Double,
                                             prefix: Regular,
                                             triple_quoted: false,
@@ -67,7 +54,7 @@ Module(
                                     },
                                 ),
                             },
-                            runtime_template_str: None,
+                            runtime_joined_str: None,
                             runtime_values: None,
                         },
                     ),
@@ -76,60 +63,59 @@ Module(
             Expr(
                 StmtExpr {
                     node_index: NodeIndex(None),
-                    range: 57..72,
-                    value: TString(
-                        ExprTString {
+                    range: 10..21,
+                    value: FString(
+                        ExprFString {
                             node_index: NodeIndex(None),
-                            range: 57..72,
-                            value: TStringValue {
+                            range: 10..21,
+                            value: FStringValue {
                                 inner: Single(
-                                    TString {
-                                        range: 57..72,
+                                    FString {
+                                        range: 10..21,
                                         node_index: NodeIndex(None),
                                         elements: [
-                                            Literal(
-                                                InterpolatedStringLiteralElement {
-                                                    range: 59..65,
-                                                    node_index: NodeIndex(None),
-                                                    value: "hello ",
-                                                },
-                                            ),
                                             Interpolation(
                                                 InterpolatedElement {
-                                                    range: 65..71,
+                                                    range: 12..16,
                                                     node_index: NodeIndex(None),
                                                     expression: Name(
                                                         ExprName {
                                                             node_index: NodeIndex(None),
-                                                            range: 66..67,
+                                                            range: 13..14,
                                                             id: Name("x"),
                                                             ctx: Load,
                                                         },
                                                     ),
                                                     debug_text: None,
-                                                    conversion: None,
-                                                    format_spec: Some(
-                                                        InterpolatedStringFormatSpec {
-                                                            range: 68..71,
+                                                    conversion: Repr,
+                                                    format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
+                                                },
+                                            ),
+                                            Interpolation(
+                                                InterpolatedElement {
+                                                    range: 16..19,
+                                                    node_index: NodeIndex(None),
+                                                    expression: Name(
+                                                        ExprName {
                                                             node_index: NodeIndex(None),
-                                                            elements: [
-                                                                Literal(
-                                                                    InterpolatedStringLiteralElement {
-                                                                        range: 68..71,
-                                                                        node_index: NodeIndex(None),
-                                                                        value: ".3f",
-                                                                    },
-                                                                ),
-                                                            ],
+                                                            range: 17..18,
+                                                            id: Name("y"),
+                                                            ctx: Load,
                                                         },
                                                     ),
+                                                    debug_text: None,
+                                                    conversion: None,
+                                                    format_spec: None,
                                                     runtime_str: None,
                                                     runtime_interpolation_format_spec: None,
                                                     runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
-                                        flags: TStringFlags {
+                                        flags: FStringFlags {
                                             quote_style: Double,
                                             prefix: Regular,
                                             triple_quoted: false,
@@ -138,7 +124,7 @@ Module(
                                     },
                                 ),
                             },
-                            runtime_template_str: None,
+                            runtime_joined_str: None,
                             runtime_values: None,
                         },
                     ),
@@ -152,15 +138,26 @@ Module(
 ## Errors
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"hello {x:"
-  |            ^ Syntax Error: t-string: expecting '}', or format specs
-3 | t"hello {x:.3f"
+1 | f"{x!s!}"
+  |       ^ Syntax Error: f-string: expecting ':' or '}'
+2 | f"{x!r{y}}"
   |
 
 
   |
-1 | # parse_options: {"target-version": "3.14"}
-2 | t"hello {x:"
-3 | t"hello {x:.3f"
-  |               ^ Syntax Error: t-string: expecting '}', or format specs
+1 | f"{x!s!}"
+  |        ^ Syntax Error: expected an element of or the end of the f-string
+2 | f"{x!r{y}}"
+  |
+
+
+  |
+1 | f"{x!s!}"
+2 | f"{x!r{y}}"
+  |       ^ Syntax Error: f-string: expecting ':' or '}'
+
+
+  |
+1 | f"{x!s!}"
+2 | f"{x!r{y}}"
+  |          ^ Syntax Error: expected an element of or the end of the f-string

@@ -127,7 +127,7 @@ Module(
   |
 5 | if call(f'''{x:.3f
 6 | '''
-  | ^^^ Syntax Error: f-string: expecting '}'
+  | ^^^ Syntax Error: f-string: expecting '}', or format specs
 7 |     pass
   |
 

@@ -275,6 +275,22 @@ Module(
 
   |
 1 | f"{"
+  |    ^ Syntax Error: f-string: expecting '}'
+2 | f"{foo!r"
+3 | f"{foo="
+  |
+
+
+  |
+1 | f"{"
+  |    ^ Syntax Error: f-string: expecting a valid expression after '{'
+2 | f"{foo!r"
+3 | f"{foo="
+  |
+
+
+  |
+1 | f"{"
   |    ^ Syntax Error: invalid syntax
 2 | f"{foo!r"
 3 | f"{foo="
@@ -304,9 +320,25 @@ Module(
 2 | f"{foo!r"
 3 | f"{foo="
 4 | f"{"
+  |    ^ Syntax Error: f-string: expecting a valid expression after '{'
+5 | f"""{"""
+  |
+
+
+  |
+2 | f"{foo!r"
+3 | f"{foo="
+4 | f"{"
   |    ^ Syntax Error: invalid syntax
 5 | f"""{"""
   |
+
+
+  |
+3 | f"{foo="
+4 | f"{"
+5 | f"""{"""
+  |      ^^^ Syntax Error: f-string: expecting a valid expression after '{'
 
 
   |

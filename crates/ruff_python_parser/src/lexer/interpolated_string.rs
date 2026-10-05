@@ -98,6 +98,12 @@ impl InterpolatedStringContext {
         self.open_parentheses_count(current_nesting) > self.format_spec_depth
     }
 
+    /// Returns `true` if the innermost open bracket is the brace that opens the current
+    /// expression or interpolation.
+    pub(crate) const fn is_at_interpolation_brace(&self, current_nesting: u32) -> bool {
+        self.open_parentheses_count(current_nesting) == self.format_spec_depth + 1
+    }
+
     /// Returns `true` if the lexer is in a f-string format spec i.e., after a colon.
     pub(crate) const fn is_in_format_spec(&self, current_nesting: u32) -> bool {
         self.format_spec_depth > 0 && !self.is_in_interpolation(current_nesting)
