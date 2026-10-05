@@ -656,6 +656,22 @@ impl<'src> Parser<'src> {
         });
         let names: Vec<_> = self.alias_scratch.take(names_snapshot);
 
+        if self.at(TokenKind::From)
+            && !names.is_empty()
+            && names.iter().all(|alias| alias.asname.is_none())
+            && let Some(end) = self.misplaced_from_error_end()
+        {
+            // test_err import_stmt_from_after_names
+            // import a from b
+            // import a.b, c from d.e as f
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "Did you mean to use 'from ... import ...' instead?".to_string(),
+                ),
+                TextRange::new(start, end),
+            );
+        }
+
         if names.is_empty() {
             // test_err import_stmt_empty
             // import
@@ -668,6 +684,26 @@ impl<'src> Parser<'src> {
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
         }
+    }
+
+    /// Returns where the error for `from` after the names of an `import` statement ends, if the
+    /// `from` is followed by a dotted name. The error ends one character before the end of the
+    /// token after the dotted name.
+    fn misplaced_from_error_end(&mut self) -> Option<TextSize> {
+        let checkpoint = self.checkpoint();
+        self.bump(TokenKind::From);
+        let mut found_name = false;
+        while self.at_identifier_or_soft_keyword() {
+            found_name = true;
+            self.bump_any();
+            if !self.eat(TokenKind::Dot) {
+                break;
+            }
+        }
+        let next = self.current_token_range();
+        let end = found_name.then(|| next.start().max(next.end() - TextSize::from(1)));
+        self.rewind(checkpoint);
+        end
     }
 
     /// Parses a `from` import statement.
@@ -1570,6 +1606,20 @@ impl<'src> Parser<'src> {
         if self.at(TokenKind::Else) {
             let clause = self.parse_elif_or_else_clause(ElifOrElse::Else);
             self.elif_else_scratch.push(clause);
+
+            if self.at(TokenKind::Elif) {
+                // test_err if_stmt_elif_after_else
+                // if x:
+                //     pass
+                // else:
+                //     pass
+                // elif y:
+                //     pass
+                self.add_error(
+                    ParseErrorType::OtherError("'elif' block follows an 'else' block".to_string()),
+                    self.current_token_range(),
+                );
+            }
         }
 
         ast::StmtIf {
@@ -1679,7 +1729,12 @@ impl<'src> Parser<'src> {
             if is_star.is_none() {
                 is_star = Some(kind.is_star());
             } else if is_star != Some(kind.is_star()) {
-                mixed_except_ranges.push(handler.range());
+                // The error covers the `except` keyword and the star.
+                let except_end = match kind {
+                    ExceptClauseKind::Star(star_range) => star_range.end(),
+                    ExceptClauseKind::Normal => handler.start() + TextSize::of("except"),
+                };
+                mixed_except_ranges.push(TextRange::new(handler.start(), except_end));
             }
             if handlers.is_empty() {
                 handlers.reserve_exact(1);

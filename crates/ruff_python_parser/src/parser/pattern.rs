@@ -214,7 +214,14 @@ impl Parser<'_> {
             let mapping_item_start = parser.node_start();
 
             if parser.eat(TokenKind::DoubleStar) {
-                let identifier = parser.parse_match_pattern_target();
+                // A `_` rest target is not a capture target.
+                let identifier = parser.parse_identifier();
+                if identifier.is_valid() && identifier.id == "_" {
+                    parser.add_error(
+                        ParseErrorType::OtherError("invalid syntax".to_string()),
+                        &identifier,
+                    );
+                }
                 if rest.is_some() {
                     parser.add_error(
                         ParseErrorType::OtherError(
