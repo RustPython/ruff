@@ -3631,7 +3631,13 @@ impl<'src> Parser<'src> {
                             AllowStarAnnotation::Yes,
                         );
 
-                        if parser.at(TokenKind::Equal) {
+                        // A starred annotation is not an annotation the rule accepts.
+                        if parser.at(TokenKind::Equal)
+                            && !param
+                                .annotation
+                                .as_deref()
+                                .is_some_and(ast::Expr::is_starred_expr)
+                        {
                             // test_err params_var_positional_with_default
                             // def foo(a, *args=(1, 2)): ...
                             parser.add_error(
