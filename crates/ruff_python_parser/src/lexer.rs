@@ -780,7 +780,8 @@ impl<'src> Lexer<'src> {
             ('f', 't'),
         ];
 
-        let mut seen = Vec::with_capacity(PREFIXES.len());
+        let bit = |prefix: char| PREFIXES.iter().position(|&c| c == prefix).map(|i| 1u8 << i);
+        let mut seen = 0u8;
         let mut len = TextSize::new(0);
         let mut chars = std::iter::once(first).chain(self.cursor.rest().chars());
         loop {
@@ -788,16 +789,17 @@ impl<'src> Lexer<'src> {
             if is_quote(c) {
                 break;
             }
-            let prefix = c.to_ascii_lowercase();
-            if !PREFIXES.contains(&prefix) || seen.contains(&prefix) {
+            let prefix = bit(c.to_ascii_lowercase())?;
+            if seen & prefix != 0 {
                 return None;
             }
-            seen.push(prefix);
+            seen |= prefix;
             len += c.text_len();
         }
+        let has = |prefix: char| bit(prefix).is_some_and(|prefix| seen & prefix != 0);
         let (first, second) = INCOMPATIBLE
             .into_iter()
-            .find(|(first, second)| seen.contains(first) && seen.contains(second))?;
+            .find(|(first, second)| has(*first) && has(*second))?;
         Some(LexicalError::new(
             LexicalErrorType::IncompatibleStringPrefixes { first, second },
             TextRange::at(self.token_range().start(), len),
