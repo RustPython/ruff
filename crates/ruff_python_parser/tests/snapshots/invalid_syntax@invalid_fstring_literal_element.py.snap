@@ -41,6 +41,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -76,11 +78,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -88,7 +93,7 @@ Module(
 
   |
 1 | f'hello \N{INVALID} world'
-  |            ^^^^^^^ Syntax Error: Got unexpected unicode
+  |                          ^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 6-16: unknown Unicode character name
 2 | f"""hello \N{INVALID} world"""
   |
 
@@ -96,4 +101,4 @@ Module(
   |
 1 | f'hello \N{INVALID} world'
 2 | f"""hello \N{INVALID} world"""
-  |              ^^^^^^^ Syntax Error: Got unexpected unicode
+  |                            ^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 6-16: unknown Unicode character name

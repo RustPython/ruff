@@ -16,6 +16,9 @@ impl FormatNodeRule<PatternMatchClass> for FormatPatternMatchClass {
             node_index: _,
             cls,
             arguments,
+            runtime_patterns: _,
+            runtime_kwd_attrs: _,
+            runtime_kwd_patterns: _,
         } = item;
 
         let comments = f.context().comments().clone();

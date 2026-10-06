@@ -36,6 +36,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             While(
@@ -65,6 +67,8 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             Assign(
@@ -90,6 +94,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             FunctionDef(
@@ -112,6 +119,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -128,6 +136,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             Match(
@@ -169,11 +181,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -181,7 +195,7 @@ Module(
 
   |
 1 | async class Foo: ...
-  |       ^^^^^ Syntax Error: Expected `def`, `with` or `for` to follow `async`, found `class`
+  |       ^^^^^ Syntax Error: expected `def`, `with` or `for` to follow `async`, found `class`
 2 | async while test: ...
 3 | async x = 1
   |
@@ -190,7 +204,7 @@ Module(
   |
 1 | async class Foo: ...
 2 | async while test: ...
-  |       ^^^^^ Syntax Error: Expected `def`, `with` or `for` to follow `async`, found `while`
+  |       ^^^^^ Syntax Error: expected `def`, `with` or `for` to follow `async`, found `while`
 3 | async x = 1
 4 | async async def foo(): ...
   |
@@ -200,7 +214,7 @@ Module(
 1 | async class Foo: ...
 2 | async while test: ...
 3 | async x = 1
-  |       ^ Syntax Error: Expected `def`, `with` or `for` to follow `async`, found identifier
+  |       ^ Syntax Error: expected `def`, `with` or `for` to follow `async`, found identifier
 4 | async async def foo(): ...
 5 | async match test:
   |
@@ -210,7 +224,7 @@ Module(
 2 | async while test: ...
 3 | async x = 1
 4 | async async def foo(): ...
-  |       ^^^^^ Syntax Error: Expected `def`, `with` or `for` to follow `async`, found `async`
+  |       ^^^^^ Syntax Error: expected `def`, `with` or `for` to follow `async`, found `async`
 5 | async match test:
 6 |     case _: ...
   |
@@ -220,6 +234,6 @@ Module(
 3 | async x = 1
 4 | async async def foo(): ...
 5 | async match test:
-  |       ^^^^^ Syntax Error: Expected `def`, `with` or `for` to follow `async`, found `match`
+  |       ^^^^^ Syntax Error: expected `def`, `with` or `for` to follow `async`, found `match`
 6 |     case _: ...
   |

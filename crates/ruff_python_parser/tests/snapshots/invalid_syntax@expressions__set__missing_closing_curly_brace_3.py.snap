@@ -38,6 +38,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -62,6 +63,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -72,9 +74,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -84,7 +91,17 @@ Module(
 2 | # token starts a statement.
 3 |
 4 | {1, 2
-  |      ^ Syntax Error: Expected `}`, found newline
+  | ^ Syntax Error: '{' was never closed
+5 |
+6 | def foo():
+  |
+
+
+  |
+2 | # token starts a statement.
+3 |
+4 | {1, 2
+  |      ^ Syntax Error: invalid syntax
 5 |
 6 | def foo():
 7 |     pass

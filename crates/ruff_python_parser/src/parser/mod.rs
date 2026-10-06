@@ -16,7 +16,10 @@ use rustc_hash::FxBuildHasher;
 use thin_vec::ThinVec;
 use unicode_normalization::UnicodeNormalization;
 
-use crate::error::UnsupportedSyntaxError;
+use crate::error::{
+    InterpolatedStringErrorType, LexicalError, LexicalErrorType, UnsupportedSyntaxError,
+};
+use crate::lexer::Lexer;
 use crate::parser::expression::ExpressionContext;
 use crate::parser::progress::{ParserProgress, TokenId};
 use crate::parser::scratch_buffer::ScratchBuffer;
@@ -98,6 +101,19 @@ pub(crate) struct Parser<'src> {
     /// The start offset in the source code from which to start parsing at.
     start_offset: TextSize,
 
+    /// The start of the token at which the parser first recovered from an unclosed bracket, if
+    /// that happened before any error was found. The error itself is reported at the end of the
+    /// bracket's logical line.
+    first_unclosed_bracket_recovery: Option<TextSize>,
+
+    /// The first escape sequence error in a literal part of the f-string or t-string being
+    /// parsed. It is reported at the closing quote once the string ends.
+    interpolated_string_escape_error: Option<LexicalErrorType>,
+
+    /// The kind of the innermost f-string or t-string whose replacement field expression is
+    /// being parsed, and the bracket level inside its brace, where a `:` starts the format spec.
+    replacement_field: Option<(InterpolatedStringKind, usize)>,
+
     /// Number of active recursive statement, expression, and pattern parsing operations.
     recursion_depth: usize,
 
@@ -118,6 +134,15 @@ pub(crate) struct Parser<'src> {
 
     /// Reusable, nesting-safe scratch storage for `elif` and `else` clauses.
     elif_else_scratch: ScratchBuffer<ElifElseClause>,
+}
+
+/// A bracket that encloses part of an expression.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Bracket {
+    /// The arguments of a call or the slices of a subscript.
+    CallOrSubscript,
+    /// A parenthesized expression, list, set or dictionary.
+    Display,
 }
 
 impl<'src> Parser<'src> {
@@ -145,6 +170,9 @@ impl<'src> Parser<'src> {
             recovery_context: RecoveryContext::empty(),
             prev_token_end: TextSize::new(0),
             start_offset,
+            first_unclosed_bracket_recovery: None,
+            interpolated_string_escape_error: None,
+            replacement_field: None,
             recursion_depth: 0,
             current_token_id: TokenId::default(),
             expr_scratch: ScratchBuffer::with_capacity(16),
@@ -243,6 +271,7 @@ impl<'src> Parser<'src> {
             body,
             range: TextRange::new(self.start_offset, self.current_token_range().end()),
             node_index: AtomicNodeIndex::NONE,
+            runtime_body: None,
         }
     }
 
@@ -253,13 +282,20 @@ impl<'src> Parser<'src> {
             "Parser should be at the end of the file."
         );
         // TODO consider re-integrating lexical error handling into the parser?
-        let parse_errors = self.errors;
+        let mut parse_errors = self.errors;
         let (tokens, lex_errors) = self.tokens.finish();
 
         // Fast path for when there are no lex errors.
         // There's no fast path for when there are no parse errors because a lex error
         // always results in a parse error.
         if lex_errors.is_empty() {
+            prioritize_tokenizer_error(
+                &mut parse_errors,
+                self.source,
+                self.options.mode,
+                self.start_offset,
+                self.first_unclosed_bracket_recovery,
+            );
             return Parsed {
                 syntax,
                 tokens: Tokens::new(tokens),
@@ -280,6 +316,17 @@ impl<'src> Parser<'src> {
                 .cmp(&lex_error.location().start())
             {
                 Ordering::Less => merged.push(parse_errors.next().unwrap()),
+                // A replacement field error at a token the tokenizer accepts replaces the lex
+                // error of that token.
+                Ordering::Equal
+                    if matches!(
+                        parse_error.error,
+                        ParseErrorType::FStringError(_) | ParseErrorType::TStringError(_)
+                    ) && !lex_error.error().is_tokenizer_error() =>
+                {
+                    lex_errors.next().unwrap();
+                    merged.push(parse_errors.next().unwrap());
+                }
                 Ordering::Equal => {
                     // Skip the parse error if we already have a lex error at the same location..
                     parse_errors.next().unwrap();
@@ -291,6 +338,13 @@ impl<'src> Parser<'src> {
 
         merged.extend(parse_errors);
         merged.extend(lex_errors.map(ParseError::from));
+        prioritize_tokenizer_error(
+            &mut merged,
+            self.source,
+            self.options.mode,
+            self.start_offset,
+            self.first_unclosed_bracket_recovery,
+        );
 
         Parsed {
             syntax,
@@ -303,6 +357,140 @@ impl<'src> Parser<'src> {
     /// Returns the start position for a node that starts at the current token.
     fn node_start(&self) -> TextSize {
         self.current_token_range().start()
+    }
+
+    /// Returns the 1-based line number of `offset` in the source.
+    ///
+    /// `\n`, `\r\n`, and a lone `\r` each count as one line break.
+    pub(super) fn line_number(&self, offset: TextSize) -> u32 {
+        line_number(self.source, offset)
+    }
+
+    /// Returns `true` if the already parsed expression at `range` is enclosed in parentheses of
+    /// its own.
+    fn is_parenthesized(&self, range: TextRange) -> bool {
+        self.enclosing_parentheses(range).is_some()
+    }
+
+    /// Returns the end of the already parsed expression at `range`, including the parentheses
+    /// that enclose only it.
+    fn parenthesized_end(&self, mut range: TextRange) -> TextSize {
+        while let Some(parenthesized) = self.enclosing_parentheses(range) {
+            range = parenthesized;
+        }
+        range.end()
+    }
+
+    /// Returns the range from the `(` directly before `range` to the `)` directly after it, if
+    /// both exist.
+    fn enclosing_parentheses(&self, range: TextRange) -> Option<TextRange> {
+        let tokens = self.tokens.bumped();
+        let before = tokens[..tokens.partition_point(|token| token.start() < range.start())]
+            .iter()
+            .rev()
+            .find(|token| !token.kind().is_trivia())
+            .filter(|token| token.kind() == TokenKind::Lpar)?;
+        let (after_kind, after_range) = self.token_after(range.end());
+        (after_kind == TokenKind::Rpar).then(|| TextRange::new(before.start(), after_range.end()))
+    }
+
+    /// Returns the kind and range of the last non-trivia token that starts before `offset`.
+    fn token_before(&self, offset: TextSize) -> Option<(TokenKind, TextRange)> {
+        let tokens = self.tokens.bumped();
+        tokens[..tokens.partition_point(|token| token.start() < offset)]
+            .iter()
+            .rev()
+            .find(|token| !token.kind().is_trivia())
+            .map(|token| (token.kind(), token.range()))
+    }
+
+    /// Returns how many brackets enclose the tokens bumped so far.
+    fn bracket_level(&self) -> usize {
+        let mut level = 0usize;
+        for token in self.tokens.bumped() {
+            match token.kind() {
+                TokenKind::Lpar | TokenKind::Lsqb | TokenKind::Lbrace => level += 1,
+                TokenKind::Rpar | TokenKind::Rsqb | TokenKind::Rbrace => {
+                    level = level.saturating_sub(1);
+                }
+                _ => {}
+            }
+        }
+        level
+    }
+
+    /// Returns the innermost bracket enclosing the tokens bumped so far, or `None` if there is
+    /// none or it starts an f-string or t-string replacement field.
+    fn innermost_bracket(&self) -> Option<Bracket> {
+        #[derive(PartialEq)]
+        enum Opener {
+            Bracket(Bracket),
+            InterpolatedString,
+            ReplacementField,
+        }
+        let mut openers = Vec::new();
+        let mut previous = TokenKind::Unknown;
+        for token in self.tokens.bumped() {
+            if token.kind().is_trivia() {
+                continue;
+            }
+            match token.kind() {
+                TokenKind::FStringStart | TokenKind::TStringStart => {
+                    openers.push(Opener::InterpolatedString);
+                }
+                TokenKind::Lbrace if openers.last() == Some(&Opener::InterpolatedString) => {
+                    openers.push(Opener::ReplacementField);
+                }
+                TokenKind::Lpar | TokenKind::Lsqb
+                    if matches!(
+                        previous,
+                        TokenKind::Identifier
+                            | TokenKind::String
+                            | TokenKind::FStringEnd
+                            | TokenKind::TStringEnd
+                            | TokenKind::Rpar
+                            | TokenKind::Rsqb
+                            | TokenKind::Rbrace
+                    ) || previous.is_soft_keyword() =>
+                {
+                    openers.push(Opener::Bracket(Bracket::CallOrSubscript));
+                }
+                TokenKind::Lpar | TokenKind::Lsqb | TokenKind::Lbrace => {
+                    openers.push(Opener::Bracket(Bracket::Display));
+                }
+                TokenKind::Rpar
+                | TokenKind::Rsqb
+                | TokenKind::Rbrace
+                | TokenKind::FStringEnd
+                | TokenKind::TStringEnd => {
+                    openers.pop();
+                }
+                _ => {}
+            }
+            previous = token.kind();
+        }
+        match openers.pop() {
+            Some(Opener::Bracket(bracket)) => Some(bracket),
+            _ => None,
+        }
+    }
+
+    /// Returns the kind of the first non-trivia token that starts at or after `offset`.
+    fn token_kind_after(&self, offset: TextSize) -> TokenKind {
+        self.token_after(offset).0
+    }
+
+    /// Returns the kind and range of the first non-trivia token that starts at or after
+    /// `offset`.
+    fn token_after(&self, offset: TextSize) -> (TokenKind, TextRange) {
+        let tokens = self.tokens.bumped();
+        tokens[tokens.partition_point(|token| token.start() < offset)..]
+            .iter()
+            .find(|token| !token.kind().is_trivia())
+            .map_or_else(
+                || (self.current_token_kind(), self.current_token_range()),
+                |token| (token.kind(), token.range()),
+            )
     }
 
     fn node_range(&self, start: TextSize) -> TextRange {
@@ -655,6 +843,15 @@ impl<'src> Parser<'src> {
         false
     }
 
+    /// Re-lexes the current token in the context of a logical line to recover from an unclosed
+    /// bracket.
+    fn re_lex_logical_token(&mut self) {
+        if self.errors.is_empty() && self.first_unclosed_bracket_recovery.is_none() {
+            self.first_unclosed_bracket_recovery = Some(self.current_token_range().start());
+        }
+        self.tokens.re_lex_logical_token();
+    }
+
     fn add_error<T>(&mut self, error: ParseErrorType, ranged: T)
     where
         T: Ranged,
@@ -667,10 +864,31 @@ impl<'src> Parser<'src> {
 
             if !is_same_location {
                 errors.push(ParseError {
+                    location: reported_range(&error, range),
                     error,
-                    location: range,
                 });
             }
+        }
+
+        fn reported_range(error: &ParseErrorType, range: TextRange) -> TextRange {
+            match error {
+                // A misplaced starred expression or star pattern is reported at its `*`.
+                ParseErrorType::InvalidStarredExpressionUsage
+                | ParseErrorType::InvalidStarPatternUsage => {
+                    TextRange::at(range.start(), TextSize::new(1))
+                }
+                // An unexpected indent is reported at the last character of the indentation.
+                ParseErrorType::UnexpectedIndentation if !range.is_empty() => {
+                    TextRange::at(range.end() - TextSize::new(1), TextSize::new(1))
+                }
+                _ => range,
+            }
+        }
+
+        // The lexer already reported an error for the current token, which comes first. A
+        // string literal that fails to decode was read before it.
+        if self.at(TokenKind::Unknown) && !matches!(error, ParseErrorType::Lexical(_)) {
+            return;
         }
 
         inner(&mut self.errors, error, ranged.range());
@@ -750,7 +968,7 @@ impl<'src> Parser<'src> {
                 // of an enclosing list, then we try to re-lex in the context of a logical line and
                 // break out of list parsing.
                 if self.is_enclosing_list_element_or_terminator() {
-                    self.tokens.re_lex_logical_token();
+                    self.re_lex_logical_token();
                     break;
                 }
 
@@ -871,7 +1089,7 @@ impl<'src> Parser<'src> {
             // enclosing list, then we try to re-lex in the context of a logical line and break out
             // of list parsing.
             if self.is_enclosing_list_element_or_terminator() {
-                self.tokens.re_lex_logical_token();
+                self.re_lex_logical_token();
                 break;
             }
 
@@ -916,7 +1134,9 @@ impl<'src> Parser<'src> {
         if let Some(trailing_comma_range) = trailing_comma_range {
             if !recovery_context_kind.allow_trailing_comma() {
                 self.add_error(
-                    ParseErrorType::OtherError("Trailing comma not allowed".to_string()),
+                    ParseErrorType::OtherError(
+                        "trailing comma not allowed without surrounding parentheses".to_string(),
+                    ),
                     trailing_comma_range,
                 );
             }
@@ -1344,7 +1564,13 @@ impl RecoveryContextKind {
                 if parenthesized.is_yes() {
                     p.at(TokenKind::Rpar).then_some(ListTerminatorKind::Regular)
                 } else {
-                    p.at_sequence_end().then_some(ListTerminatorKind::Regular)
+                    // test_err aug_assign_stmt_unparenthesized_tuple_target
+                    // a, b += 1
+                    (p.at_sequence_end()
+                        || p.current_token_kind()
+                            .as_augmented_assign_operator()
+                            .is_some())
+                    .then_some(ListTerminatorKind::Regular)
                 }
             }
             RecoveryContextKind::SequenceMatchPattern(parentheses) => match parentheses {
@@ -1474,9 +1700,10 @@ impl RecoveryContextKind {
             RecoveryContextKind::DeleteTargets => p.at_expr(),
             RecoveryContextKind::Identifiers => p.at_identifier_or_soft_keyword(),
             RecoveryContextKind::Parameters(_) => {
+                // A `(` is an element only to report parenthesized parameters.
                 matches!(
                     p.current_token_kind(),
-                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Slash
+                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Slash | TokenKind::Lpar
                 ) || p.at_identifier_or_soft_keyword()
             }
             RecoveryContextKind::WithItems(_) => p.at_expr(),
@@ -1496,91 +1723,37 @@ impl RecoveryContextKind {
                 if p.at(TokenKind::Indent) {
                     ParseErrorType::UnexpectedIndentation
                 } else {
-                    ParseErrorType::OtherError("Expected a statement".to_string())
+                    ParseErrorType::OtherError("invalid syntax".to_string())
                 }
             }
-            RecoveryContextKind::Elif => ParseErrorType::OtherError(
-                "Expected an `elif` or `else` clause, or the end of the `if` statement."
-                    .to_string(),
-            ),
-            RecoveryContextKind::Except => ParseErrorType::OtherError(
-                "Expected an `except` or `finally` clause or the end of the `try` statement."
-                    .to_string(),
-            ),
-            RecoveryContextKind::AssignmentTargets => {
-                if p.current_token_kind().is_keyword() {
-                    ParseErrorType::OtherError(
-                        "The keyword is not allowed as a variable declaration name".to_string(),
-                    )
-                } else {
-                    ParseErrorType::OtherError("Expected an assignment target".to_string())
-                }
+            RecoveryContextKind::Elif
+            | RecoveryContextKind::Except
+            | RecoveryContextKind::AssignmentTargets
+            | RecoveryContextKind::TypeParams
+            | RecoveryContextKind::ImportFromAsNames(_)
+            | RecoveryContextKind::ImportNames
+            | RecoveryContextKind::Slices
+            | RecoveryContextKind::ListElements
+            | RecoveryContextKind::SetElements
+            | RecoveryContextKind::DictElements
+            | RecoveryContextKind::TupleElements(_)
+            | RecoveryContextKind::SequenceMatchPattern(_)
+            | RecoveryContextKind::MatchPatternMapping
+            | RecoveryContextKind::MatchPatternClassArguments
+            | RecoveryContextKind::Arguments
+            | RecoveryContextKind::DeleteTargets
+            | RecoveryContextKind::Identifiers
+            | RecoveryContextKind::Parameters(_)
+            | RecoveryContextKind::WithItems(_) => {
+                ParseErrorType::OtherError("invalid syntax".to_string())
             }
-            RecoveryContextKind::TypeParams => ParseErrorType::OtherError(
-                "Expected a type parameter or the end of the type parameter list".to_string(),
-            ),
-            RecoveryContextKind::ImportFromAsNames(parenthesized) => {
-                if parenthesized.is_yes() {
-                    ParseErrorType::OtherError("Expected an import name or a ')'".to_string())
-                } else {
-                    ParseErrorType::OtherError("Expected an import name".to_string())
-                }
-            }
-            RecoveryContextKind::ImportNames => {
-                ParseErrorType::OtherError("Expected an import name".to_string())
-            }
-            RecoveryContextKind::Slices => ParseErrorType::OtherError(
-                "Expected an expression or the end of the slice list".to_string(),
-            ),
-            RecoveryContextKind::ListElements => {
-                ParseErrorType::OtherError("Expected an expression or a ']'".to_string())
-            }
-            RecoveryContextKind::SetElements | RecoveryContextKind::DictElements => {
-                ParseErrorType::OtherError("Expected an expression or a '}'".to_string())
-            }
-            RecoveryContextKind::TupleElements(parenthesized) => {
-                if parenthesized.is_yes() {
-                    ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-                } else {
-                    ParseErrorType::OtherError("Expected an expression".to_string())
-                }
-            }
-            RecoveryContextKind::SequenceMatchPattern(_) => ParseErrorType::OtherError(
-                "Expected a pattern or the end of the sequence pattern".to_string(),
-            ),
-            RecoveryContextKind::MatchPatternMapping => ParseErrorType::OtherError(
-                "Expected a mapping pattern or the end of the mapping pattern".to_string(),
-            ),
-            RecoveryContextKind::MatchPatternClassArguments => {
-                ParseErrorType::OtherError("Expected a pattern or a ')'".to_string())
-            }
-            RecoveryContextKind::Arguments => {
-                ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-            }
-            RecoveryContextKind::DeleteTargets => {
-                ParseErrorType::OtherError("Expected a delete target".to_string())
-            }
-            RecoveryContextKind::Identifiers => {
-                ParseErrorType::OtherError("Expected an identifier".to_string())
-            }
-            RecoveryContextKind::Parameters(_) => ParseErrorType::OtherError(
-                "Expected a parameter or the end of the parameter list".to_string(),
-            ),
-            RecoveryContextKind::WithItems(with_item_kind) => match with_item_kind {
-                WithItemKind::Parenthesized => {
-                    ParseErrorType::OtherError("Expected an expression or a ')'".to_string())
-                }
-                _ => ParseErrorType::OtherError(
-                    "Expected an expression or the end of the with item list".to_string(),
-                ),
-            },
             RecoveryContextKind::InterpolatedStringElements(kind) => match kind {
                 InterpolatedStringElementsKind::Regular(string_kind) => ParseErrorType::OtherError(
-                    format!("Expected an element of or the end of the {string_kind}"),
+                    format!("expected an element of or the end of the {string_kind}"),
                 ),
                 InterpolatedStringElementsKind::FormatSpec(string_kind) => {
                     ParseErrorType::OtherError(format!(
-                        "Expected an {string_kind} element or a '}}'"
+                        "expected an {string_kind} element or a '}}'"
                     ))
                 }
             },
@@ -1785,4 +1958,143 @@ impl RecoveryContext {
                 .expect("Expected context to be of a single kind.")
         })
     }
+}
+
+/// Returns the 1-based line number of `offset` in `source`.
+///
+/// `\n`, `\r\n`, and a lone `\r` each count as one line break.
+fn line_number(source: &str, offset: TextSize) -> u32 {
+    let text = &source[..offset.to_usize()];
+    let newlines =
+        text.matches('\n').count() + text.matches('\r').count() - text.matches("\r\n").count();
+    u32::try_from(newlines + 1).unwrap()
+}
+
+/// Moves the error that stops parsing first to the front of `errors`.
+///
+/// The source is tokenized again without the parser's error recovery, and its first tokenizer
+/// error is compared with the first error found by the parser, other than a tokenizer error. A
+/// tokenizer error detected before that error stops parsing there. One detected after it is still
+/// reported, because the rest of the source is tokenized once parsing failed, except:
+/// - an error detected inside an f-string or t-string keeps the parser's error;
+/// - an unexpected indent is reported without tokenizing the rest of the source;
+/// - a bracket that is never closed wins over an error on a later line. On the same line, it wins
+///   over an error at or after it when parsing reads ahead from the error to the end of the
+///   source, which it does unless a `:`, a `;` or an unknown token follows. An error found by
+///   recovering from an unclosed bracket is placed at the token that started the recovery,
+///   `unclosed_bracket_recovery`.
+fn prioritize_tokenizer_error(
+    errors: &mut Vec<ParseError>,
+    source: &str,
+    mode: Mode,
+    start_offset: TextSize,
+    unclosed_bracket_recovery: Option<TextSize>,
+) {
+    // The lexer reports every tokenizer error, so a source without errors has none to find.
+    if errors.is_empty() {
+        return;
+    }
+    let is_tokenizer_error = |error: &ParseError| matches!(&error.error, ParseErrorType::Lexical(lexical) if lexical.is_tokenizer_error());
+    let first = errors
+        .iter()
+        .find(|error| !is_tokenizer_error(error))
+        .cloned();
+
+    let mut lexer = Lexer::new(source, mode, start_offset);
+    // The starts of the tokens at which parsing stops without reading ahead.
+    let mut stops = Vec::new();
+    let (tokenizer_error, in_interpolated_string, detected) = loop {
+        let in_interpolated_string = lexer.in_interpolated_string();
+        let previous_errors = lexer.errors().len();
+        let kind = lexer.next_token();
+        if let Some(error) = lexer.errors()[previous_errors..]
+            .iter()
+            .find(|error| error.error().is_tokenizer_error())
+        {
+            // A missing closing brace or a bracket that closes a replacement field is found at
+            // the token that shows it.
+            let detected = match error.error() {
+                LexicalErrorType::FStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnmatchedBracket(_),
+                )
+                | LexicalErrorType::TStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnmatchedBracket(_),
+                ) => error.location().start(),
+                _ => lexer.offset(),
+            };
+            break (error.clone(), in_interpolated_string, detected);
+        }
+        if matches!(
+            kind,
+            TokenKind::Colon | TokenKind::Semi | TokenKind::Unknown
+        ) {
+            stops.push(lexer.current_range().start());
+        }
+        if kind == TokenKind::EndOfFile {
+            return;
+        }
+    };
+
+    let Some(first) = first else {
+        move_to_front(errors, ParseError::from(tokenizer_error));
+        return;
+    };
+    let first_start = first.location.start();
+    let error_start = match tokenizer_error.error() {
+        LexicalErrorType::UnclosedBracket { .. } => {
+            unclosed_bracket_recovery.map_or(first_start, |start| start.max(first_start))
+        }
+        _ => first_start,
+    };
+    // An escape sequence error is found when its string is parsed, before the end of the
+    // source shows an unclosed bracket.
+    let escape_error = matches!(
+        first.error,
+        ParseErrorType::Lexical(
+            LexicalErrorType::UnicodeEscapeError { .. } | LexicalErrorType::BytesEscapeError { .. }
+        )
+    );
+    let wins = detected <= first_start
+        || (!in_interpolated_string
+            && !escape_error
+            && match tokenizer_error.error() {
+                LexicalErrorType::UnclosedBracket { .. } => {
+                    let bracket_start = tokenizer_error.location().start();
+                    bracket_start <= error_start
+                        && (line_number(source, bracket_start) < line_number(source, error_start)
+                            || stops.iter().all(|stop| *stop < first_start))
+                }
+                _ => !matches!(first.error, ParseErrorType::UnexpectedIndentation),
+            });
+    if !wins {
+        move_to_front(errors, first);
+        return;
+    }
+    // A bracket reported in place of an error before the end of the source can't be closed by
+    // more input.
+    let front = match *tokenizer_error.error() {
+        LexicalErrorType::UnclosedBracket {
+            opening,
+            incomplete: true,
+        } if error_start.to_usize() < source.trim_end().len() => {
+            errors.retain(|error| *error != ParseError::from(tokenizer_error.clone()));
+            LexicalError::new(
+                LexicalErrorType::UnclosedBracket {
+                    opening,
+                    incomplete: false,
+                },
+                tokenizer_error.location(),
+            )
+        }
+        _ => tokenizer_error,
+    };
+    move_to_front(errors, ParseError::from(front));
+}
+
+/// Moves `error` to the front of `errors`, removing an equal error elsewhere.
+fn move_to_front(errors: &mut Vec<ParseError>, error: ParseError) {
+    errors.retain(|other| *other != error);
+    errors.insert(0, error);
 }

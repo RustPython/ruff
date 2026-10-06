@@ -139,6 +139,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -146,7 +147,7 @@ Module(
 
   |
 1 | type x = *y
-  |          ^^ Syntax Error: Starred expression cannot be used here
+  |          ^ Syntax Error: invalid syntax
 2 | type x = yield y
 3 | type x = yield from y
   |
@@ -155,7 +156,7 @@ Module(
   |
 1 | type x = *y
 2 | type x = yield y
-  |          ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |          ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | type x = yield from y
 4 | type x = x := 1
   |
@@ -165,7 +166,7 @@ Module(
 1 | type x = *y
 2 | type x = yield y
 3 | type x = yield from y
-  |          ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |          ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 4 | type x = x := 1
   |
 
@@ -174,7 +175,7 @@ Module(
 2 | type x = yield y
 3 | type x = yield from y
 4 | type x = x := 1
-  |            ^^ Syntax Error: Expected a statement
+  |            ^^ Syntax Error: invalid syntax
 
 
 ## Semantic Syntax Errors

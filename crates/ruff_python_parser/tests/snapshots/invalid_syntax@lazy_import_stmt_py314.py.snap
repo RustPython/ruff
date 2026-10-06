@@ -54,9 +54,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: true,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -65,7 +67,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | lazy import foo
-  | ^^^^ Syntax Error: Cannot use `lazy` import statement on Python 3.14 (syntax was added in Python 3.15)
+  | ^^^^ Syntax Error: cannot use `lazy` import statement on Python 3.14 (syntax was added in Python 3.15)
 3 | lazy from bar import baz
   |
 
@@ -74,4 +76,4 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | lazy import foo
 3 | lazy from bar import baz
-  | ^^^^ Syntax Error: Cannot use `lazy` import statement on Python 3.14 (syntax was added in Python 3.15)
+  | ^^^^ Syntax Error: cannot use `lazy` import statement on Python 3.14 (syntax was added in Python 3.15)

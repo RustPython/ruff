@@ -237,6 +237,7 @@ fn clean_params_dictionary(right: &Expr, locator: &Locator, stylist: &Stylist) -
         items,
         range: _,
         node_index: _,
+        runtime_values: _,
     }) = &right
     {
         let mut arguments: Vec<String> = vec![];

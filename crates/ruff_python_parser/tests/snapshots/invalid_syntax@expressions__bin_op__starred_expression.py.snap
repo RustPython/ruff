@@ -83,6 +83,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -90,7 +91,7 @@ Module(
 
   |
 1 | x + *y
-  |     ^^ Syntax Error: Starred expression cannot be used here
+  |     ^ Syntax Error: invalid syntax
 2 | x ** *y
   |
 
@@ -98,4 +99,4 @@ Module(
   |
 1 | x + *y
 2 | x ** *y
-  |      ^^ Syntax Error: Starred expression cannot be used here
+  |      ^ Syntax Error: invalid syntax

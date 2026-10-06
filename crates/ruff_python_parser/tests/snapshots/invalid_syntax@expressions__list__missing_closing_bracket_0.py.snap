@@ -29,11 +29,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -43,4 +45,11 @@ Module(
 1 | # Missing closing bracket 0: No elements
 2 |
 3 | [
-  |  ^ Syntax Error: unexpected EOF while parsing
+  | ^ Syntax Error: '[' was never closed
+
+
+  |
+1 | # Missing closing bracket 0: No elements
+2 |
+3 | [
+  |  ^ Syntax Error: invalid syntax

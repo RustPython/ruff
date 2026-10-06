@@ -132,12 +132,15 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

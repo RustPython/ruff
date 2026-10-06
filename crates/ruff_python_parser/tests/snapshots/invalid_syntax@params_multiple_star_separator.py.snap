@@ -39,6 +39,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -57,11 +59,14 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
                         ],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -78,6 +83,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -109,6 +118,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -127,6 +138,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -142,11 +155,14 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
                         ],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -163,9 +179,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -173,7 +194,7 @@ Module(
 
   |
 1 | def foo(a, *, *, b): ...
-  |               ^ Syntax Error: Only one '*' separator allowed
+  |               ^ Syntax Error: * argument may appear only once
 2 | def foo(a, *, b, c, *): ...
   |
 
@@ -181,4 +202,4 @@ Module(
   |
 1 | def foo(a, *, *, b): ...
 2 | def foo(a, *, b, c, *): ...
-  |                     ^ Syntax Error: Only one '*' separator allowed
+  |                     ^ Syntax Error: invalid syntax

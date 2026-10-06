@@ -57,6 +57,7 @@ impl FormatNodeRule<Parameters> for FormatParameters {
             vararg,
             kwonlyargs,
             kwarg,
+            runtime_defaults: _,
         } = item;
 
         let (slash, star) = find_parameter_separators(f.context().source(), item);

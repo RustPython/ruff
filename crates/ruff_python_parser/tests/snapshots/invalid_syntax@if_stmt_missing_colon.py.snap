@@ -24,6 +24,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -47,6 +48,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Assign(
@@ -72,9 +74,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -82,7 +88,7 @@ Module(
 
   |
 1 | if x
-  |     ^ Syntax Error: Expected `:`, found newline
+  |     ^ Syntax Error: expected ':'
 2 | if x
 3 |     pass
 4 | a = 1
@@ -92,7 +98,7 @@ Module(
   |
 1 | if x
 2 | if x
-  | ^^ Syntax Error: Expected an indented block after `if` statement
+  | ^^ Syntax Error: expected an indented block after 'if' statement on line 1
 3 |     pass
 4 | a = 1
   |
@@ -101,7 +107,7 @@ Module(
   |
 1 | if x
 2 | if x
-  |     ^ Syntax Error: Expected `:`, found newline
+  |     ^ Syntax Error: expected ':'
 3 |     pass
 4 | a = 1
   |

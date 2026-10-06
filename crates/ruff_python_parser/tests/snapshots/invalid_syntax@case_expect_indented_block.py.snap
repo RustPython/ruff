@@ -43,6 +43,7 @@ Module(
                             ),
                             guard: None,
                             body: [],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 31..42,
@@ -77,11 +78,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -91,4 +94,4 @@ Module(
 1 | match subject:
 2 |     case 1:
 3 |     case 2: ...
-  |     ^^^^ Syntax Error: Expected an indented block after `case` block
+  |     ^^^^ Syntax Error: expected an indented block after 'case' statement on line 2

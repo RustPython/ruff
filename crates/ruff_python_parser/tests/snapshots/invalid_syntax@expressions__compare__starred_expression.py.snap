@@ -46,6 +46,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -86,6 +87,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                 },
@@ -123,6 +125,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Load,
@@ -163,6 +166,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Load,
@@ -171,6 +175,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -178,7 +183,7 @@ Module(
 
   |
 1 | x >= *y
-  |      ^^ Syntax Error: Starred expression cannot be used here
+  |      ^ Syntax Error: invalid syntax
 2 | x not in *y
   |
 
@@ -186,7 +191,7 @@ Module(
   |
 1 | x >= *y
 2 | x not in *y
-  |          ^^ Syntax Error: Starred expression cannot be used here
+  |          ^ Syntax Error: invalid syntax
 3 |
 4 | *x < y
   |
@@ -196,7 +201,7 @@ Module(
 2 | x not in *y
 3 |
 4 | *x < y
-  |  ^^^^^ Syntax Error: Comparison expression cannot be used here
+  |  ^^^^^ Syntax Error: comparison expression cannot be used here
 5 | *x is not y
   |
 
@@ -204,4 +209,4 @@ Module(
   |
 4 | *x < y
 5 | *x is not y
-  |  ^^^^^^^^^^ Syntax Error: Comparison expression cannot be used here
+  |  ^^^^^^^^^^ Syntax Error: comparison expression cannot be used here

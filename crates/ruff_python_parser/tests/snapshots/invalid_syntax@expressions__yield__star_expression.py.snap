@@ -80,6 +80,7 @@ Module(
                                                                     },
                                                                 ),
                                                             ],
+                                                            runtime_values: None,
                                                         },
                                                     ),
                                                     ctx: Load,
@@ -96,6 +97,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -104,6 +106,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -112,7 +115,7 @@ Module(
   |
 1 | # Cannot use starred expression here
 2 | yield (*x)
-  |        ^^ Syntax Error: Starred expression cannot be used here
+  |        ^^ Syntax Error: cannot use starred expression here
 3 |
 4 | yield *x and y, z
   |
@@ -122,7 +125,7 @@ Module(
 2 | yield (*x)
 3 |
 4 | yield *x and y, z
-  |        ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |        ^^^^^^^ Syntax Error: boolean expression cannot be used here
 
 
 ## Semantic Syntax Errors

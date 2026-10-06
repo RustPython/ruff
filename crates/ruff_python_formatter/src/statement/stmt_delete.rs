@@ -17,6 +17,7 @@ impl FormatNodeRule<StmtDelete> for FormatStmtDelete {
             range: _,
             node_index: _,
             targets,
+            runtime_targets: _,
         } = item;
 
         write!(f, [token("del"), space()])?;

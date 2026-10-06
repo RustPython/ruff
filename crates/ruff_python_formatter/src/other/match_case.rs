@@ -30,6 +30,7 @@ impl FormatNodeRule<MatchCase> for FormatMatchCase {
             pattern,
             guard,
             body,
+            runtime_body: _,
         } = item;
 
         let comments = f.context().comments().clone();

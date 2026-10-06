@@ -121,6 +121,7 @@ pub(crate) fn unnecessary_nested_literal<'a>(checker: &Checker, literal_expr: &'
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                     ctx: ExprContext::Load,
                     parenthesized: false,
+                    runtime_elts: None,
                 })
             }),
             value: subscript.value.clone(),

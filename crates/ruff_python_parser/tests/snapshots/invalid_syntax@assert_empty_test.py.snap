@@ -26,6 +26,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -33,4 +34,4 @@ Module(
 
   |
 1 | assert
-  |       ^ Syntax Error: Expected an expression
+  |       ^ Syntax Error: invalid syntax

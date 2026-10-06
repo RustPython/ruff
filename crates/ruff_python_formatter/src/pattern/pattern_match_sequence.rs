@@ -18,6 +18,7 @@ impl FormatNodeRule<PatternMatchSequence> for FormatPatternMatchSequence {
             patterns,
             range,
             node_index: _,
+            runtime_patterns: _,
         } = item;
 
         let comments = f.context().comments().clone();

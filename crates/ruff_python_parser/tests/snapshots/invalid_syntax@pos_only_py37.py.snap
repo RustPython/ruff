@@ -38,6 +38,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -46,6 +48,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -62,6 +65,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -92,6 +99,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -109,6 +118,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -116,6 +127,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -132,6 +144,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -162,6 +178,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -177,6 +195,8 @@ Module(
                                     node_index: NodeIndex(None),
                                 },
                                 annotation: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [
@@ -192,11 +212,14 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
                         ],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -213,6 +236,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -244,6 +271,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -251,6 +280,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -267,9 +297,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -279,7 +314,7 @@ Module(
 1 | # parse_options: {"target-version": "3.7"}
 2 | def foo(a, /): ...
 3 | def foo(a, /, b, /): ...
-  |                  ^ Syntax Error: Only one '/' separator allowed
+  |                  ^ Syntax Error: / may appear only once
 4 | def foo(a, *args, /, b): ...
 5 | def foo(a, //): ...
   |
@@ -289,7 +324,7 @@ Module(
 2 | def foo(a, /): ...
 3 | def foo(a, /, b, /): ...
 4 | def foo(a, *args, /, b): ...
-  |                   ^ Syntax Error: '/' parameter must appear before '*' parameter
+  |                   ^ Syntax Error: / must be ahead of *
 5 | def foo(a, //): ...
   |
 
@@ -298,7 +333,7 @@ Module(
 3 | def foo(a, /, b, /): ...
 4 | def foo(a, *args, /, b): ...
 5 | def foo(a, //): ...
-  |            ^^ Syntax Error: Expected `,`, found `//`
+  |            ^^ Syntax Error: invalid syntax
 
 
 ## Unsupported Syntax Errors
@@ -306,7 +341,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.7"}
 2 | def foo(a, /): ...
-  |            ^ Syntax Error: Cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
+  |            ^ Syntax Error: cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
 3 | def foo(a, /, b, /): ...
 4 | def foo(a, *args, /, b): ...
   |
@@ -316,7 +351,7 @@ Module(
 1 | # parse_options: {"target-version": "3.7"}
 2 | def foo(a, /): ...
 3 | def foo(a, /, b, /): ...
-  |            ^ Syntax Error: Cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
+  |            ^ Syntax Error: cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
 4 | def foo(a, *args, /, b): ...
 5 | def foo(a, //): ...
   |
@@ -326,6 +361,6 @@ Module(
 2 | def foo(a, /): ...
 3 | def foo(a, /, b, /): ...
 4 | def foo(a, *args, /, b): ...
-  |                   ^ Syntax Error: Cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
+  |                   ^ Syntax Error: cannot use positional-only parameter separator on Python 3.7 (syntax was added in Python 3.8)
 5 | def foo(a, //): ...
   |

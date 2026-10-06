@@ -30,6 +30,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -46,6 +47,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -77,6 +82,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -84,6 +91,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -100,9 +108,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -110,7 +123,7 @@ Module(
 
   |
 1 | def foo(/): ...
-  |         ^ Syntax Error: Position-only parameter separator not allowed as first parameter
+  |         ^ Syntax Error: at least one argument must precede /
 2 | def foo(/, a): ...
   |
 
@@ -118,4 +131,4 @@ Module(
   |
 1 | def foo(/): ...
 2 | def foo(/, a): ...
-  |         ^ Syntax Error: Position-only parameter separator not allowed as first parameter
+  |         ^ Syntax Error: at least one argument must precede /

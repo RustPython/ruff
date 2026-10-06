@@ -39,6 +39,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -51,6 +54,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -84,6 +89,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: Repr,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -96,6 +104,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -135,6 +145,9 @@ Module(
                                                     ),
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -147,6 +160,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -180,6 +195,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -192,6 +210,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -225,6 +245,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -237,11 +260,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -249,7 +275,23 @@ Module(
 
   |
 1 | f"{"
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: f-string: expecting '}'
+2 | f"{foo!r"
+3 | f"{foo="
+  |
+
+
+  |
+1 | f"{"
+  |    ^ Syntax Error: f-string: expecting a valid expression after '{'
+2 | f"{foo!r"
+3 | f"{foo="
+  |
+
+
+  |
+1 | f"{"
+  |    ^ Syntax Error: invalid syntax
 2 | f"{foo!r"
 3 | f"{foo="
   |
@@ -258,7 +300,7 @@ Module(
   |
 1 | f"{"
 2 | f"{foo!r"
-  |         ^ Syntax Error: f-string: expecting `}`
+  |         ^ Syntax Error: f-string: expecting '}'
 3 | f"{foo="
 4 | f"{"
   |
@@ -268,7 +310,7 @@ Module(
 1 | f"{"
 2 | f"{foo!r"
 3 | f"{foo="
-  |        ^ Syntax Error: f-string: expecting `}`
+  |        ^ Syntax Error: f-string: expecting '}'
 4 | f"{"
 5 | f"""{"""
   |
@@ -278,7 +320,16 @@ Module(
 2 | f"{foo!r"
 3 | f"{foo="
 4 | f"{"
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: f-string: expecting a valid expression after '{'
+5 | f"""{"""
+  |
+
+
+  |
+2 | f"{foo!r"
+3 | f"{foo="
+4 | f"{"
+  |    ^ Syntax Error: invalid syntax
 5 | f"""{"""
   |
 
@@ -287,4 +338,11 @@ Module(
 3 | f"{foo="
 4 | f"{"
 5 | f"""{"""
-  |      ^^^ Syntax Error: Expected an expression
+  |      ^^^ Syntax Error: f-string: expecting a valid expression after '{'
+
+
+  |
+3 | f"{foo="
+4 | f"{"
+5 | f"""{"""
+  |      ^^^ Syntax Error: invalid syntax

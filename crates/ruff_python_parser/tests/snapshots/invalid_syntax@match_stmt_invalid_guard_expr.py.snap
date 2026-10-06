@@ -71,6 +71,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -136,6 +137,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -202,11 +204,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -215,7 +219,7 @@ Module(
   |
 1 | match x:
 2 |     case y if *a: ...
-  |               ^^ Syntax Error: Starred expression cannot be used here
+  |               ^ Syntax Error: invalid syntax
 3 | match x:
 4 |     case y if (*a): ...
   |
@@ -225,7 +229,7 @@ Module(
 2 |     case y if *a: ...
 3 | match x:
 4 |     case y if (*a): ...
-  |                ^^ Syntax Error: Starred expression cannot be used here
+  |                ^^ Syntax Error: cannot use starred expression here
 5 | match x:
 6 |     case y if yield x: ...
   |
@@ -235,4 +239,4 @@ Module(
 4 |     case y if (*a): ...
 5 | match x:
 6 |     case y if yield x: ...
-  |               ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |               ^^^^^^^ Syntax Error: yield expression cannot be used here

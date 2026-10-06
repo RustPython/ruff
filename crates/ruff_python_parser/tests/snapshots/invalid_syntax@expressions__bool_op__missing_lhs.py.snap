@@ -25,6 +25,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -32,4 +33,4 @@ Module(
 
   |
 1 | and y
-  | ^^^ Syntax Error: Expected a statement
+  | ^^^ Syntax Error: invalid syntax

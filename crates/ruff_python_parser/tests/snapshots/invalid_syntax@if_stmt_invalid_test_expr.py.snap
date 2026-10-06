@@ -44,6 +44,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -81,6 +82,7 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -116,9 +118,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -126,7 +130,7 @@ Module(
 
   |
 1 | if *x: ...
-  |    ^^ Syntax Error: Starred expression cannot be used here
+  |    ^ Syntax Error: invalid syntax
 2 | if yield x: ...
 3 | if yield from x: ...
   |
@@ -135,7 +139,7 @@ Module(
   |
 1 | if *x: ...
 2 | if yield x: ...
-  |    ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |    ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | if yield from x: ...
   |
 
@@ -144,4 +148,4 @@ Module(
 1 | if *x: ...
 2 | if yield x: ...
 3 | if yield from x: ...
-  |    ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |    ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here

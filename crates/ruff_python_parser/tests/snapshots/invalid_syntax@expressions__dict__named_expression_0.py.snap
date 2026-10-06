@@ -96,6 +96,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -130,6 +131,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -139,7 +141,7 @@ Module(
 1 | # Unparenthesized named expression not allowed in key
 2 |
 3 | {x := 1: y, z := 2: a}
-  |  ^^^^^^ Syntax Error: Unparenthesized named expression cannot be used here
+  |  ^^^^^^ Syntax Error: unparenthesized named expression cannot be used here
 4 |
 5 | x + y
   |
@@ -149,7 +151,17 @@ Module(
 1 | # Unparenthesized named expression not allowed in key
 2 |
 3 | {x := 1: y, z := 2: a}
-  |               ^^ Syntax Error: Expected `:`, found `:=`
+  |             ^ Syntax Error: ':' expected after dictionary key
+4 |
+5 | x + y
+  |
+
+
+  |
+1 | # Unparenthesized named expression not allowed in key
+2 |
+3 | {x := 1: y, z := 2: a}
+  |               ^^ Syntax Error: invalid syntax
 4 |
 5 | x + y
   |

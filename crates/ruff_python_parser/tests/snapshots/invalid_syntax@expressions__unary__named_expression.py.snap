@@ -83,6 +83,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -90,7 +91,14 @@ Module(
 
   |
 1 | -x := 1
-  |    ^^ Syntax Error: Expected a statement
+  | ^^ Syntax Error: cannot use assignment expressions with expression
+2 | not x := 1
+  |
+
+
+  |
+1 | -x := 1
+  |    ^^ Syntax Error: invalid syntax
 2 | not x := 1
   |
 
@@ -98,4 +106,10 @@ Module(
   |
 1 | -x := 1
 2 | not x := 1
-  |       ^^ Syntax Error: Expected a statement
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+
+
+  |
+1 | -x := 1
+2 | not x := 1
+  |       ^^ Syntax Error: invalid syntax

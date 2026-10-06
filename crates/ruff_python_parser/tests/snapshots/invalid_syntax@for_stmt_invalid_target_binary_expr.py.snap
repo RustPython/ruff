@@ -40,6 +40,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     iter: Name(
@@ -65,6 +66,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -97,6 +102,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     iter: Name(
@@ -122,6 +128,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -152,6 +162,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_values: None,
                         },
                     ),
                     iter: Name(
@@ -177,6 +188,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -222,6 +237,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -267,6 +286,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -320,9 +343,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -330,7 +358,7 @@ Module(
 
   |
 1 | for x not in y in z: ...
-  |     ^^^^^^^^^^ Syntax Error: Invalid assignment target
+  |       ^^^ Syntax Error: invalid syntax
 2 | for x == y in z: ...
 3 | for x or y in z: ...
   |
@@ -339,7 +367,7 @@ Module(
   |
 1 | for x not in y in z: ...
 2 | for x == y in z: ...
-  |     ^^^^^^ Syntax Error: Invalid assignment target
+  |       ^^ Syntax Error: invalid syntax
 3 | for x or y in z: ...
 4 | for -x in y: ...
   |
@@ -349,7 +377,7 @@ Module(
 1 | for x not in y in z: ...
 2 | for x == y in z: ...
 3 | for x or y in z: ...
-  |     ^^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^^ Syntax Error: cannot assign to expression
 4 | for -x in y: ...
 5 | for not x in y: ...
   |
@@ -359,7 +387,7 @@ Module(
 2 | for x == y in z: ...
 3 | for x or y in z: ...
 4 | for -x in y: ...
-  |     ^^ Syntax Error: Invalid assignment target
+  |     ^^ Syntax Error: cannot assign to expression
 5 | for not x in y: ...
 6 | for x | y in z: ...
   |
@@ -369,7 +397,7 @@ Module(
 3 | for x or y in z: ...
 4 | for -x in y: ...
 5 | for not x in y: ...
-  |     ^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^ Syntax Error: cannot assign to expression
 6 | for x | y in z: ...
   |
 
@@ -378,4 +406,4 @@ Module(
 4 | for -x in y: ...
 5 | for not x in y: ...
 6 | for x | y in z: ...
-  |     ^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^ Syntax Error: cannot assign to expression

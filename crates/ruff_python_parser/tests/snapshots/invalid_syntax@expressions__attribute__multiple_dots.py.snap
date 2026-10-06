@@ -137,6 +137,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -144,7 +145,7 @@ Module(
 
   |
 1 | extra..dot
-  |       ^ Syntax Error: Expected an identifier
+  |       ^ Syntax Error: invalid syntax
 2 | multiple....dots
 3 | multiple.....dots
   |
@@ -153,7 +154,7 @@ Module(
   |
 1 | extra..dot
 2 | multiple....dots
-  |         ^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |         ^^^ Syntax Error: invalid syntax
 3 | multiple.....dots
   |
 
@@ -162,11 +163,11 @@ Module(
 1 | extra..dot
 2 | multiple....dots
 3 | multiple.....dots
-  |         ^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |         ^^^ Syntax Error: invalid syntax
 
 
   |
 1 | extra..dot
 2 | multiple....dots
 3 | multiple.....dots
-  |             ^ Syntax Error: Expected an identifier
+  |             ^ Syntax Error: invalid syntax

@@ -32,6 +32,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -95,6 +98,9 @@ Module(
                             ctx: Invalid,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -158,6 +164,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -192,6 +201,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -199,7 +209,7 @@ Module(
 
   |
 1 | x =
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 2 | 1 + 1
 3 | x = y =
 4 | 2 + 2
@@ -210,7 +220,7 @@ Module(
 1 | x =
 2 | 1 + 1
 3 | x = y =
-  |        ^ Syntax Error: Expected an expression
+  |        ^ Syntax Error: invalid syntax
 4 | 2 + 2
 5 | x = = y
 6 | 3 + 3
@@ -221,6 +231,6 @@ Module(
 3 | x = y =
 4 | 2 + 2
 5 | x = = y
-  |     ^ Syntax Error: Expected an expression
+  |     ^ Syntax Error: invalid syntax
 6 | 3 + 3
   |

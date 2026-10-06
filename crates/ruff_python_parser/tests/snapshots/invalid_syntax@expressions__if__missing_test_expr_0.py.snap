@@ -66,6 +66,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -76,9 +77,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -87,7 +93,7 @@ Module(
   |
 1 | # Missing test expression, followed by a statement
 2 | x if
-  |     ^ Syntax Error: Expected an expression
+  |     ^ Syntax Error: invalid syntax
 3 |
 4 | def foo():
 5 |     pass

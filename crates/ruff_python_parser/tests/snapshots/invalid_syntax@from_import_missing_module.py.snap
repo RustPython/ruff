@@ -18,6 +18,7 @@ Module(
                     names: [],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -39,9 +40,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -49,7 +52,7 @@ Module(
 
   |
 1 | from
-  |     ^ Syntax Error: Expected a module name
+  |     ^ Syntax Error: expected a module name
 2 | from import x
   |
 
@@ -57,4 +60,4 @@ Module(
   |
 1 | from
 2 | from import x
-  |      ^^^^^^ Syntax Error: Expected a module name
+  |      ^^^^^^ Syntax Error: expected a module name

@@ -49,6 +49,8 @@ Module(
                                                             node_index: NodeIndex(None),
                                                         },
                                                         annotation: None,
+                                                        runtime_type_comment: None,
+                                                        runtime_type_comment_bytes: None,
                                                     },
                                                     default: None,
                                                 },
@@ -56,6 +58,7 @@ Module(
                                             vararg: None,
                                             kwonlyargs: [],
                                             kwarg: None,
+                                            runtime_defaults: None,
                                         },
                                     ),
                                     body: Name(
@@ -110,6 +113,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -117,7 +121,7 @@ Module(
 
   |
 1 | x + lambda y: y
-  |     ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+  |     ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 2 |
 3 | x - yield y
   |
@@ -127,4 +131,4 @@ Module(
 1 | x + lambda y: y
 2 |
 3 | x - yield y
-  |     ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |     ^^^^^^^ Syntax Error: yield expression cannot be used here

@@ -49,11 +49,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -62,10 +64,10 @@ Module(
   |
 1 | match foo:
 2 | case _: ...
-  | ^^^^ Syntax Error: Expected an indented block after `match` statement
+  | ^^^^ Syntax Error: expected an indented block after 'match' statement on line 1
 
 
   |
 1 | match foo:
 2 | case _: ...
-  |            ^ Syntax Error: Expected dedent, found end of file
+  |            ^ Syntax Error: invalid syntax

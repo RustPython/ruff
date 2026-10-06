@@ -69,6 +69,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -80,6 +83,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 102..135,
@@ -127,6 +131,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -138,6 +145,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 140..174,
@@ -185,6 +193,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -196,6 +207,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 179..217,
@@ -243,6 +255,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -254,6 +269,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 222..249,
@@ -301,6 +317,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -312,6 +331,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 254..285,
@@ -359,6 +379,9 @@ Module(
                                             },
                                         ],
                                     },
+                                    runtime_patterns: None,
+                                    runtime_kwd_attrs: None,
+                                    runtime_kwd_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -370,11 +393,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -384,7 +409,17 @@ Module(
 1 | # Invalid keyword pattern in class argument
 2 | match subject:
 3 |     case Foo(x as y = 1):
-  |              ^^^^^^ Syntax Error: Expected an identifier for the keyword pattern
+  |                   ^ Syntax Error: cannot use name as pattern target
+4 |         pass
+5 |     case Foo(x | y = 1):
+  |
+
+
+  |
+1 | # Invalid keyword pattern in class argument
+2 | match subject:
+3 |     case Foo(x as y = 1):
+  |              ^^^^^^ Syntax Error: invalid syntax
 4 |         pass
 5 |     case Foo(x | y = 1):
   |
@@ -394,7 +429,7 @@ Module(
 3 |     case Foo(x as y = 1):
 4 |         pass
 5 |     case Foo(x | y = 1):
-  |              ^^^^^ Syntax Error: Expected an identifier for the keyword pattern
+  |              ^^^^^ Syntax Error: invalid syntax
 6 |         pass
 7 |     case Foo([x, y] = 1):
   |
@@ -404,7 +439,7 @@ Module(
 5 |     case Foo(x | y = 1):
 6 |         pass
 7 |     case Foo([x, y] = 1):
-  |              ^^^^^^ Syntax Error: Expected an identifier for the keyword pattern
+  |              ^^^^^^ Syntax Error: invalid syntax
 8 |         pass
 9 |     case Foo({False: 0} = 1):
   |
@@ -414,7 +449,7 @@ Module(
  7 |     case Foo([x, y] = 1):
  8 |         pass
  9 |     case Foo({False: 0} = 1):
-   |              ^^^^^^^^^^ Syntax Error: Expected an identifier for the keyword pattern
+   |              ^^^^^^^^^^ Syntax Error: invalid syntax
 10 |         pass
 11 |     case Foo(1=1):
    |
@@ -424,7 +459,7 @@ Module(
  9 |     case Foo({False: 0} = 1):
 10 |         pass
 11 |     case Foo(1=1):
-   |              ^ Syntax Error: Expected an identifier for the keyword pattern
+   |              ^ Syntax Error: invalid syntax
 12 |         pass
 13 |     case Foo(Bar()=1):
    |
@@ -434,7 +469,7 @@ Module(
 11 |     case Foo(1=1):
 12 |         pass
 13 |     case Foo(Bar()=1):
-   |              ^^^^^ Syntax Error: Expected an identifier for the keyword pattern
+   |              ^^^^^ Syntax Error: invalid syntax
 14 |         pass
 15 |     # Positional pattern cannot follow keyword pattern
    |

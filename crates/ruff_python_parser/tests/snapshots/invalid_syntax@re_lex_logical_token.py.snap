@@ -40,11 +40,14 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -67,6 +70,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -77,6 +81,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             If(
@@ -109,6 +117,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -133,6 +143,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -143,10 +154,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -179,6 +195,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -203,6 +221,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -213,10 +232,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -249,6 +273,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -273,6 +299,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -283,10 +310,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -340,10 +372,13 @@ Module(
                                                 ),
                                             ],
                                             ctx: Load,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -368,6 +403,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -378,10 +414,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -435,10 +476,13 @@ Module(
                                                 ),
                                             ],
                                             ctx: Load,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -463,6 +507,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -473,10 +518,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -530,10 +580,13 @@ Module(
                                                 ),
                                             ],
                                             ctx: Load,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -558,6 +611,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -568,10 +622,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -626,6 +685,9 @@ Module(
                                                                     debug_text: None,
                                                                     conversion: None,
                                                                     format_spec: None,
+                                                                    runtime_str: None,
+                                                                    runtime_interpolation_format_spec: None,
+                                                                    runtime_formatted_value_format_spec: None,
                                                                 },
                                                             ),
                                                         ],
@@ -638,10 +700,14 @@ Module(
                                                     },
                                                 ),
                                             },
+                                            runtime_joined_str: None,
+                                            runtime_values: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -666,6 +732,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -676,10 +743,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -729,15 +801,20 @@ Module(
                                                     },
                                                 ),
                                             },
+                                            runtime_joined_str: None,
+                                            runtime_values: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -760,6 +837,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -770,18 +848,32 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
+   |
+34 | # The outer parenthesis is closed but the inner bracket isn't
+35 | if call(foo, [a, b)
+   |                   ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '['
+36 |     def bar():
+37 |         pass
+   |
+
+
   |
 1 | # No indentation before the function definition
 2 | if call(foo
-  |            ^ Syntax Error: Expected `)`, found newline
+  |            ^ Syntax Error: invalid syntax
 3 | def bar():
 4 |     pass
   |
@@ -791,7 +883,7 @@ Module(
 1 | # No indentation before the function definition
 2 | if call(foo
 3 | def bar():
-  | ^^^ Syntax Error: Expected an indented block after `if` statement
+  | ^^^ Syntax Error: expected an indented block after 'if' statement on line 2
 4 |     pass
   |
 
@@ -799,7 +891,7 @@ Module(
    |
  7 | # Indented function definition
  8 | if call(foo
-   |            ^ Syntax Error: Expected `)`, found newline
+   |            ^ Syntax Error: invalid syntax
  9 |     def bar():
 10 |         pass
    |
@@ -808,7 +900,7 @@ Module(
    |
 13 | # There are multiple non-logical newlines (blank lines) in the `if` body
 14 | if call(foo
-   |            ^ Syntax Error: Expected `)`, found newline
+   |            ^ Syntax Error: invalid syntax
 15 |
 16 |
 17 |     def bar():
@@ -818,7 +910,7 @@ Module(
    |
 21 | # There are trailing whitespaces in the blank line inside the `if` body
 22 | if call(foo
-   |            ^ Syntax Error: Expected `)`, found newline
+   |            ^ Syntax Error: invalid syntax
 23 |         
 24 |     def bar():
 25 |         pass
@@ -829,7 +921,7 @@ Module(
 28 | # The lexer is nested with multiple levels of parentheses
 29 | if call(foo, [a, b
 30 |     def bar():
-   |     ^^^ Syntax Error: Expected `]`, found `def`
+   |     ^^^ Syntax Error: invalid syntax
 31 |         pass
    |
 
@@ -837,7 +929,7 @@ Module(
    |
 28 | # The lexer is nested with multiple levels of parentheses
 29 | if call(foo, [a, b
-   |                   ^ Syntax Error: Expected `)`, found newline
+   |                   ^ Syntax Error: invalid syntax
 30 |     def bar():
 31 |         pass
    |
@@ -846,16 +938,7 @@ Module(
    |
 34 | # The outer parenthesis is closed but the inner bracket isn't
 35 | if call(foo, [a, b)
-   |                   ^ Syntax Error: Expected `]`, found `)`
-36 |     def bar():
-37 |         pass
-   |
-
-
-   |
-34 | # The outer parenthesis is closed but the inner bracket isn't
-35 | if call(foo, [a, b)
-   |                    ^ Syntax Error: Expected `:`, found newline
+   |                    ^ Syntax Error: expected ':'
 36 |     def bar():
 37 |         pass
    |
@@ -865,7 +948,7 @@ Module(
 42 | if call(foo, [a,
 43 |     b
 44 | )
-   | ^ Syntax Error: Expected `]`, found `)`
+   | ^ Syntax Error: closing parenthesis ')' does not match opening parenthesis '[' on line 42
 45 |     def bar():
 46 |         pass
    |
@@ -875,7 +958,7 @@ Module(
 42 | if call(foo, [a,
 43 |     b
 44 | )
-   |  ^ Syntax Error: Expected `:`, found newline
+   |  ^ Syntax Error: expected ':'
 45 |     def bar():
 46 |         pass
    |
@@ -884,7 +967,7 @@ Module(
    |
 49 | # F-strings uses normal list parsing, so test those as well
 50 | if call(f"hello {x
-   |                   ^ Syntax Error: f-string: unterminated string
+   |         ^ Syntax Error: unterminated f-string literal (detected at line 50)
 51 |     def bar():
 52 |         pass
    |
@@ -894,7 +977,7 @@ Module(
 49 | # F-strings uses normal list parsing, so test those as well
 50 | if call(f"hello {x
 51 |     def bar():
-   |     ^^^ Syntax Error: f-string: expecting `}`
+   |     ^^^ Syntax Error: f-string: expecting '=', or '!', or ':', or '}'
 52 |         pass
    |
 
@@ -902,7 +985,7 @@ Module(
    |
 49 | # F-strings uses normal list parsing, so test those as well
 50 | if call(f"hello {x
-   |                   ^ Syntax Error: Expected `)`, found newline
+   |                   ^ Syntax Error: invalid syntax
 51 |     def bar():
 52 |         pass
    |
@@ -910,7 +993,7 @@ Module(
 
    |
 55 | if call(f"hello
-   |           ^^^^^ Syntax Error: f-string: unterminated string
+   |         ^ Syntax Error: unterminated f-string literal (detected at line 55)
 56 |     def bar():
 57 |         pass
    |
@@ -918,7 +1001,7 @@ Module(
 
    |
 55 | if call(f"hello
-   |                ^ Syntax Error: Expected FStringEnd, found newline
+   |                ^ Syntax Error: invalid syntax
 56 |     def bar():
 57 |         pass
    |
@@ -927,7 +1010,7 @@ Module(
    |
 55 | if call(f"hello
 56 |     def bar():
-   | ^^^^ Syntax Error: Expected `,`, found indent
+   | ^^^^ Syntax Error: invalid syntax
 57 |         pass
    |
 
@@ -935,7 +1018,7 @@ Module(
    |
 55 | if call(f"hello
 56 |     def bar():
-   |     ^^^ Syntax Error: Expected `)`, found `def`
+   |     ^^^ Syntax Error: invalid syntax
 57 |         pass
    |
 
@@ -944,4 +1027,4 @@ Module(
 55 | if call(f"hello
 56 |     def bar():
 57 |         pass
-   |             ^ Syntax Error: Expected a statement
+   |             ^ Syntax Error: invalid syntax

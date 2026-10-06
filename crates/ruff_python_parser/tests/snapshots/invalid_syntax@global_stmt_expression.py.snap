@@ -46,6 +46,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -53,4 +54,4 @@ Module(
 
   |
 1 | global x + 1
-  |          ^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |          ^ Syntax Error: invalid syntax

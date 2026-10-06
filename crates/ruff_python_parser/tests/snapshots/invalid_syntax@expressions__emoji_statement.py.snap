@@ -10,6 +10,7 @@ Module(
         node_index: NodeIndex(None),
         range: 0..5,
         body: [],
+        runtime_body: None,
     },
 )
 ```
@@ -17,4 +18,4 @@ Module(
 
   |
 1 | 👍
-  | ^^ Syntax Error: Got unexpected token 👍
+  | ^^ Syntax Error: invalid character '👍' (U+1F44D)

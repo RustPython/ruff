@@ -69,6 +69,7 @@ Module(
                             ],
                             ctx: Load,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -118,6 +119,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -125,7 +127,14 @@ Module(
 
   |
 1 | x - y := (1, 2)
-  |       ^^ Syntax Error: Expected a statement
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+2 | x / y := 2
+  |
+
+
+  |
+1 | x - y := (1, 2)
+  |       ^^ Syntax Error: invalid syntax
 2 | x / y := 2
   |
 
@@ -133,4 +142,10 @@ Module(
   |
 1 | x - y := (1, 2)
 2 | x / y := 2
-  |       ^^ Syntax Error: Expected a statement
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+
+
+  |
+1 | x - y := (1, 2)
+2 | x / y := 2
+  |       ^^ Syntax Error: invalid syntax

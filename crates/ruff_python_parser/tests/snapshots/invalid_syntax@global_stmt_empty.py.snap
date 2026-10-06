@@ -18,6 +18,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -25,4 +26,4 @@ Module(
 
   |
 1 | global
-  |       ^ Syntax Error: Global statement must have at least one name
+  |       ^ Syntax Error: global statement must have at least one name

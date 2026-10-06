@@ -44,6 +44,9 @@ Module(
                         },
                     ],
                     body: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             IpyEscapeCommand(
@@ -77,9 +80,13 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -88,7 +95,7 @@ Module(
   |
 1 | # parse_options: {"mode": "ipython"}
 2 | with a, ?b
-  |         ^ Syntax Error: Expected `,`, found `?`
+  |         ^ Syntax Error: invalid syntax
 3 | ?
 4 | x = 1
   |
@@ -97,7 +104,7 @@ Module(
   |
 1 | # parse_options: {"mode": "ipython"}
 2 | with a, ?b
-  |           ^ Syntax Error: Expected `:`, found newline
+  |           ^ Syntax Error: expected ':'
 3 | ?
 4 | x = 1
   |
@@ -107,6 +114,6 @@ Module(
 1 | # parse_options: {"mode": "ipython"}
 2 | with a, ?b
 3 | ?
-  | ^ Syntax Error: Expected an indented block after `with` statement
+  | ^ Syntax Error: expected an indented block after 'with' statement on line 2
 4 | x = 1
   |

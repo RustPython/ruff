@@ -77,6 +77,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -131,6 +132,7 @@ Module(
                                                                 },
                                                             ),
                                                         ],
+                                                        runtime_values: None,
                                                     },
                                                 ),
                                                 ctx: Load,
@@ -139,6 +141,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -146,6 +149,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -154,7 +158,7 @@ Module(
   |
 1 | # Unparenthesized named expression
 2 | yield from x := 1
-  |              ^^ Syntax Error: Expected a statement
+  |              ^^ Syntax Error: invalid syntax
 3 |
 4 | # Unparenthesized tuple expression
   |
@@ -163,7 +167,7 @@ Module(
   |
 4 | # Unparenthesized tuple expression
 5 | yield from x, y
-  |            ^^^^ Syntax Error: Unparenthesized tuple expression cannot be used here
+  |            ^^^^ Syntax Error: unparenthesized tuple expression cannot be used here
 6 |
 7 | # This is a tuple expression parsing
   |
@@ -173,4 +177,4 @@ Module(
 7 | # This is a tuple expression parsing
 8 | #          vvvvvvvvvvvvv
 9 | yield from (x, *x and y)
-  |                 ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |                 ^^^^^^^ Syntax Error: boolean expression cannot be used here

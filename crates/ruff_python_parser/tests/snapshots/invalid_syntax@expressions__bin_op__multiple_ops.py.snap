@@ -145,6 +145,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -152,7 +153,7 @@ Module(
 
   |
 1 | x++
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 2 | 1 + 2
 3 | x--
 4 | 1 - 2
@@ -163,6 +164,6 @@ Module(
 1 | x++
 2 | 1 + 2
 3 | x--
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: invalid syntax
 4 | 1 - 2
   |

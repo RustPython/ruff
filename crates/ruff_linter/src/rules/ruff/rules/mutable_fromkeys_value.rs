@@ -119,6 +119,8 @@ fn generate_dict_comprehension(
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
         is_async: false,
+        runtime_ifs: None,
+        runtime_is_async: None,
     };
     // Construct the dict comprehension.
     let dict_comp = ast::ExprDictComp {

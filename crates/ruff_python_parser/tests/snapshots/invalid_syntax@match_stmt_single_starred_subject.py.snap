@@ -56,11 +56,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -68,6 +70,6 @@ Module(
 
   |
 1 | match *foo:
-  |       ^^^^ Syntax Error: Starred expression cannot be used here
+  |       ^ Syntax Error: invalid syntax
 2 |     case _: ...
   |

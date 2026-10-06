@@ -29,6 +29,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -62,6 +63,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -86,6 +88,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -119,6 +122,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -152,6 +156,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -199,6 +204,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -232,6 +238,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -262,11 +269,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -276,7 +285,7 @@ Module(
 1 | # Test cases for list expressions where the parser recovers from a syntax error.
 2 |
 3 | [,]
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 4 |
 5 | [1,,2]
   |
@@ -286,7 +295,7 @@ Module(
 3 | [,]
 4 |
 5 | [1,,2]
-  |    ^ Syntax Error: Expected an expression or a ']'
+  |    ^ Syntax Error: invalid syntax
 6 |
 7 | [1,,]
   |
@@ -296,7 +305,7 @@ Module(
 5 | [1,,2]
 6 |
 7 | [1,,]
-  |    ^ Syntax Error: Expected an expression or a ']'
+  |    ^ Syntax Error: invalid syntax
 8 |
 9 | # Missing comma
   |
@@ -305,7 +314,16 @@ Module(
    |
  9 | # Missing comma
 10 | [1 2]
-   |    ^ Syntax Error: Expected `,`, found int
+   |  ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+11 |
+12 | # Dictionary element in a list
+   |
+
+
+   |
+ 9 | # Missing comma
+10 | [1 2]
+   |    ^ Syntax Error: invalid syntax
 11 |
 12 | # Dictionary element in a list
    |
@@ -314,7 +332,7 @@ Module(
    |
 12 | # Dictionary element in a list
 13 | [1: 2]
-   |   ^ Syntax Error: Expected an expression or a ']'
+   |   ^ Syntax Error: invalid syntax
 14 |
 15 | # Missing expression
    |
@@ -323,7 +341,7 @@ Module(
    |
 15 | # Missing expression
 16 | [1, x + ]
-   |         ^ Syntax Error: Expected an expression
+   |         ^ Syntax Error: invalid syntax
 17 |
 18 | [1; 2]
    |
@@ -333,7 +351,7 @@ Module(
 16 | [1, x + ]
 17 |
 18 | [1; 2]
-   |   ^ Syntax Error: Expected an expression or a ']'
+   |   ^ Syntax Error: invalid syntax
 19 |
 20 | [*]
    |
@@ -343,4 +361,4 @@ Module(
 18 | [1; 2]
 19 |
 20 | [*]
-   |   ^ Syntax Error: Expected an expression
+   |   ^ Syntax Error: Invalid star expression

@@ -83,6 +83,8 @@ Module(
                                                             node_index: NodeIndex(None),
                                                         },
                                                         annotation: None,
+                                                        runtime_type_comment: None,
+                                                        runtime_type_comment_bytes: None,
                                                     },
                                                     default: None,
                                                 },
@@ -90,6 +92,7 @@ Module(
                                             vararg: None,
                                             kwonlyargs: [],
                                             kwarg: None,
+                                            runtime_defaults: None,
                                         },
                                     ),
                                     body: Name(
@@ -338,6 +341,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -346,7 +350,7 @@ Module(
   |
 1 | # Invalid test expression
 2 | x if *expr else y
-  |      ^^^^^ Syntax Error: Starred expression cannot be used here
+  |      ^ Syntax Error: invalid syntax
 3 | x if lambda x: x else y
 4 | x if yield x else y
   |
@@ -356,7 +360,7 @@ Module(
 1 | # Invalid test expression
 2 | x if *expr else y
 3 | x if lambda x: x else y
-  |      ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+  |      ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 4 | x if yield x else y
 5 | x if yield from x else y
   |
@@ -366,7 +370,7 @@ Module(
 2 | x if *expr else y
 3 | x if lambda x: x else y
 4 | x if yield x else y
-  |      ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |      ^^^^^^^ Syntax Error: yield expression cannot be used here
 5 | x if yield from x else y
   |
 
@@ -375,7 +379,7 @@ Module(
 3 | x if lambda x: x else y
 4 | x if yield x else y
 5 | x if yield from x else y
-  |      ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |      ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 6 |
 7 | # Invalid orelse expression
   |
@@ -384,7 +388,7 @@ Module(
    |
  7 | # Invalid orelse expression
  8 | x if expr else *orelse
-   |                ^^^^^^^ Syntax Error: Starred expression cannot be used here
+   |                ^ Syntax Error: expected expression after 'else', but statement is given
  9 | x if expr else yield y
 10 | x if expr else yield from y
    |
@@ -394,7 +398,7 @@ Module(
  7 | # Invalid orelse expression
  8 | x if expr else *orelse
  9 | x if expr else yield y
-   |                ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                ^^^^^ Syntax Error: expected expression after 'else', but statement is given
 10 | x if expr else yield from y
    |
 
@@ -403,4 +407,4 @@ Module(
  8 | x if expr else *orelse
  9 | x if expr else yield y
 10 | x if expr else yield from y
-   |                ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                ^^^^^ Syntax Error: expected expression after 'else', but statement is given

@@ -61,9 +61,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -71,7 +75,15 @@ Module(
 
   |
 1 | with (:
-  |       ^ Syntax Error: Expected an expression
+  |       ^ Syntax Error: invalid syntax
+2 |
+3 | x + y
+  |
+
+
+  |
+1 | with (:
+  |      ^ Syntax Error: '(' was never closed
 2 |
 3 | x + y
   |
@@ -81,4 +93,4 @@ Module(
 1 | with (:
 2 |
 3 | x + y
-  |      ^ Syntax Error: unexpected EOF while parsing
+  |      ^ Syntax Error: invalid syntax

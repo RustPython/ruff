@@ -82,6 +82,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -91,4 +92,4 @@ Module(
 1 | # parse_options: {"target-version": "3.8"}
 2 | # before 3.9, only emit the parse error, not the unsupported syntax error
 3 | lst[x:=1:-1]
-  |     ^^^^ Syntax Error: Unparenthesized named expression cannot be used here
+  |     ^^^^ Syntax Error: unparenthesized named expression cannot be used here

@@ -2305,6 +2305,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             test,
             body,
             elif_else_clauses,
+            runtime_body: _,
         } = if_statement;
 
         let test_ty = self.infer_standalone_expression(test, TypeContext::default());
@@ -2321,6 +2322,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                 node_index: _,
                 test,
                 body,
+                runtime_body: _,
+                runtime_orelse: _,
             } = clause;
 
             if let Some(test) = &test {
@@ -2344,6 +2347,10 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             orelse,
             finalbody,
             is_star: _,
+            runtime_body: _,
+            runtime_handlers: _,
+            runtime_orelse: _,
+            runtime_finalbody: _,
         } = try_statement;
 
         self.infer_body(body);
@@ -2356,6 +2363,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                 body,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             } = handler;
 
             // If `symbol_name` is `Some()` and `handled_exceptions` is `None`,
@@ -2383,6 +2391,9 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             is_async,
             items,
             body,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
         } = with_statement;
         for item in items {
             let target = item.optional_vars.as_deref();
@@ -2777,6 +2788,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                 body,
                 pattern,
                 guard,
+                runtime_body: _,
             } = case;
             self.infer_match_pattern(pattern);
 
@@ -2895,6 +2907,9 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                     node_index: _,
                     cls,
                     arguments,
+                    runtime_patterns: _,
+                    runtime_kwd_attrs: _,
+                    runtime_kwd_patterns: _,
                 } = match_class;
                 for pattern in &arguments.patterns {
                     self.infer_nested_match_pattern(pattern);
@@ -2933,6 +2948,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                     keys,
                     patterns,
                     rest,
+                    runtime_keys: _,
+                    runtime_patterns: _,
                 } = match_mapping;
                 for key in keys {
                     self.infer_maybe_standalone_expression(key, TypeContext::default());
@@ -2950,6 +2967,9 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                     node_index: _,
                     cls,
                     arguments,
+                    runtime_patterns: _,
+                    runtime_kwd_attrs: _,
+                    runtime_kwd_patterns: _,
                 } = match_class;
                 for pattern in &arguments.patterns {
                     self.infer_nested_match_pattern(pattern);
@@ -2988,6 +3008,9 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             node_index: _,
             targets,
             value,
+            runtime_targets: _,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
         } = assignment;
 
         if let [ast::Expr::Name(name)] = targets.as_slice() {
@@ -3787,6 +3810,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             keywords,
             range: _,
             node_index: _,
+            runtime_args: _,
+            runtime_bases: _,
         } = &call_expr.arguments;
 
         if args.iter().any(ast::Expr::is_starred_expr) {
@@ -4311,6 +4336,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                 value,
                 target,
                 simple: _,
+                runtime_simple: _,
             } = assignment;
             let annotated = self.infer_annotation_expression(
                 annotation,
@@ -5223,6 +5249,10 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             body,
             orelse,
             is_async,
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
+            runtime_body: _,
+            runtime_orelse: _,
         } = for_statement;
 
         self.infer_target(target, iter, &|builder, tcx| {
@@ -5306,6 +5336,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             test,
             body,
             orelse,
+            runtime_body: _,
+            runtime_orelse: _,
         } = while_statement;
 
         let test_ty = self.infer_standalone_expression(test, TypeContext::default());
@@ -5422,6 +5454,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             range: _,
             node_index: _,
             targets,
+            runtime_targets: _,
         } = delete;
         for target in targets {
             self.infer_expression(target, TypeContext::default());
@@ -6748,6 +6781,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             ast::Expr::IpyEscapeCommand(_) => {
                 todo_type!("Ipy escape command support")
             }
+            ast::Expr::Constant(_) => Type::unknown(),
         };
 
         self.finish_expression_type(expression, ty, tcx)
@@ -7074,6 +7108,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             range: _,
             node_index: _,
             value,
+            runtime_joined_str: _,
+            runtime_values: _,
         } = fstring;
 
         let mut collector = StringPartsCollector::new();
@@ -7095,6 +7131,9 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
                                     debug_text,
                                     conversion,
                                     format_spec,
+                                    runtime_str: _,
+                                    runtime_interpolation_format_spec: _,
+                                    runtime_formatted_value_format_spec: _,
                                 } = expression;
                                 let ty = self.infer_expression(expression, TypeContext::default());
 
@@ -7228,6 +7267,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             elts,
             ctx: _,
             parenthesized: _,
+            runtime_elts: _,
         } = tuple;
 
         // Remove any union elements of the annotation that are unrelated to the tuple type.
@@ -7329,6 +7369,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             node_index: _,
             elts,
             ctx: _,
+            runtime_elts: _,
         } = list;
 
         let elts = elts.iter().map(|elt| [Some(elt)]).collect_vec();
@@ -7357,6 +7398,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             range: _,
             node_index: _,
             elts,
+            runtime_elts: _,
         } = set;
 
         let elts = elts.iter().map(|elt| [Some(elt)]).collect_vec();
@@ -7444,6 +7486,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             range: _,
             node_index: _,
             items,
+            runtime_values: _,
         } = dict;
 
         let mut item_types = FxHashMap::default();
@@ -8520,6 +8563,8 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             iter,
             ifs,
             is_async: _,
+            runtime_ifs: _,
+            runtime_is_async: _,
         } = comprehension;
 
         self.infer_target(target, iter, &|builder, tcx| {
@@ -11619,6 +11664,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             node_index: _,
             op,
             values,
+            runtime_values: _,
         } = bool_op;
         // The first operand has no peers. If no later operand is a collection literal,
         // accumulating prior types cannot affect inference.
@@ -11840,6 +11886,7 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
             range: _,
             node_index: _,
             type_params,
+            runtime_type_params: _,
         } = type_parameters;
         for type_param in type_params {
             match type_param {

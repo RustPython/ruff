@@ -33,6 +33,10 @@ Module(
                         ),
                     ],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Pass(
@@ -42,6 +46,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -60,7 +65,7 @@ Module(
 3 | finally:
 4 |     pass
 5 | else:
-  |     ^ Syntax Error: Expected a statement
+  |     ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -69,7 +74,7 @@ Module(
 3 | finally:
 4 |     pass
 5 | else:
-  |      ^ Syntax Error: Expected a statement
+  |      ^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -78,4 +83,4 @@ Module(
 4 |     pass
 5 | else:
 6 |     pass
-  | ^^^^ Syntax Error: Unexpected indentation
+  |    ^ Syntax Error: unexpected indent

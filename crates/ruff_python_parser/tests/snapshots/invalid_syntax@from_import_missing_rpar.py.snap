@@ -45,6 +45,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             Expr(
@@ -113,6 +114,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             Expr(
@@ -147,6 +149,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -154,7 +157,7 @@ Module(
 
   |
 1 | from x import (a, b
-  |                    ^ Syntax Error: Expected `)`, found newline
+  |                    ^ Syntax Error: invalid syntax
 2 | 1 + 1
 3 | from x import (a, b,
 4 | 2 + 2
@@ -165,6 +168,6 @@ Module(
 1 | from x import (a, b
 2 | 1 + 1
 3 | from x import (a, b,
-  |                     ^ Syntax Error: Expected `)`, found newline
+  |                     ^ Syntax Error: invalid syntax
 4 | 2 + 2
   |

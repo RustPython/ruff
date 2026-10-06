@@ -9,9 +9,10 @@ use ruff_text_size::{Ranged, TextSize};
 use crate::parser::progress::ParserProgress;
 use crate::parser::{Parser, RecoveryContextKind, SequenceMatchPatternParentheses, recovery};
 use crate::token_set::TokenSet;
-use crate::{ParseErrorType, UnsupportedSyntaxErrorKind};
+use crate::{ExpressionKind, ParseErrorType, UnsupportedSyntaxErrorKind};
 
 use super::expression::ExpressionContext;
+use super::statement::invalid_target_identifier;
 
 /// The set of tokens that can start a literal pattern.
 const LITERAL_PATTERN_START_SET: TokenSet = TokenSet::new([
@@ -115,6 +116,7 @@ impl Parser<'_> {
                 range: self.node_range(start),
                 patterns,
                 node_index: AtomicNodeIndex::NONE,
+                runtime_patterns: None,
             });
         }
 
@@ -125,7 +127,26 @@ impl Parser<'_> {
                 self.add_error(ParseErrorType::InvalidStarPatternUsage, &lhs);
             }
 
-            let ident = self.parse_match_pattern_target();
+            let ident = if self.at_expr()
+                && !(self.at_identifier_or_soft_keyword()
+                    && (self.src_text(self.current_token_range()) == "_"
+                        || !matches!(
+                            self.peek(),
+                            TokenKind::Dot | TokenKind::Lpar | TokenKind::Equal
+                        ))) {
+                // test_err match_as_pattern_invalid_target
+                // match x:
+                //     case y as z.w: ...
+                //     case y as f(): ...
+                let target = self.parse_conditional_expression_or_higher();
+                self.add_error(
+                    ParseErrorType::InvalidPatternTarget(ExpressionKind::of(&target.expr)),
+                    &target,
+                );
+                invalid_target_identifier(&target.expr)
+            } else {
+                self.parse_match_pattern_target()
+            };
             lhs = Pattern::MatchAs(ast::PatternMatchAs {
                 range: self.node_range(start),
                 name: Some(ident),
@@ -193,11 +214,18 @@ impl Parser<'_> {
             let mapping_item_start = parser.node_start();
 
             if parser.eat(TokenKind::DoubleStar) {
-                let identifier = parser.parse_match_pattern_target();
+                // A `_` rest target is not a capture target.
+                let identifier = parser.parse_identifier();
+                if identifier.is_valid() && identifier.id == "_" {
+                    parser.add_error(
+                        ParseErrorType::OtherError("invalid syntax".to_string()),
+                        &identifier,
+                    );
+                }
                 if rest.is_some() {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Only one double star pattern is allowed".to_string(),
+                            "only one double star pattern is allowed".to_string(),
                         ),
                         parser.node_range(mapping_item_start),
                     );
@@ -231,7 +259,7 @@ impl Parser<'_> {
                     },
                     pattern => {
                         parser.add_error(
-                            ParseErrorType::OtherError("Invalid mapping pattern key".to_string()),
+                            ParseErrorType::OtherError("invalid mapping pattern key".to_string()),
                             &pattern,
                         );
                         recovery::pattern_to_expr(pattern)
@@ -246,7 +274,7 @@ impl Parser<'_> {
                 if rest.is_some() {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Pattern cannot follow a double star pattern".to_string(),
+                            "pattern cannot follow a double star pattern".to_string(),
                         ),
                         parser.node_range(mapping_item_start),
                     );
@@ -262,6 +290,8 @@ impl Parser<'_> {
             patterns,
             rest,
             node_index: AtomicNodeIndex::NONE,
+            runtime_keys: None,
+            runtime_patterns: None,
         }
     }
 
@@ -328,7 +358,7 @@ impl Parser<'_> {
             // parenthesis, it'll consider `case` an identifier token instead.
             self.add_error(
                 ParseErrorType::OtherError(format!(
-                    "Missing '{closing}'",
+                    "missing '{closing}'",
                     closing = if parentheses.is_list() { "]" } else { ")" }
                 )),
                 self.current_token_range(),
@@ -340,6 +370,7 @@ impl Parser<'_> {
                 patterns: Vec::new(),
                 range: self.node_range(start),
                 node_index: AtomicNodeIndex::NONE,
+                runtime_patterns: None,
             });
         }
 
@@ -395,6 +426,7 @@ impl Parser<'_> {
             range: self.node_range(start),
             patterns,
             node_index: AtomicNodeIndex::NONE,
+            runtime_patterns: None,
         }
     }
 
@@ -504,7 +536,7 @@ impl Parser<'_> {
                         if !unary_expr.operand.is_number_literal_expr() {
                             self.add_error(
                                 ParseErrorType::OtherError(
-                                    "Expected a numeric literal after unary operator".to_string(),
+                                    "expected a numeric literal after unary operator".to_string(),
                                 ),
                                 unary_expr.operand.range(),
                             );
@@ -580,7 +612,7 @@ impl Parser<'_> {
                     // Upon encountering an unexpected token, return a `Pattern::MatchValue` containing
                     // an empty `Expr::Name`.
                     self.add_error(
-                        ParseErrorType::OtherError("Expected a pattern".to_string()),
+                        ParseErrorType::OtherError("expected a pattern".to_string()),
                         self.current_token_range(),
                     );
                     let invalid_node = Expr::Name(ast::ExprName {
@@ -713,7 +745,7 @@ impl Parser<'_> {
             }
             pattern => {
                 self.add_error(
-                    ParseErrorType::OtherError("Invalid value for a class pattern".to_string()),
+                    ParseErrorType::OtherError("invalid value for a class pattern".to_string()),
                     &pattern,
                 );
                 Box::new(recovery::pattern_to_expr(pattern))
@@ -746,9 +778,7 @@ impl Parser<'_> {
                         name
                     } else {
                         parser.add_error(
-                            ParseErrorType::OtherError(
-                                "Expected an identifier for the keyword pattern".to_string(),
-                            ),
+                            ParseErrorType::OtherError("invalid syntax".to_string()),
                             &pattern,
                         );
                         ast::Identifier {
@@ -774,7 +804,7 @@ impl Parser<'_> {
                 if has_seen_keyword_pattern && has_seen_pattern {
                     parser.add_error(
                         ParseErrorType::OtherError(
-                            "Positional patterns cannot follow keyword patterns".to_string(),
+                            "positional patterns follow keyword patterns".to_string(),
                         ),
                         parser.node_range(pattern_start),
                     );
@@ -794,6 +824,9 @@ impl Parser<'_> {
             },
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+            runtime_patterns: None,
+            runtime_kwd_attrs: None,
+            runtime_kwd_patterns: None,
         }
     }
 }

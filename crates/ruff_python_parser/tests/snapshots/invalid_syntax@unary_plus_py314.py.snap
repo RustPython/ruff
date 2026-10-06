@@ -63,6 +63,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 76..93,
@@ -107,6 +108,8 @@ Module(
                                         ),
                                     ],
                                     rest: None,
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -124,11 +127,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -138,7 +143,7 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | match foo:
 3 |     case +1: ...
-  |          ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+  |          ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
 4 |     case {+1: 2}: ...
   |
 
@@ -147,4 +152,4 @@ Module(
 2 | match foo:
 3 |     case +1: ...
 4 |     case {+1: 2}: ...
-  |           ^^ Syntax Error: Unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)
+  |           ^^ Syntax Error: unary '+' is not allowed in a literal pattern on Python 3.14 (syntax was added in Python 3.15)

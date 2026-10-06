@@ -50,6 +50,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             ctx: Load,
@@ -70,6 +71,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -116,6 +121,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -141,6 +150,10 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             AnnAssign(
@@ -164,9 +177,11 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -174,7 +189,7 @@ Module(
 
   |
 1 | for x in *a and b: ...
-  |           ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |           ^^^^^^^ Syntax Error: boolean expression cannot be used here
 2 | for x in yield a: ...
 3 | for target in x := 1: ...
   |
@@ -183,7 +198,7 @@ Module(
   |
 1 | for x in *a and b: ...
 2 | for x in yield a: ...
-  |          ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |          ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | for target in x := 1: ...
   |
 
@@ -192,14 +207,14 @@ Module(
 1 | for x in *a and b: ...
 2 | for x in yield a: ...
 3 | for target in x := 1: ...
-  |                 ^^ Syntax Error: Expected `:`, found `:=`
+  |                 ^^ Syntax Error: invalid syntax
 
 
   |
 1 | for x in *a and b: ...
 2 | for x in yield a: ...
 3 | for target in x := 1: ...
-  |                    ^ Syntax Error: Invalid annotated assignment target
+  |                    ^ Syntax Error: illegal target for annotation
 
 
 ## Semantic Syntax Errors

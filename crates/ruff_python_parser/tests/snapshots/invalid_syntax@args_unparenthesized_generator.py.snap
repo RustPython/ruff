@@ -81,11 +81,15 @@ Module(
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     ifs: [],
                                                     is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                             parenthesized: false,
@@ -102,6 +106,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -196,11 +202,15 @@ Module(
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     ifs: [],
                                                     is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                             parenthesized: false,
@@ -217,6 +227,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -293,11 +305,15 @@ Module(
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     ifs: [],
                                                     is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                             parenthesized: false,
@@ -305,12 +321,15 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -318,7 +337,7 @@ Module(
 
   |
 1 | sum(x for x in range(10), 5)
-  |     ^^^^^^^^^^^^^^^^^^^^ Syntax Error: Unparenthesized generator expression cannot be used here
+  |     ^^^^^^^^^^^^^^^^^^^^ Syntax Error: Generator expression must be parenthesized
 2 | total(1, 2, x for x in range(5), 6)
 3 | sum(x for x in range(10),)
   |
@@ -327,7 +346,7 @@ Module(
   |
 1 | sum(x for x in range(10), 5)
 2 | total(1, 2, x for x in range(5), 6)
-  |             ^^^^^^^^^^^^^^^^^^^ Syntax Error: Unparenthesized generator expression cannot be used here
+  |             ^^^^^^^^^^^^^^^^^^^ Syntax Error: Generator expression must be parenthesized
 3 | sum(x for x in range(10),)
   |
 
@@ -336,4 +355,4 @@ Module(
 1 | sum(x for x in range(10), 5)
 2 | total(1, 2, x for x in range(5), 6)
 3 | sum(x for x in range(10),)
-  |     ^^^^^^^^^^^^^^^^^^^^ Syntax Error: Unparenthesized generator expression cannot be used here
+  |     ^^^^^^^^^^^^^^^^^^^^ Syntax Error: Generator expression must be parenthesized

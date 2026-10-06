@@ -19,6 +19,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -26,4 +27,4 @@ Module(
 
   |
 1 | import
-  |       ^ Syntax Error: Expected one or more symbol names after import
+  |       ^ Syntax Error: Expected one or more names after 'import'

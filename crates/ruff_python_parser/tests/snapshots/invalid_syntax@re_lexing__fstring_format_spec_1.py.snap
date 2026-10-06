@@ -73,6 +73,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -85,6 +88,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -207,6 +212,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -219,6 +227,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -313,6 +323,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -325,6 +338,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -385,6 +400,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -393,7 +409,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |         ^ Syntax Error: f-string: expecting `}`
+  |                     ^ Syntax Error: unterminated string literal (detected at line 6)
 7 |
 8 | f'middle {'string':\\
   |
@@ -402,7 +418,27 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |          ^^^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |         ^ Syntax Error: f-string: expecting '}', or format specs
+7 |
+8 | f'middle {'string':\\
+  |
+
+
+  |
+3 |   # https://github.com/astral-sh/ruff/issues/12004
+4 |
+5 | / f'middle {'string':\
+6 | |         'format spec'}
+  | |_______________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+7 |
+8 |   f'middle {'string':\\
+  |
+
+
+  |
+5 | f'middle {'string':\
+6 |         'format spec'}
+  |          ^^^^^^ Syntax Error: invalid syntax
 7 |
 8 | f'middle {'string':\\
   |
@@ -411,16 +447,7 @@ Module(
   |
 5 | f'middle {'string':\
 6 |         'format spec'}
-  |                 ^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
-7 |
-8 | f'middle {'string':\\
-  |
-
-
-  |
-5 | f'middle {'string':\
-6 |         'format spec'}
-  |                     ^^ Syntax Error: missing closing quote in string literal
+  |                 ^^^^ Syntax Error: invalid syntax
 7 |
 8 | f'middle {'string':\\
   |
@@ -430,7 +457,7 @@ Module(
 6 |         'format spec'}
 7 |
 8 | f'middle {'string':\\
-  |                    ^^ Syntax Error: f-string: newlines are not allowed in format specifiers when using single quotes
+  |                    ^^ Syntax Error: f-string: newlines are not allowed in format specifiers for single quoted f-strings
 9 |         'format spec'}
   |
 
@@ -439,7 +466,7 @@ Module(
  6 |         'format spec'}
  7 |
  8 | f'middle {'string':\\
-   |                      ^ Syntax Error: f-string: expecting `}`
+   |                      ^ Syntax Error: f-string: expecting '}', or format specs
  9 |         'format spec'}
 10 |
 11 | f'middle {'string':\\\
@@ -449,7 +476,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   | ^^^^^^^^ Syntax Error: Unexpected indentation
+   |        ^ Syntax Error: unexpected indent
 10 |
 11 | f'middle {'string':\\\
    |
@@ -458,7 +485,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   |                      ^ Syntax Error: Expected a statement
+   |                      ^ Syntax Error: unmatched '}'
 10 |
 11 | f'middle {'string':\\\
    |
@@ -467,7 +494,7 @@ Module(
    |
  8 | f'middle {'string':\\
  9 |         'format spec'}
-   |                       ^ Syntax Error: Expected a statement
+   |                       ^ Syntax Error: invalid syntax
 10 |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
@@ -477,22 +504,30 @@ Module(
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |         ^ Syntax Error: f-string: expecting `}`
+   |         ^ Syntax Error: f-string: expecting '}', or format specs
+
+
+   |
+ 9 |           'format spec'}
+10 |
+11 | / f'middle {'string':\\\
+12 | |         'format spec'}
+   | |_______________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
 
 
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |          ^^^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+   |          ^^^^^^ Syntax Error: invalid syntax
 
 
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |                 ^^^^ Syntax Error: Simple statements must be separated by newlines or semicolons
+   |                 ^^^^ Syntax Error: invalid syntax
 
 
    |
 11 | f'middle {'string':\\\
 12 |         'format spec'}
-   |                     ^^ Syntax Error: missing closing quote in string literal
+   |                     ^ Syntax Error: unterminated string literal (detected at line 12)

@@ -48,6 +48,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -63,6 +65,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -70,9 +74,14 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -95,6 +104,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -116,6 +126,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -156,6 +170,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -180,6 +196,8 @@ Module(
                                             },
                                         ),
                                     ),
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -195,6 +213,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: Some(
                                     NumberLiteral(
@@ -212,12 +232,18 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -226,7 +252,7 @@ Module(
   |
 1 | def foo(a: int, b:
 2 | def foo():
-  | ^^^ Syntax Error: Expected an expression
+  | ^^^ Syntax Error: invalid syntax
 3 |     return 42
 4 | def foo(a: int, b: str
   |
@@ -234,7 +260,7 @@ Module(
 
   |
 1 | def foo(a: int, b:
-  |                   ^ Syntax Error: Expected `)`, found newline
+  |                   ^ Syntax Error: invalid syntax
 2 | def foo():
 3 |     return 42
 4 | def foo(a: int, b: str
@@ -244,20 +270,38 @@ Module(
   |
 1 | def foo(a: int, b:
 2 | def foo():
-  | ^^^ Syntax Error: Expected an indented block after function definition
+  | ^^^ Syntax Error: expected an indented block after function definition on line 1
 3 |     return 42
 4 | def foo(a: int, b: str
   |
 
 
   |
+2 | def foo():
+3 |     return 42
+4 | def foo(a: int, b: str
+  |        ^ Syntax Error: '(' was never closed
+5 | x = 10
+  |
+
+
+  |
+2 |   def foo():
+3 |       return 42
+4 |   def foo(a: int, b: str
+  |  ____________________^
+5 | | x = 10
+  | |_^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
 3 |     return 42
 4 | def foo(a: int, b: str
 5 | x = 10
-  | ^ Syntax Error: Expected `,`, found identifier
+  | ^ Syntax Error: invalid syntax
 
 
   |
 4 | def foo(a: int, b: str
 5 | x = 10
-  |       ^ Syntax Error: unexpected EOF while parsing
+  |       ^ Syntax Error: invalid syntax

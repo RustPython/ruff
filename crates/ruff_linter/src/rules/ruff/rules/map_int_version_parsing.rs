@@ -71,6 +71,8 @@ fn map_call_with_two_arguments<'a>(
                 keywords,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         range_start: _,
         node_index: _,

@@ -54,13 +54,24 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
   |
+2 | # assignment value.
+3 |
+4 | (x :=
+  | ^ Syntax Error: '(' was never closed
+5 |
+6 | x + y
+  |
+
+
+  |
 4 | (x :=
 5 |
 6 | x + y
-  |      ^ Syntax Error: unexpected EOF while parsing
+  |      ^ Syntax Error: invalid syntax

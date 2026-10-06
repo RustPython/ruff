@@ -57,11 +57,13 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -69,6 +71,14 @@ Module(
 
   |
 1 | {x:
+  | ^ Syntax Error: '{' was never closed
 2 |
 3 | 1 + 2
-  |      ^ Syntax Error: unexpected EOF while parsing
+  |
+
+
+  |
+1 | {x:
+2 |
+3 | 1 + 2
+  |      ^ Syntax Error: invalid syntax

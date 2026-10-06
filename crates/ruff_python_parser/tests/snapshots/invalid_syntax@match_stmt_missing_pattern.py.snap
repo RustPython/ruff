@@ -55,11 +55,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -68,4 +70,4 @@ Module(
   |
 1 | match x:
 2 |     case : ...
-  |          ^ Syntax Error: Expected a pattern
+  |          ^ Syntax Error: expected a pattern

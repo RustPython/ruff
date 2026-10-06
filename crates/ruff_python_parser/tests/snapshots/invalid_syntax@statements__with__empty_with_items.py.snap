@@ -30,6 +30,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -62,6 +65,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -71,7 +75,7 @@ Module(
 2 | # The parser should recover from this syntax error.
 3 |
 4 | with : ...
-  |      ^ Syntax Error: Expected the start of an expression after `with` keyword
+  |      ^ Syntax Error: expected the start of an expression after `with` keyword
 5 |
 6 | x + y
   |

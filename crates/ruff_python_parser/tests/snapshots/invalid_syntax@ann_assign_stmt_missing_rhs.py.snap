@@ -32,9 +32,11 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -42,4 +44,4 @@ Module(
 
   |
 1 | x: int =
-  |         ^ Syntax Error: Expected an expression
+  |         ^ Syntax Error: invalid syntax

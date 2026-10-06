@@ -79,6 +79,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -92,6 +93,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

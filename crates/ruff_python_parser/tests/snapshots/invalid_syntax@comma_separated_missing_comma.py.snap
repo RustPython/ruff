@@ -55,12 +55,15 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -68,9 +71,9 @@ Module(
 
   |
 1 | call(**x := 1)
-  |          ^^ Syntax Error: Expected `,`, found `:=`
+  |          ^^ Syntax Error: invalid syntax
 
 
   |
 1 | call(**x := 1)
-  |             ^ Syntax Error: Positional argument cannot follow keyword argument unpacking
+  |              ^ Syntax Error: positional argument follows keyword argument unpacking

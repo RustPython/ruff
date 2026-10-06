@@ -30,6 +30,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -37,4 +38,4 @@ Module(
 
   |
 1 | import x as
-  |            ^ Syntax Error: Expected symbol after `as`
+  |            ^ Syntax Error: expected symbol after `as`

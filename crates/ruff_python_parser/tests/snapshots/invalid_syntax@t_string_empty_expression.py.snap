@@ -39,6 +39,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -51,6 +54,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -84,6 +89,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -96,11 +104,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -109,7 +120,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"{}"
-  |    ^ Syntax Error: Expected an expression
+  |    ^ Syntax Error: t-string: valid expression required before '}'
 3 | t"{  }"
   |
 
@@ -118,4 +129,4 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"{}"
 3 | t"{  }"
-  |      ^ Syntax Error: Expected an expression
+  |      ^ Syntax Error: t-string: valid expression required before '}'

@@ -43,15 +43,20 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                             optional_vars: None,
                         },
                     ],
                     body: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -60,7 +65,15 @@ Module(
   |
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b
-  |          ^ Syntax Error: Expected an expression or a ')'
+  |      ^ Syntax Error: '(' was never closed
+3 | ?
+  |
+
+
+  |
+1 | # parse_options: {"mode": "ipython"}
+2 | with (a, ?b
+  |          ^ Syntax Error: invalid syntax
 3 | ?
   |
 
@@ -69,10 +82,10 @@ Module(
 1 | # parse_options: {"mode": "ipython"}
 2 | with (a, ?b
 3 | ?
-  | ^ Syntax Error: Expected `,`, found `?`
+  | ^ Syntax Error: invalid syntax
 
 
   |
 2 | with (a, ?b
 3 | ?
-  |  ^ Syntax Error: unexpected EOF while parsing
+  |  ^ Syntax Error: invalid syntax

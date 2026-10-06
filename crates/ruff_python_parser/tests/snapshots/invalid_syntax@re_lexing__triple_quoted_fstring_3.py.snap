@@ -17,7 +17,7 @@ Module(
                     test: Call(
                         ExprCall {
                             node_index: NodeIndex(None),
-                            range: 234..253,
+                            range: 234..258,
                             func: Name(
                                 ExprName {
                                     node_index: NodeIndex(None),
@@ -27,7 +27,7 @@ Module(
                                 },
                             ),
                             arguments: Arguments {
-                                range: 238..253,
+                                range: 238..258,
                                 node_index: NodeIndex(None),
                                 args: [
                                     FString(
@@ -69,6 +69,9 @@ Module(
                                                                             ],
                                                                         },
                                                                     ),
+                                                                    runtime_str: None,
+                                                                    runtime_interpolation_format_spec: None,
+                                                                    runtime_formatted_value_format_spec: None,
                                                                 },
                                                             ),
                                                         ],
@@ -81,10 +84,14 @@ Module(
                                                     },
                                                 ),
                                             },
+                                            runtime_joined_str: None,
+                                            runtime_values: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -97,18 +104,22 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
   |
+3 | # within an f-string but the lexer shouldn't go back.
+4 |
 5 | if call(f'''{x:.3f
+  |        ^ Syntax Error: '(' was never closed
 6 | '''
-  | ^^^ Syntax Error: f-string: expecting `}`
 7 |     pass
   |
 
@@ -116,6 +127,35 @@ Module(
   |
 5 | if call(f'''{x:.3f
 6 | '''
-  |    ^ Syntax Error: Expected `)`, found newline
+  | ^^^ Syntax Error: f-string: expecting '}', or format specs
 7 |     pass
   |
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+  |    ^ Syntax Error: invalid syntax
+7 |     pass
+  |
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  | ^^^^ Syntax Error: invalid syntax
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  |     ^^^^ Syntax Error: invalid syntax
+
+
+  |
+5 | if call(f'''{x:.3f
+6 | '''
+7 |     pass
+  |         ^ Syntax Error: invalid syntax

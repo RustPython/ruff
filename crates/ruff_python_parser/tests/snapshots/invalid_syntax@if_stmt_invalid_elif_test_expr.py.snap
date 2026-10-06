@@ -59,6 +59,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 33..55,
@@ -89,11 +91,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -103,7 +109,7 @@ Module(
 1 | if x:
 2 |     pass
 3 | elif *x:
-  |      ^^ Syntax Error: Starred expression cannot be used here
+  |      ^ Syntax Error: invalid syntax
 4 |     pass
 5 | elif yield x:
   |
@@ -113,6 +119,6 @@ Module(
 3 | elif *x:
 4 |     pass
 5 | elif yield x:
-  |      ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |      ^^^^^^^ Syntax Error: yield expression cannot be used here
 6 |     pass
   |
