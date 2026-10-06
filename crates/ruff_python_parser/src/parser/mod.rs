@@ -1990,6 +1990,10 @@ fn prioritize_tokenizer_error(
     start_offset: TextSize,
     unclosed_bracket_recovery: Option<TextSize>,
 ) {
+    // The lexer reports every tokenizer error, so a source without errors has none to find.
+    if errors.is_empty() {
+        return;
+    }
     let is_tokenizer_error = |error: &ParseError| matches!(&error.error, ParseErrorType::Lexical(lexical) if lexical.is_tokenizer_error());
     let first = errors
         .iter()
