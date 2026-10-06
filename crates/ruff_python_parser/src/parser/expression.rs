@@ -822,7 +822,10 @@ impl<'src> Parser<'src> {
     }
 
     fn parse_missing_identifier(&mut self) -> ast::Identifier {
-        self.add_error(ParseErrorType::ExpectedIdentifier, self.current_token_range());
+        self.add_error(
+            ParseErrorType::ExpectedIdentifier,
+            self.current_token_range(),
+        );
 
         ast::Identifier {
             id: Name::empty(),
@@ -1976,9 +1979,10 @@ impl<'src> Parser<'src> {
         // test_err interpolated_string_escape_error
         // f'a\N b{x}'
         // t'{x}\x1' 'c'
-        if let Some(error) =
-            std::mem::replace(&mut self.interpolated_string_escape_error, outer_escape_error)
-        {
+        if let Some(error) = std::mem::replace(
+            &mut self.interpolated_string_escape_error,
+            outer_escape_error,
+        ) {
             self.add_error(ParseErrorType::Lexical(error), end_range);
         }
 

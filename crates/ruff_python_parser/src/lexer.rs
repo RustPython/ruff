@@ -1192,10 +1192,12 @@ impl<'src> Lexer<'src> {
     /// that has no opening bracket or does not match it.
     fn close_bracket(&mut self, closing: char) {
         let start = self.token_range().start();
-        let at_interpolation_brace = self
-            .interpolated_strings
-            .current()
-            .filter(|interpolated_string| interpolated_string.is_at_interpolation_brace(self.nesting));
+        let at_interpolation_brace =
+            self.interpolated_strings
+                .current()
+                .filter(|interpolated_string| {
+                    interpolated_string.is_at_interpolation_brace(self.nesting)
+                });
         let error = match self.brackets.pop() {
             Some(open) if open.kind == opening_bracket(closing) => None,
             Some(open) if open.kind == '{' && at_interpolation_brace.is_some() => {
