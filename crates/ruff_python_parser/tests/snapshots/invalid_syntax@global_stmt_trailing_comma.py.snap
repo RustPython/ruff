@@ -65,7 +65,7 @@ Module(
 
   |
 1 | global ,
-  |         ^ Syntax Error: global statement must have at least one name
+  |         ^ Syntax Error: invalid syntax
 2 | global x,
 3 | global x, y,
   |
@@ -74,7 +74,7 @@ Module(
   |
 1 | global ,
 2 | global x,
-  |         ^ Syntax Error: trailing comma not allowed without surrounding parentheses
+  |          ^ Syntax Error: invalid syntax
 3 | global x, y,
   |
 
@@ -83,4 +83,4 @@ Module(
 1 | global ,
 2 | global x,
 3 | global x, y,
-  |            ^ Syntax Error: trailing comma not allowed without surrounding parentheses
+  |             ^ Syntax Error: invalid syntax

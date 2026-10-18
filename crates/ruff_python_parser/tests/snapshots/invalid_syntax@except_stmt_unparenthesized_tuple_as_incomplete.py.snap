@@ -188,7 +188,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except x, y as (exc):
-  |                ^ Syntax Error: expected name after `as`
+  |                ^ Syntax Error: invalid syntax
 4 |     pass
 5 | try:
   |

@@ -295,6 +295,12 @@ pub enum ParseErrorType {
         expected: TokenKind,
         found: TokenKind,
     },
+    /// A token that the grammar requires right after the preceding ones (a forced token, `&&`
+    /// in the PEG grammar) was not found.
+    ExpectedForcedToken {
+        expected: TokenKind,
+        found: TokenKind,
+    },
 
     /// A compound statement header is not followed by an indented block. `line` is the line of
     /// the header's keyword.
@@ -502,15 +508,15 @@ impl std::fmt::Display for ParseErrorType {
                 }
                 _ => f.write_str("invalid syntax"),
             },
+            ParseErrorType::ExpectedForcedToken { expected, .. } => match expected {
+                TokenKind::Colon => f.write_str("expected ':'"),
+                TokenKind::Lpar => f.write_str("expected '('"),
+                expected => write!(f, "expected {expected}"),
+            },
             ParseErrorType::Lexical(lex_error) => write!(f, "{lex_error}"),
             ParseErrorType::SimpleStatementsOnSameLine => f.write_str("invalid syntax"),
             ParseErrorType::SimpleAndCompoundStatementOnSameLine => f.write_str("invalid syntax"),
-            ParseErrorType::UnexpectedTokenAfterAsync(kind) => {
-                write!(
-                    f,
-                    "expected `def`, `with` or `for` to follow `async`, found {kind}",
-                )
-            }
+            ParseErrorType::UnexpectedTokenAfterAsync(_) => f.write_str("invalid syntax"),
             ParseErrorType::InvalidArgumentUnpackingOrder => {
                 f.write_str("iterable argument unpacking follows keyword argument unpacking")
             }
@@ -540,15 +546,9 @@ impl std::fmt::Display for ParseErrorType {
                 f.write_str("positional argument follows keyword argument unpacking")
             }
             ParseErrorType::EmptySlice => f.write_str("expected index or slice expression"),
-            ParseErrorType::EmptyGlobalNames => {
-                f.write_str("global statement must have at least one name")
-            }
-            ParseErrorType::EmptyNonlocalNames => {
-                f.write_str("nonlocal statement must have at least one name")
-            }
-            ParseErrorType::EmptyDeleteTargets => {
-                f.write_str("delete statement must have at least one target")
-            }
+            ParseErrorType::EmptyGlobalNames
+            | ParseErrorType::EmptyNonlocalNames
+            | ParseErrorType::EmptyDeleteTargets => f.write_str("invalid syntax"),
             ParseErrorType::EmptyImportNames => {
                 f.write_str("Expected one or more names after 'import'")
             }

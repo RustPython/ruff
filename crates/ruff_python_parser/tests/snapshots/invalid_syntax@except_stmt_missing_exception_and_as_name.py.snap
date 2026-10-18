@@ -70,6 +70,6 @@ Module(
 1 | try:
 2 |     pass
 3 | except as:
-  |          ^ Syntax Error: expected name after `as`
+  |          ^ Syntax Error: invalid syntax
 4 |     pass
   |

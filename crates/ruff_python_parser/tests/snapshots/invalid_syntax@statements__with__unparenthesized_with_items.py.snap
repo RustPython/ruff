@@ -365,7 +365,7 @@ Module(
 1 | # For parenthesized with items test cases, refer to `./ambiguous_lpar_with_items.py`
 2 |
 3 | with item,: pass
-  |          ^ Syntax Error: trailing comma not allowed without surrounding parentheses
+  |          ^ Syntax Error: the last 'with' item has a trailing comma
 4 | with item as x,: pass
 5 | with *item: pass
   |
@@ -374,7 +374,7 @@ Module(
   |
 3 | with item,: pass
 4 | with item as x,: pass
-  |               ^ Syntax Error: trailing comma not allowed without surrounding parentheses
+  |               ^ Syntax Error: the last 'with' item has a trailing comma
 5 | with *item: pass
 6 | with *item as x: pass
   |

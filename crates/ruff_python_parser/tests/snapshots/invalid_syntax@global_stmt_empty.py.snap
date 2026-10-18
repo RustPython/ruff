@@ -26,4 +26,4 @@ Module(
 
   |
 1 | global
-  |       ^ Syntax Error: global statement must have at least one name
+  |       ^ Syntax Error: invalid syntax

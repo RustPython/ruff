@@ -107,7 +107,7 @@ Module(
 
   |
 1 | import *
-  |        ^ Syntax Error: Expected one or more names after 'import'
+  |        ^ Syntax Error: invalid syntax
 2 | import x, *, y
   |
 
@@ -117,12 +117,6 @@ Module(
   |         ^ Syntax Error: invalid syntax
 2 | import x, *, y
   |
-
-
-  |
-1 | import *
-2 | import x, *, y
-  |         ^ Syntax Error: trailing comma not allowed without surrounding parentheses
 
 
   |

@@ -136,4 +136,4 @@ Module(
   |
 1 | x = pass if 1 else 1
 2 | pass if 1 else pass
-  |                ^^^^ Syntax Error: invalid syntax
+  |                ^^^^ Syntax Error: expected ':'

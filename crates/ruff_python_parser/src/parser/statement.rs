@@ -559,6 +559,7 @@ impl<'src> Parser<'src> {
     /// See: <https://docs.python.org/3/reference/simple_stmts.html#grammar-token-python-grammar-raise_stmt>
     fn parse_raise_statement(&mut self) -> ast::StmtRaise {
         let start = self.node_start();
+        let raise_range = self.current_token_range();
         self.bump(TokenKind::Raise);
 
         let exc = match self.current_token_kind() {
@@ -569,9 +570,9 @@ impl<'src> Parser<'src> {
                 // raise from None
                 self.add_error(
                     ParseErrorType::OtherError(
-                        "exception missing in `raise` statement with cause".to_string(),
+                        "did you forget an expression between 'raise' and 'from'?".to_string(),
                     ),
-                    self.current_token_range(),
+                    raise_range.cover(self.current_token_range()),
                 );
                 None
             }
@@ -598,7 +599,19 @@ impl<'src> Parser<'src> {
             }
         };
 
+        let from_range = self.current_token_range();
         let cause = self.eat(TokenKind::From).then(|| {
+            if exc.is_some() && !self.at_expr() {
+                // test_err raise_stmt_missing_cause
+                // raise x from
+                self.add_error(
+                    ParseErrorType::OtherError(
+                        "did you forget an expression after 'from'?".to_string(),
+                    ),
+                    from_range,
+                );
+            }
+
             // test_err raise_stmt_invalid_cause
             // raise x from *y
             // raise x from yield y
@@ -675,7 +688,7 @@ impl<'src> Parser<'src> {
         if names.is_empty() {
             // test_err import_stmt_empty
             // import
-            self.add_error(ParseErrorType::EmptyImportNames, self.current_token_range());
+            self.add_empty_import_names_error();
         }
 
         ast::StmtImport {
@@ -683,6 +696,24 @@ impl<'src> Parser<'src> {
             is_lazy,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+        }
+    }
+
+    /// Reports an import statement without names. Only an empty list before the newline has its
+    /// own rule, starting from the newline and ending where it starts; otherwise parsing fails at
+    /// the token after `import`.
+    fn add_empty_import_names_error(&mut self) {
+        let range = self.current_token_range();
+        if self.at(TokenKind::Newline) {
+            self.add_error(
+                ParseErrorType::EmptyImportNames,
+                TextRange::empty(range.start()),
+            );
+        } else {
+            self.add_error(
+                ParseErrorType::OtherError("invalid syntax".to_string()),
+                range,
+            );
         }
     }
 
@@ -749,7 +780,7 @@ impl<'src> Parser<'src> {
                 // from
                 // from import x
                 self.add_error(
-                    ParseErrorType::OtherError("expected a module name".to_string()),
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
                     self.current_token_range(),
                 );
             }
@@ -790,7 +821,7 @@ impl<'src> Parser<'src> {
             // from x import
             // from x import ()
             // from x import ,,
-            self.add_error(ParseErrorType::EmptyImportNames, self.current_token_range());
+            self.add_empty_import_names_error();
         }
 
         if seen_star_import && parenthesized.is_yes() {
@@ -891,7 +922,7 @@ impl<'src> Parser<'src> {
                 // test_err import_alias_missing_asname
                 // import x as
                 self.add_error(
-                    ParseErrorType::OtherError("expected symbol after `as`".to_string()),
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
                     self.current_token_range(),
                 );
                 None
@@ -1664,7 +1695,11 @@ impl<'src> Parser<'src> {
         //     pass
         // else:
         //     pass
-        self.expect(TokenKind::Colon);
+        if kind.is_elif() {
+            self.expect(TokenKind::Colon);
+        } else {
+            self.expect_forced(TokenKind::Colon);
+        }
 
         let body = self.parse_body(kind.as_block_clause(), start);
 
@@ -1688,7 +1723,7 @@ impl<'src> Parser<'src> {
     fn parse_try_statement(&mut self) -> ast::StmtTry {
         let try_start = self.node_start();
         self.bump(TokenKind::Try);
-        self.expect(TokenKind::Colon);
+        self.expect_forced(TokenKind::Colon);
 
         let mut is_star: Option<bool> = None;
 
@@ -1773,7 +1808,7 @@ impl<'src> Parser<'src> {
         let orelse = if self.at(TokenKind::Else) {
             let else_start = self.current_token_range().start();
             self.bump(TokenKind::Else);
-            self.expect(TokenKind::Colon);
+            self.expect_forced(TokenKind::Colon);
             self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
@@ -1782,7 +1817,7 @@ impl<'src> Parser<'src> {
         let (finalbody, has_finally) = if self.at(TokenKind::Finally) {
             let finally_start = self.current_token_range().start();
             self.bump(TokenKind::Finally);
-            self.expect(TokenKind::Colon);
+            self.expect_forced(TokenKind::Colon);
             (self.parse_body(BlockClause::Finally, finally_start), true)
         } else {
             (Suite::new(), false)
@@ -1990,7 +2025,7 @@ impl<'src> Parser<'src> {
                 // except Exception as
                 //     pass
                 self.add_error(
-                    ParseErrorType::OtherError("expected name after `as`".to_string()),
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
                     self.current_token_range(),
                 );
                 None
@@ -2147,7 +2182,7 @@ impl<'src> Parser<'src> {
         let orelse = if self.at(TokenKind::Else) {
             let else_start = self.current_token_range().start();
             self.bump(TokenKind::Else);
-            self.expect(TokenKind::Colon);
+            self.expect_forced(TokenKind::Colon);
             self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
@@ -2203,7 +2238,7 @@ impl<'src> Parser<'src> {
         let orelse = if self.at(TokenKind::Else) {
             let else_start = self.current_token_range().start();
             self.bump(TokenKind::Else);
-            self.expect(TokenKind::Colon);
+            self.expect_forced(TokenKind::Colon);
             self.parse_body(BlockClause::Else, else_start)
         } else {
             Suite::new()
@@ -2280,48 +2315,45 @@ impl<'src> Parser<'src> {
         // x = 10
         let parameters = self.parse_parameters(FunctionKind::FunctionDef);
 
+        let arrow_range = self.current_token_range();
         let returns = if self.eat(TokenKind::Rarrow) {
-            if self.at_expr() {
+            if self.at_expr()
+                && !matches!(
+                    self.current_token_kind(),
+                    TokenKind::Star | TokenKind::Yield
+                )
+            {
                 // test_ok function_def_valid_return_expr
                 // def foo() -> int | str: ...
                 // def foo() -> lambda x: x: ...
                 // def foo() -> int if True else str: ...
 
+                // test_ok function_def_parenthesized_return_types
+                // def foo() -> (int,): ...
+                // def foo() -> (int, str): ...
+
+                // test_err function_def_unparenthesized_return_types
+                // def foo() -> int,: ...
+                // def foo() -> int, str: ...
+                let returns = self.parse_conditional_expression_or_higher();
+                Some(Box::new(returns.expr))
+            } else {
+                // The annotation is an `expression`, so without one `->` is where the forced `:`
+                // is missing.
+
+                // test_err function_def_missing_return_type
+                // def foo() -> : ...
+
                 // test_err function_def_invalid_return_expr
                 // def foo() -> *int: ...
                 // def foo() -> (*int): ...
                 // def foo() -> yield x: ...
-                let returns = self.parse_expression_list(ExpressionContext::default());
-
-                if matches!(
-                    returns.expr,
-                    Expr::Tuple(ast::ExprTuple {
-                        parenthesized: false,
-                        ..
-                    })
-                ) {
-                    // test_ok function_def_parenthesized_return_types
-                    // def foo() -> (int,): ...
-                    // def foo() -> (int, str): ...
-
-                    // test_err function_def_unparenthesized_return_types
-                    // def foo() -> int,: ...
-                    // def foo() -> int, str: ...
-                    self.add_error(
-                        ParseErrorType::OtherError(
-                            "multiple return types must be parenthesized".to_string(),
-                        ),
-                        returns.range(),
-                    );
-                }
-
-                Some(Box::new(returns.expr))
-            } else {
-                // test_err function_def_missing_return_type
-                // def foo() -> : ...
                 self.add_error(
-                    ParseErrorType::ExpectedExpression,
-                    self.current_token_range(),
+                    ParseErrorType::ExpectedForcedToken {
+                        expected: TokenKind::Colon,
+                        found: TokenKind::Rarrow,
+                    },
+                    arrow_range,
                 );
 
                 None
@@ -2330,7 +2362,7 @@ impl<'src> Parser<'src> {
             None
         };
 
-        self.expect(TokenKind::Colon);
+        self.expect_forced(TokenKind::Colon);
 
         // test_err function_def_empty_body
         // def foo():
@@ -2472,9 +2504,7 @@ impl<'src> Parser<'src> {
     fn parse_with_items(&mut self) -> Vec<WithItem> {
         if !self.at_expr() {
             self.add_error(
-                ParseErrorType::OtherError(
-                    "expected the start of an expression after `with` keyword".to_string(),
-                ),
+                ParseErrorType::OtherError("invalid syntax".to_string()),
                 self.current_token_range(),
             );
             return vec![];
@@ -3282,13 +3312,20 @@ impl<'src> Parser<'src> {
                 // async with x: ...
                 // @foo
                 // x = 1
+
+                // Parsing fails at the token after `async`, which only `def` can follow here.
+                let range = if self.at(TokenKind::Async) {
+                    let checkpoint = self.checkpoint();
+                    self.bump(TokenKind::Async);
+                    let range = self.current_token_range();
+                    self.rewind(checkpoint);
+                    range
+                } else {
+                    self.current_token_range()
+                };
                 self.add_error(
-                    ParseErrorType::OtherError(
-                        "expected class, function definition or async function definition \
-                            after decorator"
-                            .to_string(),
-                    ),
-                    self.current_token_range(),
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
+                    range,
                 );
 
                 let range = self.node_range(start);

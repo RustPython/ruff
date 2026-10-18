@@ -13,7 +13,7 @@ Module(
             FunctionDef(
                 StmtFunctionDef {
                     node_index: NodeIndex(None),
-                    range: 0..22,
+                    range: 0..16,
                     is_async: false,
                     decorator_list: [],
                     name: Identifier {
@@ -33,50 +33,38 @@ Module(
                         runtime_defaults: None,
                     },
                     returns: Some(
-                        Tuple(
-                            ExprTuple {
+                        Name(
+                            ExprName {
                                 node_index: NodeIndex(None),
-                                range: 13..17,
-                                elts: [
-                                    Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 13..16,
-                                            id: Name("int"),
-                                            ctx: Load,
-                                        },
-                                    ),
-                                ],
+                                range: 13..16,
+                                id: Name("int"),
                                 ctx: Load,
-                                parenthesized: false,
-                                runtime_elts: None,
                             },
                         ),
                     ),
-                    body: [
-                        Expr(
-                            StmtExpr {
-                                node_index: NodeIndex(None),
-                                range: 19..22,
-                                value: EllipsisLiteral(
-                                    ExprEllipsisLiteral {
-                                        node_index: NodeIndex(None),
-                                        range: 19..22,
-                                    },
-                                ),
-                            },
-                        ),
-                    ],
+                    body: [],
                     runtime_decorator_list: None,
                     runtime_type_comment: None,
                     runtime_type_comment_bytes: None,
                     runtime_body: None,
                 },
             ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 19..22,
+                    value: EllipsisLiteral(
+                        ExprEllipsisLiteral {
+                            node_index: NodeIndex(None),
+                            range: 19..22,
+                        },
+                    ),
+                },
+            ),
             FunctionDef(
                 StmtFunctionDef {
                     node_index: NodeIndex(None),
-                    range: 23..49,
+                    range: 23..39,
                     is_async: false,
                     decorator_list: [],
                     name: Identifier {
@@ -96,52 +84,43 @@ Module(
                         runtime_defaults: None,
                     },
                     returns: Some(
-                        Tuple(
-                            ExprTuple {
+                        Name(
+                            ExprName {
                                 node_index: NodeIndex(None),
-                                range: 36..44,
-                                elts: [
-                                    Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 36..39,
-                                            id: Name("int"),
-                                            ctx: Load,
-                                        },
-                                    ),
-                                    Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 41..44,
-                                            id: Name("str"),
-                                            ctx: Load,
-                                        },
-                                    ),
-                                ],
+                                range: 36..39,
+                                id: Name("int"),
                                 ctx: Load,
-                                parenthesized: false,
-                                runtime_elts: None,
                             },
                         ),
                     ),
-                    body: [
-                        Expr(
-                            StmtExpr {
-                                node_index: NodeIndex(None),
-                                range: 46..49,
-                                value: EllipsisLiteral(
-                                    ExprEllipsisLiteral {
-                                        node_index: NodeIndex(None),
-                                        range: 46..49,
-                                    },
-                                ),
-                            },
-                        ),
-                    ],
+                    body: [],
                     runtime_decorator_list: None,
                     runtime_type_comment: None,
                     runtime_type_comment_bytes: None,
                     runtime_body: None,
+                },
+            ),
+            AnnAssign(
+                StmtAnnAssign {
+                    node_index: NodeIndex(None),
+                    range: 41..49,
+                    target: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 41..44,
+                            id: Name("str"),
+                            ctx: Store,
+                        },
+                    ),
+                    annotation: EllipsisLiteral(
+                        ExprEllipsisLiteral {
+                            node_index: NodeIndex(None),
+                            range: 46..49,
+                        },
+                    ),
+                    value: None,
+                    simple: true,
+                    runtime_simple: None,
                 },
             ),
         ],
@@ -153,7 +132,14 @@ Module(
 
   |
 1 | def foo() -> int,: ...
-  |              ^^^^ Syntax Error: multiple return types must be parenthesized
+  |                 ^ Syntax Error: expected ':'
+2 | def foo() -> int, str: ...
+  |
+
+
+  |
+1 | def foo() -> int,: ...
+  |                  ^ Syntax Error: invalid syntax
 2 | def foo() -> int, str: ...
   |
 
@@ -161,4 +147,4 @@ Module(
   |
 1 | def foo() -> int,: ...
 2 | def foo() -> int, str: ...
-  |              ^^^^^^^^ Syntax Error: multiple return types must be parenthesized
+  |                 ^ Syntax Error: expected ':'

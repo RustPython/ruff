@@ -79,7 +79,7 @@ Module(
   |
 1 | from x import
 2 | from x import ()
-  |                ^ Syntax Error: Expected one or more names after 'import'
+  |                ^ Syntax Error: invalid syntax
 3 | from x import ,,
   |
 
@@ -102,4 +102,4 @@ Module(
 1 | from x import
 2 | from x import ()
 3 | from x import ,,
-  |                 ^ Syntax Error: Expected one or more names after 'import'
+  |                 ^ Syntax Error: trailing comma not allowed without surrounding parentheses

@@ -62,4 +62,4 @@ Module(
 
   |
 1 | def foo() -> : ...
-  |              ^ Syntax Error: invalid syntax
+  |           ^^ Syntax Error: expected ':'

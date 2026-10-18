@@ -843,6 +843,24 @@ impl<'src> Parser<'src> {
         false
     }
 
+    /// Like [`Parser::expect`], for a token that the grammar forces, which is reported as missing
+    /// whatever token is found instead.
+    fn expect_forced(&mut self, expected: TokenKind) -> bool {
+        if self.eat(expected) {
+            return true;
+        }
+
+        self.add_error(
+            ParseErrorType::ExpectedForcedToken {
+                found: self.current_token_kind(),
+                expected,
+            },
+            self.current_token_range(),
+        );
+
+        false
+    }
+
     /// Re-lexes the current token in the context of a logical line to recover from an unclosed
     /// bracket.
     fn re_lex_logical_token(&mut self) {
@@ -1131,15 +1149,27 @@ impl<'src> Parser<'src> {
             self.bump_any();
         }
 
-        if let Some(trailing_comma_range) = trailing_comma_range {
-            if !recovery_context_kind.allow_trailing_comma() {
-                self.add_error(
-                    ParseErrorType::OtherError(
-                        "trailing comma not allowed without surrounding parentheses".to_string(),
-                    ),
+        if let Some(trailing_comma_range) = trailing_comma_range
+            && !recovery_context_kind.allow_trailing_comma()
+        {
+            // Only `from ... import` names before the newline and `with` items before the `:` have
+            // a rule for a trailing comma. Otherwise parsing fails at the token after the comma.
+            let (message, range) = match recovery_context_kind {
+                RecoveryContextKind::ImportFromAsNames(Parenthesized::No)
+                    if self.at(TokenKind::Newline) =>
+                {
+                    (
+                        "trailing comma not allowed without surrounding parentheses",
+                        self.current_token_range(),
+                    )
+                }
+                RecoveryContextKind::WithItems(_) if self.at(TokenKind::Colon) => (
+                    "the last 'with' item has a trailing comma",
                     trailing_comma_range,
-                );
-            }
+                ),
+                _ => ("invalid syntax", self.current_token_range()),
+            };
+            self.add_error(ParseErrorType::OtherError(message.to_string()), range);
         }
 
         self.recovery_context = saved_context;
