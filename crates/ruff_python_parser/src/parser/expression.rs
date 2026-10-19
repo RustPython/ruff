@@ -1584,9 +1584,28 @@ impl<'src> Parser<'src> {
             CmpOp::NotIn => (TokenKind::Not, Some(TokenKind::In)),
         };
 
+        let first_range = self.current_token_range();
         self.bump(first);
         if let Some(second) = second {
             self.bump(second);
+        }
+
+        // test_err obsolete_not_equal
+        // 2 <> 3
+        // a < > b
+        // a <<> b
+        if op == CmpOp::Lt
+            && self.at(TokenKind::Greater)
+            && self.current_token_range().start() == first_range.end()
+        {
+            let range = first_range.cover(self.current_token_range());
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "invalid syntax.  Maybe you meant '!=' instead of '<>'?".to_string(),
+                ),
+                range,
+            );
+            self.bump(TokenKind::Greater);
         }
     }
 
