@@ -517,7 +517,7 @@ Module(
  6 | [*x and y, z]
  7 | [*x or y, z]
  8 | [*x if True else y, z]
-   |   ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   |  ^^^^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
  9 | [*lambda x: x, z]
 10 | [*x := 2, z]
    |

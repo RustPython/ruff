@@ -1,0 +1,114 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_soft_keyword_operand.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..72,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..53,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 44..53,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 47..52,
+                                        id: Name("match"),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 54..62,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 54..62,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 57..61,
+                                        id: Name("case"),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 63..71,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 63..71,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 66..70,
+                                        id: Name("type"),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**match]
+  |  ^^ Syntax Error: cannot use dict unpacking here
+3 | [**case]
+4 | [**type]
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**match]
+3 | [**case]
+  |  ^^ Syntax Error: cannot use dict unpacking here
+4 | [**type]
+  |
+
+
+  |
+2 | [**match]
+3 | [**case]
+4 | [**type]
+  |  ^^ Syntax Error: cannot use dict unpacking here

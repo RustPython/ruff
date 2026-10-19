@@ -1,0 +1,124 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_comparison_then_error.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..69,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..63,
+                    value: Generator(
+                        ExprGenerator {
+                            node_index: NodeIndex(None),
+                            range: 44..63,
+                            elt: Starred(
+                                ExprStarred {
+                                    node_index: NodeIndex(None),
+                                    range: 45..51,
+                                    value: Compare(
+                                        ExprCompare {
+                                            node_index: NodeIndex(None),
+                                            range: 46..51,
+                                            ops: [
+                                                Lt,
+                                            ],
+                                            operands: [
+                                                Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 46..47,
+                                                        id: Name("x"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                                Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 50..51,
+                                                        id: Name("y"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                            ],
+                                            runtime_comparators: None,
+                                        },
+                                    ),
+                                    ctx: Load,
+                                },
+                            ),
+                            generators: [
+                                Comprehension {
+                                    range: 52..62,
+                                    node_index: NodeIndex(None),
+                                    target: Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 56..57,
+                                            id: Name("x"),
+                                            ctx: Store,
+                                        },
+                                    ),
+                                    iter: Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 61..62,
+                                            id: Name("z"),
+                                            ctx: Load,
+                                        },
+                                    ),
+                                    ifs: [],
+                                    is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
+                                },
+                            ],
+                            parenthesized: true,
+                        },
+                    ),
+                },
+            ),
+            Assign(
+                StmtAssign {
+                    node_index: NodeIndex(None),
+                    range: 65..68,
+                    targets: [
+                        Name(
+                            ExprName {
+                                node_index: NodeIndex(None),
+                                range: 65..66,
+                                id: Name("a"),
+                                ctx: Store,
+                            },
+                        ),
+                    ],
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 68..68,
+                            id: Name(""),
+                            ctx: Invalid,
+                        },
+                    ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | (*x < y for x in z); a =
+  |                         ^ Syntax Error: invalid syntax

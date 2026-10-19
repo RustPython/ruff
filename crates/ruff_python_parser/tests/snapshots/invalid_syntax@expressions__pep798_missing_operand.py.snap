@@ -1,0 +1,216 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_missing_operand.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..78,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..48,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 44..48,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 47..47,
+                                        id: Name(""),
+                                        ctx: Invalid,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 49..53,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 52..52,
+                            id: Name(""),
+                            ctx: Invalid,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 54..61,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 54..61,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 57..57,
+                                        id: Name(""),
+                                        ctx: Invalid,
+                                    },
+                                ),
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 59..60,
+                                        id: Name("x"),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 62..77,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 62..77,
+                            elts: [
+                                Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 66..69,
+                                        id: Name("for"),
+                                        ctx: Load,
+                                    },
+                                ),
+                                Compare(
+                                    ExprCompare {
+                                        node_index: NodeIndex(None),
+                                        range: 70..76,
+                                        ops: [
+                                            In,
+                                        ],
+                                        operands: [
+                                            Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 70..71,
+                                                    id: Name("x"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                            Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 75..76,
+                                                    id: Name("z"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                        ],
+                                        runtime_comparators: None,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**]
+  |  ^^ Syntax Error: invalid syntax
+3 | (**)
+4 | [**, x]
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**]
+  |    ^ Syntax Error: invalid syntax
+3 | (**)
+4 | [**, x]
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**]
+3 | (**)
+  |  ^^ Syntax Error: invalid syntax
+4 | [**, x]
+5 | [** for x in z]
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [**]
+3 | (**)
+  |    ^ Syntax Error: invalid syntax
+4 | [**, x]
+5 | [** for x in z]
+  |
+
+
+  |
+2 | [**]
+3 | (**)
+4 | [**, x]
+  |  ^^ Syntax Error: invalid syntax
+5 | [** for x in z]
+  |
+
+
+  |
+2 | [**]
+3 | (**)
+4 | [**, x]
+  |    ^ Syntax Error: invalid syntax
+5 | [** for x in z]
+  |
+
+
+  |
+3 | (**)
+4 | [**, x]
+5 | [** for x in z]
+  |  ^^ Syntax Error: invalid syntax
+
+
+  |
+3 | (**)
+4 | [**, x]
+5 | [** for x in z]
+  |     ^^^ Syntax Error: invalid syntax
+
+
+  |
+3 | (**)
+4 | [**, x]
+5 | [** for x in z]
+  |         ^ Syntax Error: invalid syntax

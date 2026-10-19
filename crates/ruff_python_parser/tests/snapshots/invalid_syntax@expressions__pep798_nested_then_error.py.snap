@@ -1,0 +1,162 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_nested_then_error.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..85,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..79,
+                    value: Generator(
+                        ExprGenerator {
+                            node_index: NodeIndex(None),
+                            range: 44..79,
+                            elt: Starred(
+                                ExprStarred {
+                                    node_index: NodeIndex(None),
+                                    range: 45..66,
+                                    value: Generator(
+                                        ExprGenerator {
+                                            node_index: NodeIndex(None),
+                                            range: 46..66,
+                                            elt: Starred(
+                                                ExprStarred {
+                                                    node_index: NodeIndex(None),
+                                                    range: 47..54,
+                                                    value: BoolOp(
+                                                        ExprBoolOp {
+                                                            node_index: NodeIndex(None),
+                                                            range: 48..54,
+                                                            op: Or,
+                                                            values: [
+                                                                Name(
+                                                                    ExprName {
+                                                                        node_index: NodeIndex(None),
+                                                                        range: 48..49,
+                                                                        id: Name("x"),
+                                                                        ctx: Load,
+                                                                    },
+                                                                ),
+                                                                Name(
+                                                                    ExprName {
+                                                                        node_index: NodeIndex(None),
+                                                                        range: 53..54,
+                                                                        id: Name("y"),
+                                                                        ctx: Load,
+                                                                    },
+                                                                ),
+                                                            ],
+                                                            runtime_values: None,
+                                                        },
+                                                    ),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                            generators: [
+                                                Comprehension {
+                                                    range: 55..65,
+                                                    node_index: NodeIndex(None),
+                                                    target: Name(
+                                                        ExprName {
+                                                            node_index: NodeIndex(None),
+                                                            range: 59..60,
+                                                            id: Name("x"),
+                                                            ctx: Store,
+                                                        },
+                                                    ),
+                                                    iter: Name(
+                                                        ExprName {
+                                                            node_index: NodeIndex(None),
+                                                            range: 64..65,
+                                                            id: Name("z"),
+                                                            ctx: Load,
+                                                        },
+                                                    ),
+                                                    ifs: [],
+                                                    is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
+                                                },
+                                            ],
+                                            parenthesized: true,
+                                        },
+                                    ),
+                                    ctx: Load,
+                                },
+                            ),
+                            generators: [
+                                Comprehension {
+                                    range: 67..78,
+                                    node_index: NodeIndex(None),
+                                    target: Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 71..72,
+                                            id: Name("z"),
+                                            ctx: Store,
+                                        },
+                                    ),
+                                    iter: Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 76..78,
+                                            id: Name("zs"),
+                                            ctx: Load,
+                                        },
+                                    ),
+                                    ifs: [],
+                                    is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
+                                },
+                            ],
+                            parenthesized: true,
+                        },
+                    ),
+                },
+            ),
+            Assign(
+                StmtAssign {
+                    node_index: NodeIndex(None),
+                    range: 81..84,
+                    targets: [
+                        Name(
+                            ExprName {
+                                node_index: NodeIndex(None),
+                                range: 81..82,
+                                id: Name("a"),
+                                ctx: Store,
+                            },
+                        ),
+                    ],
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 84..84,
+                            id: Name(""),
+                            ctx: Invalid,
+                        },
+                    ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | (*(*x or y for x in z) for z in zs); a =
+  |                                         ^ Syntax Error: invalid syntax

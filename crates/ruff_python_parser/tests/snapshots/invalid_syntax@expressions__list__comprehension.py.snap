@@ -488,27 +488,12 @@ Module(
                         ExprListComp {
                             node_index: NodeIndex(None),
                             range: 193..216,
-                            elt: BinOp(
-                                ExprBinOp {
+                            elt: Name(
+                                ExprName {
                                     node_index: NodeIndex(None),
-                                    range: 194..197,
-                                    left: Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 194..194,
-                                            id: Name(""),
-                                            ctx: Invalid,
-                                        },
-                                    ),
-                                    op: Pow,
-                                    right: Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 196..197,
-                                            id: Name("x"),
-                                            ctx: Load,
-                                        },
-                                    ),
+                                    range: 196..197,
+                                    id: Name("x"),
+                                    ctx: Load,
                                 },
                             ),
                             generators: [
@@ -1224,7 +1209,7 @@ Module(
 10 | [x for x in yield from y]
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
-   |  ^^ Syntax Error: invalid syntax
+   |  ^^^ Syntax Error: cannot use dict unpacking in list comprehension
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
    |
@@ -1352,7 +1337,7 @@ Module(
 19 | [x for x in data if yield from y]
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
-   |   ^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   |  ^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
 22 | [x if x else *y for x in z]
    |
 
@@ -1361,7 +1346,7 @@ Module(
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
 22 | [x if x else *y for x in z]
-   |              ^ Syntax Error: expected expression after 'else', but statement is given
+   |              ^ Syntax Error: cannot unpack only part of a conditional expression
 
 
 ## Unsupported Syntax Errors

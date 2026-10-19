@@ -33,4 +33,4 @@ Module(
 
   |
 1 | (**x)
-  |  ^^ Syntax Error: cannot use double starred expression here
+  |  ^^ Syntax Error: cannot use dict unpacking here
