@@ -451,10 +451,61 @@ impl<'src> Parser<'src> {
             return;
         };
         let range = TextRange::new(first.start(), second_end);
+        if let Some((diagnostic_start, end)) = self.concatenated_literal_comma_range(first) {
+            self.add_error(
+                ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+                    expression_range: range,
+                    diagnostic_start,
+                },
+                TextRange::new(diagnostic_start.min(end), end),
+            );
+            return;
+        }
         self.add_error(
             ParseErrorType::OtherError("invalid syntax. Perhaps you forgot a comma?".to_string()),
             range,
         );
+    }
+
+    /// Points a multiline concatenation's missing-comma hint at its final literal line,
+    /// retaining the first literal's column, as CPython does.
+    fn concatenated_literal_comma_range(&self, first: &ParsedExpr) -> Option<(TextSize, TextSize)> {
+        let last = match &first.expr {
+            Expr::StringLiteral(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            Expr::BytesLiteral(bytes) if bytes.value.is_implicit_concatenated() => {
+                bytes.value.iter().next_back()?.range()
+            }
+            Expr::FString(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            Expr::TString(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            _ => return None,
+        };
+        let first_start = first.start().to_usize();
+        let end = last.end().to_usize();
+        let line_start = |offset| {
+            self.source[..offset]
+                .rfind(['\n', '\r'])
+                .map_or(0, |i| i + 1)
+        };
+        let first_line = line_start(first_start);
+        let last_line = line_start(end);
+        if first_line == last_line {
+            return None;
+        }
+        let line_end = self.source[end..]
+            .find(['\n', '\r'])
+            .map_or(self.source.len(), |i| end + i);
+        let mut start = (last_line + first_start - first_line).min(line_end);
+        // Keep the projected byte column at a valid character boundary.
+        while !self.source.is_char_boundary(start) {
+            start -= 1;
+        }
+        Some((TextSize::try_from(start).unwrap(), last.end()))
     }
 
     /// Reports the Python 2 `print` or `exec` statement named `keyword` that starts at `start`

@@ -1,0 +1,123 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/concat_unicode.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..83,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..82,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 44..82,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 44..49,
+                                    id: Name("print"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 49..82,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    StringLiteral(
+                                        ExprStringLiteral {
+                                            node_index: NodeIndex(None),
+                                            range: 55..72,
+                                            value: StringLiteralValue {
+                                                inner: Concatenated(
+                                                    ConcatenatedStringLiteral {
+                                                        strings: [
+                                                            StringLiteral {
+                                                                range: 55..59,
+                                                                node_index: NodeIndex(None),
+                                                                value: "é",
+                                                                flags: StringLiteralFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Empty,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                            StringLiteral {
+                                                                range: 64..72,
+                                                                node_index: NodeIndex(None),
+                                                                value: "한글",
+                                                                flags: StringLiteralFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Empty,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                        ],
+                                                        value: "é한글",
+                                                    },
+                                                ),
+                                            },
+                                        },
+                                    ),
+                                ],
+                                keywords: [
+                                    Keyword {
+                                        range: 77..80,
+                                        node_index: NodeIndex(None),
+                                        arg: Some(
+                                            Identifier {
+                                                id: Name("x"),
+                                                range: 77..78,
+                                                node_index: NodeIndex(None),
+                                            },
+                                        ),
+                                        value: NumberLiteral(
+                                            ExprNumberLiteral {
+                                                node_index: NodeIndex(None),
+                                                range: 79..80,
+                                                value: Int(
+                                                    1,
+                                                ),
+                                            },
+                                        ),
+                                    },
+                                ],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+2 | print(
+3 |     "é"
+4 |     "한글"
+  |     ^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 |     x=1
+6 | )
+  |
+
+
+  |
+3 |     "é"
+4 |     "한글"
+5 |     x=1
+  |     ^ Syntax Error: invalid syntax
+6 | )
+  |
