@@ -1126,7 +1126,7 @@ impl<'src> Lexer<'src> {
                         == self.current_flags.is_triple_quoted() =>
             {
                 LexicalErrorType::from_interpolated_string_error(
-                    InterpolatedStringErrorType::UnclosedLbrace,
+                    self.unclosed_replacement_field_error(),
                     interpolated_string.kind(),
                 )
             }
@@ -1160,6 +1160,30 @@ impl<'src> Lexer<'src> {
             })
             .count();
         u32::try_from(newlines + 1).unwrap()
+    }
+
+    /// Returns the opening brace of the active replacement field and whether it is in a
+    /// format specifier. Brackets inside its expression are not replacement fields.
+    pub(crate) fn replacement_field(&self) -> Option<(TextSize, bool)> {
+        let context = self.interpolated_strings.current()?;
+        if self.nesting <= context.nesting() {
+            return None;
+        }
+        let implicit = self.nesting as usize - self.brackets.len();
+        let index =
+            (context.replacement_field_nesting(self.nesting) as usize).checked_sub(implicit)?;
+        let bracket = self.brackets.get(index)?;
+        (bracket.kind == '{').then_some((bracket.start, context.is_in_format_spec(self.nesting)))
+    }
+
+    fn unclosed_replacement_field_error(&self) -> InterpolatedStringErrorType {
+        if let Some((start, _)) = self.replacement_field() {
+            let opening_line = self.line_number(start);
+            if opening_line != self.line_number(self.token_range().start()) {
+                return InterpolatedStringErrorType::UnclosedLbraceOnLine { opening_line };
+            }
+        }
+        InterpolatedStringErrorType::UnclosedLbrace
     }
 
     /// Returns the error for reaching the end of the source unexpectedly at `range`: the innermost

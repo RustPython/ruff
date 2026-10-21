@@ -2058,7 +2058,10 @@ fn prioritize_tokenizer_error(
     let mut lexer = Lexer::new(source, mode, start_offset);
     // The starts of the tokens at which parsing stops without reading ahead.
     let mut stops = Vec::new();
+    let mut replacement_hint = ReplacementFieldHint::new(first.as_ref());
+    let mut replacement_hint_wins = false;
     let (tokenizer_error, in_interpolated_string, detected) = loop {
+        let replacement_field = lexer.replacement_field();
         let in_interpolated_string = lexer.in_interpolated_string();
         let previous_errors = lexer.errors().len();
         let kind = lexer.next_token();
@@ -2066,21 +2069,26 @@ fn prioritize_tokenizer_error(
             .iter()
             .find(|error| error.error().is_tokenizer_error())
         {
+            replacement_hint_wins =
+                replacement_hint.is_unclosed_field_hint(error.error(), replacement_field);
             // A missing closing brace or a bracket that closes a replacement field is found at
             // the token that shows it.
             let detected = match error.error() {
                 LexicalErrorType::FStringError(
                     InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
                     | InterpolatedStringErrorType::UnmatchedBracket(_),
                 )
                 | LexicalErrorType::TStringError(
                     InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
                     | InterpolatedStringErrorType::UnmatchedBracket(_),
                 ) => error.location().start(),
                 _ => lexer.offset(),
             };
             break (error.clone(), in_interpolated_string, detected);
         }
+        replacement_hint.token(kind, lexer.current_range(), replacement_field);
         if matches!(
             kind,
             TokenKind::Colon | TokenKind::Semi | TokenKind::Unknown
@@ -2088,6 +2096,16 @@ fn prioritize_tokenizer_error(
             stops.push(lexer.current_range().start());
         }
         if kind == TokenKind::EndOfFile {
+            if let Some(start) = replacement_hint.unclosed_format_spec {
+                let error = LexicalError::new(
+                    LexicalErrorType::UnclosedBracket {
+                        opening: '{',
+                        incomplete: false,
+                    },
+                    TextRange::empty(start),
+                );
+                break (error, false, lexer.offset());
+            }
             return;
         }
     };
@@ -2116,7 +2134,8 @@ fn prioritize_tokenizer_error(
             LexicalErrorType::UnicodeEscapeError { .. } | LexicalErrorType::BytesEscapeError { .. }
         )
     );
-    let wins = detected <= first_start
+    let wins = replacement_hint_wins
+        || detected <= first_start
         || (!in_interpolated_string
             && !escape_error
             && match tokenizer_error.error() {
@@ -2151,6 +2170,91 @@ fn prioritize_tokenizer_error(
         _ => tokenizer_error,
     };
     move_to_front(errors, ParseError::from(front));
+}
+
+/// Tracks the grammar boundaries after an expression hint while the unrecovered token stream
+/// is read. A replacement field keeps reading to its separator; an inner display or a debug /
+/// conversion separator can already establish the hint before a later missing brace is found.
+struct ReplacementFieldHint {
+    range: Option<TextRange>,
+    field: Option<TextSize>,
+    stopped: bool,
+    unclosed_format_spec: Option<TextSize>,
+}
+impl ReplacementFieldHint {
+    fn new(first: Option<&ParseError>) -> Self {
+        let range = first.and_then(|error| match &error.error {
+            ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+                expression_range, ..
+            } => Some(*expression_range),
+            ParseErrorType::OtherError(message)
+                if matches!(
+                    message.as_str(),
+                    "invalid syntax. Perhaps you forgot a comma?"
+                        | "invalid syntax. Is this intended to be part of the string?"
+                ) =>
+            {
+                Some(error.location)
+            }
+            _ => None,
+        });
+        Self {
+            range,
+            field: None,
+            stopped: false,
+            unclosed_format_spec: None,
+        }
+    }
+
+    fn token(&mut self, kind: TokenKind, range: TextRange, field: Option<(TextSize, bool)>) {
+        let Some(hint) = self.range else {
+            return;
+        };
+        if range.contains(hint.start()) {
+            self.field = field.map(|(start, _)| start);
+        }
+        if range.start() < hint.end() || self.field.is_none() {
+            return;
+        }
+        // The hint covers both expressions. A later expression token establishes the hint;
+        // only the format-specifier and string-end tokens still belong to this field.
+        if !kind.is_trivia()
+            && !matches!(
+                kind,
+                TokenKind::Colon
+                    | TokenKind::FStringMiddle
+                    | TokenKind::TStringMiddle
+                    | TokenKind::FStringEnd
+                    | TokenKind::TStringEnd
+                    | TokenKind::EndOfFile
+            )
+        {
+            self.stopped = true;
+        }
+        if kind.is_interpolated_string_end() && !self.stopped {
+            self.unclosed_format_spec = field
+                .filter(|(start, format)| *format && Some(*start) == self.field)
+                .map(|(start, _)| start);
+        }
+    }
+
+    fn is_unclosed_field_hint(
+        &self,
+        error: &LexicalErrorType,
+        field: Option<(TextSize, bool)>,
+    ) -> bool {
+        self.field.is_some()
+            && self.field == field.map(|(start, _)| start)
+            && !self.stopped
+            && matches!(
+                error,
+                LexicalErrorType::FStringError(
+                    InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                ) | LexicalErrorType::TStringError(
+                    InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                )
+            )
+    }
 }
 
 /// Moves `error` to the front of `errors`, removing an equal error elsewhere.
