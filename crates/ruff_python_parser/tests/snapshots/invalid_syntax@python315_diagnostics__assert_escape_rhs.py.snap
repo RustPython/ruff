@@ -1,0 +1,102 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/assert_escape_rhs.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..66,
+        body: [
+            Assert(
+                StmtAssert {
+                    node_index: NodeIndex(None),
+                    range: 44..52,
+                    test: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 51..52,
+                            id: Name("x"),
+                            ctx: Load,
+                        },
+                    ),
+                    msg: None,
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 55..65,
+                    value: FString(
+                        ExprFString {
+                            node_index: NodeIndex(None),
+                            range: 55..65,
+                            value: FStringValue {
+                                inner: Single(
+                                    FString {
+                                        range: 55..65,
+                                        node_index: NodeIndex(None),
+                                        elements: [
+                                            Interpolation(
+                                                InterpolatedElement {
+                                                    range: 57..60,
+                                                    node_index: NodeIndex(None),
+                                                    expression: NumberLiteral(
+                                                        ExprNumberLiteral {
+                                                            node_index: NodeIndex(None),
+                                                            range: 58..59,
+                                                            value: Int(
+                                                                1,
+                                                            ),
+                                                        },
+                                                    ),
+                                                    debug_text: None,
+                                                    conversion: None,
+                                                    format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
+                                                },
+                                            ),
+                                            Literal(
+                                                InterpolatedStringLiteralElement {
+                                                    range: 60..64,
+                                                    node_index: NodeIndex(None),
+                                                    value: "",
+                                                },
+                                            ),
+                                        ],
+                                        flags: FStringFlags {
+                                            quote_style: Single,
+                                            prefix: Regular,
+                                            triple_quoted: false,
+                                            unclosed: false,
+                                        },
+                                    },
+                                ),
+                            },
+                            runtime_joined_str: None,
+                            runtime_values: None,
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | assert x = f'{1}\xZZ'
+  |          ^ Syntax Error: invalid syntax
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | assert x = f'{1}\xZZ'
+  |                     ^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-1: truncated \xXX escape

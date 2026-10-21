@@ -1,0 +1,76 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/misplaced_lazy.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..74,
+        body: [
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 44..61,
+                    module: Some(
+                        Identifier {
+                            id: Name("os.path"),
+                            range: 49..56,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 57..61,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("lazy"),
+                                range: 57..61,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 0,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+            Import(
+                StmtImport {
+                    node_index: NodeIndex(None),
+                    range: 62..73,
+                    names: [
+                        Alias {
+                            range: 69..73,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("join"),
+                                range: 69..73,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    is_lazy: false,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | from os.path lazy import join
+  |              ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | from os.path lazy import join
+  |                   ^^^^^^ Syntax Error: invalid syntax

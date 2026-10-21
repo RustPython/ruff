@@ -1,0 +1,85 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/valid/python315_diagnostics/parenthesized_assert.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..88,
+        body: [
+            Assert(
+                StmtAssert {
+                    node_index: NodeIndex(None),
+                    range: 44..59,
+                    test: Named(
+                        ExprNamed {
+                            node_index: NodeIndex(None),
+                            range: 52..58,
+                            target: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 52..53,
+                                    id: Name("x"),
+                                    ctx: Store,
+                                },
+                            ),
+                            value: NumberLiteral(
+                                ExprNumberLiteral {
+                                    node_index: NodeIndex(None),
+                                    range: 57..58,
+                                    value: Int(
+                                        1,
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    msg: None,
+                },
+            ),
+            Assert(
+                StmtAssert {
+                    node_index: NodeIndex(None),
+                    range: 60..87,
+                    test: BooleanLiteral(
+                        ExprBooleanLiteral {
+                            node_index: NodeIndex(None),
+                            range: 67..71,
+                            value: true,
+                        },
+                    ),
+                    msg: Some(
+                        Named(
+                            ExprNamed {
+                                node_index: NodeIndex(None),
+                                range: 74..86,
+                                target: Name(
+                                    ExprName {
+                                        node_index: NodeIndex(None),
+                                        range: 74..81,
+                                        id: Name("message"),
+                                        ctx: Store,
+                                    },
+                                ),
+                                value: NumberLiteral(
+                                    ExprNumberLiteral {
+                                        node_index: NodeIndex(None),
+                                        range: 85..86,
+                                        value: Int(
+                                            2,
+                                        ),
+                                    },
+                                ),
+                            },
+                        ),
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```

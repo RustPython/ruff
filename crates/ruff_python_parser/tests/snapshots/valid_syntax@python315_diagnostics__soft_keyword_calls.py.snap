@@ -1,0 +1,223 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/valid/python315_diagnostics/soft_keyword_calls.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..114,
+        body: [
+            FunctionDef(
+                StmtFunctionDef {
+                    node_index: NodeIndex(None),
+                    range: 44..69,
+                    is_async: false,
+                    decorator_list: [],
+                    name: Identifier {
+                        id: Name("case"),
+                        range: 48..52,
+                        node_index: NodeIndex(None),
+                    },
+                    type_params: None,
+                    parameters: Parameters {
+                        range: 52..55,
+                        node_index: NodeIndex(None),
+                        posonlyargs: [],
+                        args: [
+                            ParameterWithDefault {
+                                range: 53..54,
+                                node_index: NodeIndex(None),
+                                parameter: Parameter {
+                                    range: 53..54,
+                                    node_index: NodeIndex(None),
+                                    name: Identifier {
+                                        id: Name("x"),
+                                        range: 53..54,
+                                        node_index: NodeIndex(None),
+                                    },
+                                    annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
+                                },
+                                default: None,
+                            },
+                        ],
+                        vararg: None,
+                        kwonlyargs: [],
+                        kwarg: None,
+                        runtime_defaults: None,
+                    },
+                    returns: None,
+                    body: [
+                        Return(
+                            StmtReturn {
+                                node_index: NodeIndex(None),
+                                range: 61..69,
+                                value: Some(
+                                    Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 68..69,
+                                            id: Name("x"),
+                                            ctx: Load,
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                },
+            ),
+            FunctionDef(
+                StmtFunctionDef {
+                    node_index: NodeIndex(None),
+                    range: 70..96,
+                    is_async: false,
+                    decorator_list: [],
+                    name: Identifier {
+                        id: Name("match"),
+                        range: 74..79,
+                        node_index: NodeIndex(None),
+                    },
+                    type_params: None,
+                    parameters: Parameters {
+                        range: 79..82,
+                        node_index: NodeIndex(None),
+                        posonlyargs: [],
+                        args: [
+                            ParameterWithDefault {
+                                range: 80..81,
+                                node_index: NodeIndex(None),
+                                parameter: Parameter {
+                                    range: 80..81,
+                                    node_index: NodeIndex(None),
+                                    name: Identifier {
+                                        id: Name("x"),
+                                        range: 80..81,
+                                        node_index: NodeIndex(None),
+                                    },
+                                    annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
+                                },
+                                default: None,
+                            },
+                        ],
+                        vararg: None,
+                        kwonlyargs: [],
+                        kwarg: None,
+                        runtime_defaults: None,
+                    },
+                    returns: None,
+                    body: [
+                        Return(
+                            StmtReturn {
+                                node_index: NodeIndex(None),
+                                range: 88..96,
+                                value: Some(
+                                    Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 95..96,
+                                            id: Name("x"),
+                                            ctx: Load,
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 97..104,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 97..104,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 97..101,
+                                    id: Name("case"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 101..104,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    NumberLiteral(
+                                        ExprNumberLiteral {
+                                            node_index: NodeIndex(None),
+                                            range: 102..103,
+                                            value: Int(
+                                                1,
+                                            ),
+                                        },
+                                    ),
+                                ],
+                                keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 105..113,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 105..113,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 105..110,
+                                    id: Name("match"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 110..113,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    NumberLiteral(
+                                        ExprNumberLiteral {
+                                            node_index: NodeIndex(None),
+                                            range: 111..112,
+                                            value: Int(
+                                                1,
+                                            ),
+                                        },
+                                    ),
+                                ],
+                                keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```

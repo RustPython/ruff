@@ -198,6 +198,15 @@ pub enum ParseErrorType {
     /// An error specific to stringified annotations occurred.
     StringAnnotationError(&'static str),
 
+    /// A `raise from` statement has no exception expression.
+    MissingRaiseException,
+    /// A `raise` statement ends immediately after `from`.
+    MissingRaiseCause,
+    /// An unparenthesized `with` item list ends with a comma.
+    TrailingCommaInWith,
+    /// `lazy` follows the module name instead of preceding `from`.
+    MisplacedLazyImport,
+
     /// An empty slice was found during parsing, e.g `data[]`.
     EmptySlice,
     /// An empty global names list was found during parsing.
@@ -240,6 +249,8 @@ pub enum ParseErrorType {
     InvalidStarPatternUsage,
     /// An underscore was used as a binding target in a match pattern.
     InvalidMatchPatternTarget,
+    /// A complete case clause was found outside a match statement.
+    CaseOutsideMatch,
 
     /// A parameter was found after a vararg.
     ParamAfterVarKeywordParam,
@@ -259,6 +270,10 @@ pub enum ParseErrorType {
         kind: ExpressionKind,
         maybe_comparison: bool,
     },
+    /// A named expression is used in an assertion without its required parentheses.
+    NamedExpressionWithoutParentheses,
+    /// A mapping pattern contains an entry after its double-star rest pattern.
+    MappingRestPatternNotLast,
     /// A name is assigned to where `==` or `:=` may have been meant.
     AssignmentInsteadOfComparison,
     /// A `yield` expression is assigned to.
@@ -462,6 +477,8 @@ pub enum BlockClause {
     Finally,
     Match,
     Case,
+    /// A standalone case uses the generic invalid-block diagnostic.
+    StandaloneCase,
     Class,
     FunctionDef,
 }
@@ -480,7 +497,7 @@ impl std::fmt::Display for BlockClause {
             Self::ExceptStar => "'except*' statement",
             Self::Finally => "'finally' statement",
             Self::Match => "'match' statement",
-            Self::Case => "'case' statement",
+            Self::Case | Self::StandaloneCase => "'case' statement",
             Self::Class => "class definition",
             Self::FunctionDef => "function definition",
         })
@@ -505,6 +522,10 @@ impl std::fmt::Display for ParseErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ParseErrorType::OtherError(msg) => f.write_str(msg),
+            ParseErrorType::ExpectedIndentedBlock {
+                clause: BlockClause::StandaloneCase,
+                ..
+            } => f.write_str("expected an indented block"),
             ParseErrorType::ExpectedIndentedBlock { clause, line } => {
                 write!(
                     f,
@@ -600,6 +621,18 @@ impl std::fmt::Display for ParseErrorType {
             ParseErrorType::PositionalAfterKeywordUnpacking => {
                 f.write_str("positional argument follows keyword argument unpacking")
             }
+            ParseErrorType::MissingRaiseException => {
+                f.write_str("did you forget an expression between 'raise' and 'from'?")
+            }
+            ParseErrorType::MissingRaiseCause => {
+                f.write_str("did you forget an expression after 'from'?")
+            }
+            ParseErrorType::TrailingCommaInWith => {
+                f.write_str("the last 'with' item has a trailing comma")
+            }
+            ParseErrorType::MisplacedLazyImport => {
+                f.write_str("use 'lazy from ... ' instead of 'from ... lazy import'")
+            }
             ParseErrorType::EmptySlice => f.write_str("expected index or slice expression"),
             ParseErrorType::EmptyGlobalNames
             | ParseErrorType::EmptyNonlocalNames
@@ -630,6 +663,9 @@ impl std::fmt::Display for ParseErrorType {
                 f.write_str("cannot use starred expression here")
             }
             ParseErrorType::InvalidMatchPatternTarget => f.write_str("cannot use '_' as a target"),
+            ParseErrorType::CaseOutsideMatch => {
+                f.write_str("case statement must be inside match statement")
+            }
             ParseErrorType::ExpectedRealNumber => {
                 f.write_str("expected a real number in complex literal pattern")
             }
@@ -650,6 +686,12 @@ impl std::fmt::Display for ParseErrorType {
             } => write!(
                 f,
                 "cannot assign to {kind} here. Maybe you meant '==' instead of '='?"
+            ),
+            ParseErrorType::NamedExpressionWithoutParentheses => {
+                f.write_str("cannot use named expression without parentheses here")
+            }
+            ParseErrorType::MappingRestPatternNotLast => f.write_str(
+                "double star pattern must be the last (right-most) subpattern in the mapping pattern",
             ),
             ParseErrorType::AssignmentInsteadOfComparison => {
                 f.write_str("invalid syntax. Maybe you meant '==' or ':=' instead of '='?")
