@@ -31,6 +31,7 @@ use crate::{Parsed, Tokens};
 
 pub use crate::parser::options::ParseOptions;
 
+mod case_diagnostics;
 mod expression;
 mod helpers;
 mod options;
@@ -1167,22 +1168,27 @@ impl<'src> Parser<'src> {
         {
             // Only `from ... import` names before the newline and `with` items before the `:` have
             // a rule for a trailing comma. Otherwise parsing fails at the token after the comma.
-            let (message, range) = match recovery_context_kind {
+            let (error, range) = match recovery_context_kind {
                 RecoveryContextKind::ImportFromAsNames(Parenthesized::No)
                     if self.at(TokenKind::Newline) =>
                 {
                     (
-                        "trailing comma not allowed without surrounding parentheses",
+                        ParseErrorType::OtherError(
+                            "trailing comma not allowed without surrounding parentheses"
+                                .to_string(),
+                        ),
                         self.current_token_range(),
                     )
                 }
-                RecoveryContextKind::WithItems(_) if self.at(TokenKind::Colon) => (
-                    "the last 'with' item has a trailing comma",
-                    trailing_comma_range,
+                RecoveryContextKind::WithItems(_) if self.at(TokenKind::Colon) => {
+                    (ParseErrorType::TrailingCommaInWith, trailing_comma_range)
+                }
+                _ => (
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
+                    self.current_token_range(),
                 ),
-                _ => ("invalid syntax", self.current_token_range()),
             };
-            self.add_error(ParseErrorType::OtherError(message.to_string()), range);
+            self.add_error(error, range);
         }
 
         self.recovery_context = saved_context;

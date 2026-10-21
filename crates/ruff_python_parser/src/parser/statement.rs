@@ -111,8 +111,9 @@ impl<'src> Parser<'src> {
     /// - <https://docs.python.org/3/reference/simple_stmts.html>
     pub(super) fn parse_statement(&mut self) -> Stmt {
         let start = self.node_start();
+        let case_diagnostic = self.standalone_case_diagnostic();
 
-        match self.current_token_kind() {
+        let statement = match self.current_token_kind() {
             TokenKind::If => Stmt::If(self.parse_if_statement()),
             TokenKind::For => Stmt::For(self.parse_for_statement(start)),
             TokenKind::While => Stmt::While(self.parse_while_statement()),
@@ -146,7 +147,16 @@ impl<'src> Parser<'src> {
 
                 self.parse_single_simple_statement()
             }
+        };
+        if !self.errors.is_empty()
+            && let Some(error) = case_diagnostic
+        {
+            // Only the invalid-grammar diagnostic changes. Keep the ordinary
+            // statement parser's AST, tokens, and recovery path intact.
+            self.errors.insert(0, error);
         }
+
+        statement
     }
 
     /// Parses a single simple statement.
@@ -569,9 +579,7 @@ impl<'src> Parser<'src> {
                 // raise from exc
                 // raise from None
                 self.add_error(
-                    ParseErrorType::OtherError(
-                        "did you forget an expression between 'raise' and 'from'?".to_string(),
-                    ),
+                    ParseErrorType::MissingRaiseException,
                     raise_range.cover(self.current_token_range()),
                 );
                 None
@@ -604,12 +612,7 @@ impl<'src> Parser<'src> {
             if exc.is_some() && !self.at_expr() {
                 // test_err raise_stmt_missing_cause
                 // raise x from
-                self.add_error(
-                    ParseErrorType::OtherError(
-                        "did you forget an expression after 'from'?".to_string(),
-                    ),
-                    from_range,
-                );
+                self.add_error(ParseErrorType::MissingRaiseCause, from_range);
             }
 
             // test_err raise_stmt_invalid_cause
@@ -787,6 +790,12 @@ impl<'src> Parser<'src> {
             None
         };
 
+        if module.is_some()
+            && let Some(range) = self.misplaced_lazy_import_range()
+        {
+            self.add_error(ParseErrorType::MisplacedLazyImport, range);
+        }
+
         // test_ok from_import_no_space
         // from.import x
         // from...import x
@@ -863,6 +872,39 @@ impl<'src> Parser<'src> {
             node_index: AtomicNodeIndex::NONE,
             runtime_level: None,
         }
+    }
+
+    /// Checks the misplaced `lazy` invalid production with the import-target parser.
+    /// Rewind afterward so the existing invalid-input recovery and AST stay intact.
+    fn misplaced_lazy_import_range(&mut self) -> Option<TextRange> {
+        if !self.at(TokenKind::Lazy) || self.peek() != TokenKind::Import {
+            return None;
+        }
+        let checkpoint = self.checkpoint();
+        let unclosed_bracket = self.first_unclosed_bracket_recovery;
+        let escape_error = self.interpolated_string_escape_error.clone();
+        let replacement_field = self.replacement_field;
+        let errors_before = self.errors.len();
+        let lazy_range = self.current_token_range();
+        self.bump(TokenKind::Lazy);
+        self.bump(TokenKind::Import);
+        let parenthesized = Parenthesized::from(self.eat(TokenKind::Lpar));
+        let names = self.parse_comma_separated_list_into_vec(
+            RecoveryContextKind::ImportFromAsNames(parenthesized),
+            |parser| parser.parse_alias(ImportStyle::ImportFrom),
+        );
+        if parenthesized.is_yes() {
+            self.expect(TokenKind::Rpar);
+        }
+        let valid = !names.is_empty()
+            && self.errors.len() == errors_before
+            && (!names.iter().any(|alias| alias.name.id == "*")
+                || (names.len() == 1 && !parenthesized.is_yes()));
+        self.rewind(checkpoint);
+        self.first_unclosed_bracket_recovery = unclosed_bracket;
+        self.interpolated_string_escape_error = escape_error;
+        self.replacement_field = replacement_field;
+        valid.then_some(lazy_range)
     }
 
     /// Parses an `import` or `from` import name.
@@ -1045,7 +1087,11 @@ impl<'src> Parser<'src> {
         // assert assert x
         // assert yield x
         // assert x := 1
+        let test_errors_start = self.errors.len();
         let test = self.parse_conditional_expression_or_higher();
+        if self.errors.len() == test_errors_start {
+            self.check_assert_assignment(&test);
+        }
 
         let msg = if self.eat(TokenKind::Comma) {
             if self.at_expr() {
@@ -1054,7 +1100,12 @@ impl<'src> Parser<'src> {
                 // assert False, assert x
                 // assert False, yield x
                 // assert False, x := 1
-                Some(Box::new(self.parse_conditional_expression_or_higher().expr))
+                let message_errors_start = self.errors.len();
+                let message = self.parse_conditional_expression_or_higher();
+                if self.errors.len() == message_errors_start {
+                    self.check_assert_assignment(&message);
+                }
+                Some(Box::new(message.expr))
             } else {
                 // test_err assert_empty_msg
                 // assert x,
@@ -1073,6 +1124,51 @@ impl<'src> Parser<'src> {
             msg,
             range: self.node_range(start),
             node_index: AtomicNodeIndex::NONE,
+        }
+    }
+
+    /// Diagnose an assignment after an otherwise valid assertion expression. Speculative
+    /// parsing supplies the expression span without consuming recovery tokens or changing
+    /// the recovered assertion AST. Errors inside parentheses retain their own diagnostics.
+    fn check_assert_assignment(&mut self, target: &ParsedExpr) {
+        let operator = self.current_token_kind();
+        if !matches!(operator, TokenKind::Equal | TokenKind::ColonEqual) {
+            return;
+        }
+
+        let checkpoint = self.checkpoint();
+        // Diagnostic speculation must not retain recovery state from its RHS.
+        let unclosed_bracket = self.first_unclosed_bracket_recovery;
+        let escape_error = self.interpolated_string_escape_error.clone();
+        let replacement_field = self.replacement_field;
+        let errors_start = self.errors.len();
+        self.bump(operator);
+        let value_end = if self.at_expr() {
+            let value = self.parse_conditional_expression_or_higher();
+            (self.errors.len() == errors_start
+                && !self.tokens.has_tokenizer_error_in(TextRange::new(
+                    target.start(),
+                    self.current_token_range().end(),
+                )))
+            .then_some(value.end())
+        } else {
+            None
+        };
+        self.rewind(checkpoint);
+        self.first_unclosed_bracket_recovery = unclosed_bracket;
+        self.interpolated_string_escape_error = escape_error;
+        self.replacement_field = replacement_field;
+
+        if let Some(value_end) = value_end {
+            let error = if operator == TokenKind::ColonEqual {
+                ParseErrorType::NamedExpressionWithoutParentheses
+            } else {
+                ParseErrorType::InvalidAssignmentTarget {
+                    kind: ExpressionKind::of(&target.expr),
+                    maybe_comparison: true,
+                }
+            };
+            self.add_error(error, TextRange::new(target.start(), value_end));
         }
     }
 
@@ -3363,7 +3459,7 @@ impl<'src> Parser<'src> {
     /// clause header or an indented block.
     ///
     /// `header_start` is the start of the clause's header keyword token.
-    fn parse_body(&mut self, clause: BlockClause, header_start: TextSize) -> Suite {
+    pub(super) fn parse_body(&mut self, clause: BlockClause, header_start: TextSize) -> Suite {
         // Note: The test cases in this method chooses a clause at random to test
         // the error logic.
 

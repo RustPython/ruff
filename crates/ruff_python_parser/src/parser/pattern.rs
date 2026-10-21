@@ -212,6 +212,8 @@ impl Parser<'_> {
 
         self.parse_comma_separated_list(RecoveryContextKind::MatchPatternMapping, |parser| {
             let mapping_item_start = parser.node_start();
+            let mapping_item_token = parser.current_token_range();
+            let mapping_item_errors_start = parser.errors.len();
 
             if parser.eat(TokenKind::DoubleStar) {
                 // A `_` rest target is not a capture target.
@@ -267,17 +269,20 @@ impl Parser<'_> {
                 };
                 keys.push(key);
 
+                let colon_errors_start = parser.errors.len();
                 parser.expect(TokenKind::Colon);
+                if rest.is_some() && parser.errors.len() > colon_errors_start {
+                    // An incomplete mapping entry does not match the invalid rest-order
+                    // production. Report its first token, where the mapping stopped.
+                    parser.errors[colon_errors_start].location = mapping_item_token;
+                }
 
                 patterns.push(parser.parse_match_pattern(AllowStarPattern::No));
 
-                if rest.is_some() {
-                    parser.add_error(
-                        ParseErrorType::OtherError(
-                            "pattern cannot follow a double star pattern".to_string(),
-                        ),
-                        parser.node_range(mapping_item_start),
-                    );
+                if let Some(rest) = &rest
+                    && parser.errors.len() == mapping_item_errors_start
+                {
+                    parser.add_error(ParseErrorType::MappingRestPatternNotLast, rest);
                 }
             }
         });

@@ -175,4 +175,11 @@ Module(
 2 | assert False, assert x
 3 | assert False, yield x
 4 | assert False, x := 1
+  |               ^^^^^^ Syntax Error: cannot use named expression without parentheses here
+
+
+  |
+2 | assert False, assert x
+3 | assert False, yield x
+4 | assert False, x := 1
   |                 ^^ Syntax Error: invalid syntax
