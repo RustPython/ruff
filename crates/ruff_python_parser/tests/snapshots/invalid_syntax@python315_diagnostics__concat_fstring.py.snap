@@ -1,0 +1,142 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/concat_fstring.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..87,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..86,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 44..86,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 44..49,
+                                    id: Name("print"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 49..86,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    FString(
+                                        ExprFString {
+                                            node_index: NodeIndex(None),
+                                            range: 55..76,
+                                            value: FStringValue {
+                                                inner: Concatenated(
+                                                    [
+                                                        FString(
+                                                            FString {
+                                                                range: 55..63,
+                                                                node_index: NodeIndex(None),
+                                                                elements: [
+                                                                    Literal(
+                                                                        InterpolatedStringLiteralElement {
+                                                                            range: 57..62,
+                                                                            node_index: NodeIndex(None),
+                                                                            value: "line1",
+                                                                        },
+                                                                    ),
+                                                                ],
+                                                                flags: FStringFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Regular,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                        ),
+                                                        FString(
+                                                            FString {
+                                                                range: 68..76,
+                                                                node_index: NodeIndex(None),
+                                                                elements: [
+                                                                    Literal(
+                                                                        InterpolatedStringLiteralElement {
+                                                                            range: 70..75,
+                                                                            node_index: NodeIndex(None),
+                                                                            value: "line2",
+                                                                        },
+                                                                    ),
+                                                                ],
+                                                                flags: FStringFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Regular,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                        ),
+                                                    ],
+                                                ),
+                                            },
+                                            runtime_joined_str: None,
+                                            runtime_values: None,
+                                        },
+                                    ),
+                                ],
+                                keywords: [
+                                    Keyword {
+                                        range: 81..84,
+                                        node_index: NodeIndex(None),
+                                        arg: Some(
+                                            Identifier {
+                                                id: Name("x"),
+                                                range: 81..82,
+                                                node_index: NodeIndex(None),
+                                            },
+                                        ),
+                                        value: NumberLiteral(
+                                            ExprNumberLiteral {
+                                                node_index: NodeIndex(None),
+                                                range: 83..84,
+                                                value: Int(
+                                                    1,
+                                                ),
+                                            },
+                                        ),
+                                    },
+                                ],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+2 | print(
+3 |     f"line1"
+4 |     f"line2"
+  |     ^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 |     x=1
+6 | )
+  |
+
+
+  |
+3 |     f"line1"
+4 |     f"line2"
+5 |     x=1
+  |     ^ Syntax Error: invalid syntax
+6 | )
+  |

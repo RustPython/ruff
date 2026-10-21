@@ -2096,7 +2096,12 @@ fn prioritize_tokenizer_error(
         move_to_front(errors, ParseError::from(tokenizer_error));
         return;
     };
-    let first_start = first.location.start();
+    let first_start = match &first.error {
+        ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+            expression_range, ..
+        } => expression_range.start(),
+        _ => first.location.start(),
+    };
     let error_start = match tokenizer_error.error() {
         LexicalErrorType::UnclosedBracket { .. } => {
             unclosed_bracket_recovery.map_or(first_start, |start| start.max(first_start))

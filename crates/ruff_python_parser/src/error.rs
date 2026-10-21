@@ -2,7 +2,7 @@ use std::fmt::{self, Display};
 
 use ruff_python_ast::token::TokenKind;
 use ruff_python_ast::{ConstantValue, Expr, PythonVersion};
-use ruff_text_size::{Ranged, TextRange};
+use ruff_text_size::{Ranged, TextRange, TextSize};
 
 use crate::string::InterpolatedStringKind;
 
@@ -194,6 +194,14 @@ fn write_interpolated_string_error(
 pub enum ParseErrorType {
     /// An unexpected error occurred.
     OtherError(String),
+
+    /// A missing-comma hint whose concatenated literal is displayed on its final line.
+    /// The original expression range controls error precedence; `diagnostic_start` can be
+    /// after the displayed range's end, which a `TextRange` cannot represent.
+    MissingCommaAfterConcatenatedLiteral {
+        expression_range: TextRange,
+        diagnostic_start: TextSize,
+    },
 
     /// An error specific to stringified annotations occurred.
     StringAnnotationError(&'static str),
@@ -522,6 +530,9 @@ impl std::fmt::Display for ParseErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ParseErrorType::OtherError(msg) => f.write_str(msg),
+            ParseErrorType::MissingCommaAfterConcatenatedLiteral { .. } => {
+                f.write_str("invalid syntax. Perhaps you forgot a comma?")
+            }
             ParseErrorType::ExpectedIndentedBlock {
                 clause: BlockClause::StandaloneCase,
                 ..
