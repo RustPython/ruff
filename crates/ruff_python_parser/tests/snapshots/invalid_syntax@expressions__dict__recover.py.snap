@@ -554,7 +554,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |  ^ Syntax Error: invalid syntax
+   |  ^^ Syntax Error: cannot use a starred expression in a dictionary key
 24 | {x: *y, z: *a}
    |
 
@@ -562,7 +562,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |               ^ Syntax Error: invalid syntax
+   |               ^^ Syntax Error: cannot use a starred expression in a dictionary key
 24 | {x: *y, z: *a}
    |
 

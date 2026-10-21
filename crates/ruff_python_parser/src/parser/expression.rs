@@ -451,10 +451,61 @@ impl<'src> Parser<'src> {
             return;
         };
         let range = TextRange::new(first.start(), second_end);
+        if let Some((diagnostic_start, end)) = self.concatenated_literal_comma_range(first) {
+            self.add_error(
+                ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+                    expression_range: range,
+                    diagnostic_start,
+                },
+                TextRange::new(diagnostic_start.min(end), end),
+            );
+            return;
+        }
         self.add_error(
             ParseErrorType::OtherError("invalid syntax. Perhaps you forgot a comma?".to_string()),
             range,
         );
+    }
+
+    /// Points a multiline concatenation's missing-comma hint at its final literal line,
+    /// retaining the first literal's column, as CPython does.
+    fn concatenated_literal_comma_range(&self, first: &ParsedExpr) -> Option<(TextSize, TextSize)> {
+        let last = match &first.expr {
+            Expr::StringLiteral(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            Expr::BytesLiteral(bytes) if bytes.value.is_implicit_concatenated() => {
+                bytes.value.iter().next_back()?.range()
+            }
+            Expr::FString(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            Expr::TString(string) if string.value.is_implicit_concatenated() => {
+                string.value.iter().next_back()?.range()
+            }
+            _ => return None,
+        };
+        let first_start = first.start().to_usize();
+        let end = last.end().to_usize();
+        let line_start = |offset| {
+            self.source[..offset]
+                .rfind(['\n', '\r'])
+                .map_or(0, |i| i + 1)
+        };
+        let first_line = line_start(first_start);
+        let last_line = line_start(end);
+        if first_line == last_line {
+            return None;
+        }
+        let line_end = self.source[end..]
+            .find(['\n', '\r'])
+            .map_or(self.source.len(), |i| end + i);
+        let mut start = (last_line + first_start - first_line).min(line_end);
+        // Keep the projected byte column at a valid character boundary.
+        while !self.source.is_char_boundary(start) {
+            start -= 1;
+        }
+        Some((TextSize::try_from(start).unwrap(), last.end()))
     }
 
     /// Reports the Python 2 `print` or `exec` statement named `keyword` that starts at `start`
@@ -687,22 +738,33 @@ impl<'src> Parser<'src> {
         }
     }
 
-    /// Parses an expression with a minimum precedence of bitwise `or`.
-    ///
-    /// This methods actually parses the expression using the `expression` rule
-    /// of the [Python grammar] and then validates the parsed expression. In a
-    /// sense, it matches the `bitwise_or` rule of the [Python grammar].
-    ///
-    /// [Python grammar]: https://docs.python.org/3/reference/grammar.html
-    fn parse_expression_with_bitwise_or_precedence(&mut self) -> ParsedExpr {
-        let parsed_expr =
-            self.parse_conditional_expression_without_comma_check(ExpressionContext::default());
-
+    /// Checks the bitwise-or operand required by sequence and dictionary displays.
+    /// The caller can defer this check until a dictionary comprehension is ruled out.
+    fn validate_unpacking_precedence(
+        &mut self,
+        parsed_expr: &ParsedExpr,
+        start: TextSize,
+        double_starred: bool,
+    ) {
         if parsed_expr.is_parenthesized {
             // Parentheses resets the precedence, so we don't need to validate it.
-            return parsed_expr;
+            return;
+        }
+        if parsed_expr.expr.is_if_expr() {
+            self.add_error(
+                ParseErrorType::InvalidConditionalUnpacking { double_starred },
+                TextRange::new(start, parsed_expr.end()),
+            );
+            return;
         }
 
+        self.validate_bitwise_or_precedence(parsed_expr);
+    }
+
+    fn validate_bitwise_or_precedence(&mut self, parsed_expr: &ParsedExpr) {
+        if parsed_expr.is_parenthesized {
+            return;
+        }
         let expr_name = match parsed_expr.expr {
             Expr::Compare(_) => "comparison",
             Expr::BoolOp(_)
@@ -712,15 +774,13 @@ impl<'src> Parser<'src> {
             }) => "boolean",
             Expr::If(_) => "conditional",
             Expr::Lambda(_) => "lambda",
-            _ => return parsed_expr,
+            _ => return,
         };
 
         self.add_error(
             ParseErrorType::OtherError(format!("{expr_name} expression cannot be used here")),
-            &parsed_expr,
+            parsed_expr,
         );
-
-        parsed_expr
     }
 
     /// Parses a name.
@@ -1002,6 +1062,7 @@ impl<'src> Parser<'src> {
         let keywords_snapshot = self.keyword_scratch.snapshot();
         let mut seen_keyword_argument = false; // foo = 1
         let mut seen_keyword_unpacking = false; // **foo
+        let mut first_argument = true;
         // The first positional argument after a keyword argument, reported where the arguments
         // end, and the number of errors before it.
         let mut positional_after_keyword: Option<(ParseErrorType, usize)> = None;
@@ -1009,8 +1070,43 @@ impl<'src> Parser<'src> {
         let has_trailing_comma =
             self.parse_comma_separated_list(RecoveryContextKind::Arguments, |parser| {
                 let argument_start = parser.node_start();
+                let is_first_argument = first_argument;
+                first_argument = false;
                 if parser.eat(TokenKind::DoubleStar) {
                     let mut value = parser.parse_conditional_expression_or_higher();
+                    if is_first_argument
+                        && matches!(context, ArgumentsContext::Call)
+                        && matches!(
+                            parser.current_token_kind(),
+                            TokenKind::Async | TokenKind::For
+                        )
+                    {
+                        let for_range = parser.current_token_range();
+                        let for_kind = parser.current_token_kind();
+                        let errors_start = parser.errors.len();
+                        let generators = parser.parse_generators();
+                        let (error, location) = if parser
+                            .has_valid_first_comprehension_clause(&generators, errors_start)
+                        {
+                            (
+                                ParseErrorType::InvalidComprehensionDictUnpacking {
+                                    generator: true,
+                                },
+                                TextRange::new(argument_start, value.end()),
+                            )
+                        } else {
+                            (
+                                ParseErrorType::ExpectedToken {
+                                    expected: TokenKind::Comma,
+                                    found: for_kind,
+                                },
+                                for_range,
+                            )
+                        };
+                        parser
+                            .errors
+                            .insert(errors_start, crate::ParseError { error, location });
+                    }
 
                     if parser.eat(TokenKind::Equal) {
                         // test_err args_keyword_unpacking_assignment
@@ -2623,6 +2719,103 @@ impl<'src> Parser<'src> {
         }
     }
 
+    /// An invalid comprehension only needs one complete target/iterable clause.
+    /// Later incomplete filters or clauses do not undo that first successful clause.
+    fn has_valid_first_comprehension_clause(
+        &self,
+        generators: &[ast::Comprehension],
+        errors_start: usize,
+    ) -> bool {
+        generators.first().is_some_and(|clause| {
+            self.errors[errors_start..]
+                .iter()
+                .all(|error| error.location.start() > clause.iter.end())
+        })
+    }
+
+    /// Recovers a dictionary unpack in a sequence, using the same parse for diagnostics.
+    fn parse_invalid_sequence_dict_unpacking(&mut self, start: TextSize, generator: bool) -> Expr {
+        let stars = self.current_token_range();
+        let errors_start = self.errors.len();
+        self.bump(TokenKind::DoubleStar);
+        let has_operand = self.at_expr();
+        let has_bitwise_operand = has_operand
+            && !matches!(
+                self.current_token_kind(),
+                TokenKind::Lambda
+                    | TokenKind::Not
+                    | TokenKind::Yield
+                    | TokenKind::Star
+                    | TokenKind::DoubleStar
+            );
+        let value = self.parse_conditional_expression_or_higher();
+        let value_end = value.end();
+        let operand_is_valid = self.errors.len() == errors_start;
+        let is_group = generator && self.at(TokenKind::Rpar);
+        let clause_errors_start = self.errors.len();
+        let (expression, valid_comprehension) =
+            if matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For) {
+                if generator {
+                    let expression =
+                        self.parse_generator_expression(value.expr, start, Parenthesized::Yes);
+                    let valid = self.has_valid_first_comprehension_clause(
+                        &expression.generators,
+                        clause_errors_start,
+                    );
+                    (Expr::Generator(expression), valid)
+                } else {
+                    let expression = self.parse_list_comprehension_expression(value.expr, start);
+                    let valid = self.has_valid_first_comprehension_clause(
+                        &expression.generators,
+                        clause_errors_start,
+                    );
+                    (Expr::ListComp(expression), valid)
+                }
+            } else if !generator {
+                (
+                    Expr::List(self.parse_list_expression(value.expr, start)),
+                    false,
+                )
+            } else if self.at(TokenKind::Comma) {
+                let tuple =
+                    self.parse_tuple_expression(value.expr, start, Parenthesized::Yes, |p| {
+                        p.parse_named_expression_or_higher(ExpressionContext::starred_bitwise_or())
+                    });
+                (Expr::Tuple(tuple), false)
+            } else {
+                self.expect(TokenKind::Rpar);
+                (value.expr, false)
+            };
+        let invalid_target = self.errors[clause_errors_start..]
+            .iter()
+            .any(|error| matches!(error.error, ParseErrorType::InvalidAssignmentTarget { .. }));
+        let diagnostic = if invalid_target || (!operand_is_valid && has_operand) {
+            None
+        } else if operand_is_valid && valid_comprehension {
+            Some((
+                ParseErrorType::InvalidComprehensionDictUnpacking { generator },
+                TextRange::new(stars.start(), value_end),
+            ))
+        } else if operand_is_valid && has_bitwise_operand {
+            Some((ParseErrorType::InvalidDictUnpacking, stars))
+        } else if operand_is_valid && is_group {
+            Some((
+                ParseErrorType::OtherError("cannot use double starred expression here".to_string()),
+                stars,
+            ))
+        } else if !operand_is_valid || !has_bitwise_operand {
+            Some((ParseErrorType::ExpectedExpression, stars))
+        } else {
+            None
+        };
+        if let Some((error, location)) = diagnostic {
+            // The invalid production starts before any clause-recovery errors.
+            self.errors
+                .insert(errors_start, crate::ParseError { error, location });
+        }
+        expression
+    }
+
     /// Parses a list or a list comprehension expression.
     ///
     /// # Panics
@@ -2655,6 +2848,9 @@ impl<'src> Parser<'src> {
         }
 
         // Parse the first element with a more general rule and limit it later.
+        if self.at(TokenKind::DoubleStar) {
+            return self.parse_invalid_sequence_dict_unpacking(start, false);
+        }
         let first_element = self.parse_named_expression_or_higher(
             ExpressionContext::starred_bitwise_or().with_for_excluded(),
         );
@@ -2751,7 +2947,8 @@ impl<'src> Parser<'src> {
         if self.eat(TokenKind::DoubleStar) {
             // Handle dictionary unpacking. Here, the grammar is `'**' bitwise_or`
             // which requires limiting the expression.
-            let value = self.parse_expression_with_bitwise_or_precedence();
+            let value =
+                self.parse_conditional_expression_without_comma_check(ExpressionContext::default());
             let unpack_range = TextRange::new(after_brace, value.range().end());
 
             if matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For) {
@@ -2762,13 +2959,23 @@ impl<'src> Parser<'src> {
                     unpack_range,
                 );
 
-                return Expr::DictComp(
-                    self.parse_dictionary_comprehension_expression(None, value.expr, start),
-                );
+                return Expr::DictComp(self.parse_dictionary_comprehension_expression(
+                    None,
+                    value.expr,
+                    start,
+                    Some(TextRange::at(after_brace, TextSize::new(2))),
+                ));
             }
 
+            self.validate_unpacking_precedence(&value, after_brace, true);
+
             if self.at(TokenKind::Colon) {
-                self.add_error(ParseErrorType::InvalidStarredExpressionUsage, unpack_range);
+                self.add_error(
+                    ParseErrorType::InvalidDictKeyUnpacking {
+                        double_starred: true,
+                    },
+                    unpack_range,
+                );
 
                 self.bump(TokenKind::Colon);
                 let dict_value = self.parse_conditional_expression_or_higher();
@@ -2778,6 +2985,7 @@ impl<'src> Parser<'src> {
                         Some(value.expr),
                         dict_value.expr,
                         start,
+                        None,
                     ));
                 }
 
@@ -2837,7 +3045,9 @@ impl<'src> Parser<'src> {
                 if !key_or_element.is_parenthesized {
                     match key_or_element.expr {
                         Expr::Starred(_) => self.add_error(
-                            ParseErrorType::InvalidStarredExpressionUsage,
+                            ParseErrorType::InvalidDictKeyUnpacking {
+                                double_starred: false,
+                            },
                             &key_or_element.expr,
                         ),
                         Expr::Named(_) => self.add_error(
@@ -2850,24 +3060,14 @@ impl<'src> Parser<'src> {
 
                 let colon_range = self.current_token_range();
                 self.bump(TokenKind::Colon);
-                let value = if self.at(TokenKind::DoubleStar) {
-                    let unpack_start = self.node_start();
-                    self.bump(TokenKind::DoubleStar);
-                    let value = self.parse_expression_with_bitwise_or_precedence();
-                    self.add_error(
-                        ParseErrorType::InvalidStarredExpressionUsage,
-                        TextRange::new(unpack_start, value.range().end()),
-                    );
-                    value
-                } else {
-                    self.parse_dictionary_value(colon_range)
-                };
+                let value = self.parse_dictionary_value(colon_range);
 
                 if matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For) {
                     Expr::DictComp(self.parse_dictionary_comprehension_expression(
                         Some(key_or_element.expr),
                         value.expr,
                         start,
+                        None,
                     ))
                 } else {
                     Expr::Dict(self.parse_dictionary_expression(
@@ -2912,32 +3112,20 @@ impl<'src> Parser<'src> {
             .into();
         }
 
-        if self.at(TokenKind::DoubleStar) {
-            let double_star_range = self.current_token_range();
-            let checkpoint = self.checkpoint();
-            self.bump(TokenKind::DoubleStar);
-            if self.at_expr() {
-                let mut parsed_expr = self.parse_conditional_expression_or_higher();
-                if self.eat(TokenKind::Rpar) {
-                    // test_err parenthesized_double_starred_expr
-                    // (**x)
-                    self.add_error(
-                        ParseErrorType::OtherError(
-                            "cannot use double starred expression here".to_string(),
-                        ),
-                        double_star_range,
-                    );
-                    parsed_expr.is_parenthesized = true;
-                    return parsed_expr;
-                }
-            }
-            self.rewind(checkpoint);
-        }
-
         // Use the more general rule of the three to parse the first element
         // and limit it later.
+        if self.at(TokenKind::DoubleStar) {
+            // test_err parenthesized_double_starred_expr
+            // (**x)
+            return ParsedExpr {
+                expr: self.parse_invalid_sequence_dict_unpacking(start, true),
+                is_parenthesized: true,
+            };
+        }
         let mut parsed_expr = self.parse_named_expression_or_higher(
-            ExpressionContext::yield_or_starred_bitwise_or().with_for_excluded(),
+            ExpressionContext::yield_or_starred_bitwise_or()
+                .with_for_excluded()
+                .with_starred_generator_allowed(),
         );
 
         match self.current_token_kind() {
@@ -3161,17 +3349,27 @@ impl<'src> Parser<'src> {
 
         self.parse_comma_separated_list(RecoveryContextKind::DictElements, |parser| {
             if parser.eat(TokenKind::DoubleStar) {
-                // Handle dictionary unpacking. Here, the grammar is `'**' bitwise_or`
-                // which requires limiting the expression.
+                // Subsequent dictionary spreads retain the ordinary display grammar.
+                let value = parser
+                    .parse_conditional_expression_without_comma_check(ExpressionContext::default());
+                parser.validate_bitwise_or_precedence(&value);
                 items.push(ast::DictItem {
                     key: None,
-                    value: parser.parse_expression_with_bitwise_or_precedence().expr,
+                    value: value.expr,
                 });
             } else {
                 // A missing comma is not reported in a key after the first item.
-                let key = parser
-                    .parse_conditional_expression_without_comma_check(ExpressionContext::default())
-                    .expr;
+                let key = parser.parse_conditional_expression_without_comma_check(
+                    ExpressionContext::starred_bitwise_or(),
+                );
+                if key.is_unparenthesized_starred_expr() {
+                    parser.add_error(
+                        ParseErrorType::InvalidDictKeyUnpacking {
+                            double_starred: false,
+                        },
+                        &key,
+                    );
+                }
                 if !parser.at(TokenKind::Colon) {
                     // test_err dict_missing_colon_after_key
                     // {a: 1, b}
@@ -3189,7 +3387,7 @@ impl<'src> Parser<'src> {
                 parser.expect(TokenKind::Colon);
 
                 items.push(ast::DictItem {
-                    key: Some(key),
+                    key: Some(key.expr),
                     value: parser.parse_dictionary_value(colon_range).expr,
                 });
             }
@@ -3219,18 +3417,23 @@ impl<'src> Parser<'src> {
                 ),
                 colon_range,
             );
-        } else if self.at(TokenKind::Star) {
+        } else if matches!(
+            self.current_token_kind(),
+            TokenKind::Star | TokenKind::DoubleStar
+        ) {
             // test_err dict_starred_value
             // {a: *b}
             // {a: 1, b: *c}
-            let star_start = self.node_start();
-            self.bump(TokenKind::Star);
-            let value = self.parse_expression_with_bitwise_or_precedence();
+            let start = self.node_start();
+            let double_starred = self.at(TokenKind::DoubleStar);
+            self.bump_any();
+            let value = self.parse_binary_expression_or_higher(
+                OperatorPrecedence::ComparisonsMembershipIdentity,
+                ExpressionContext::default(),
+            );
             self.add_error(
-                ParseErrorType::OtherError(
-                    "cannot use a starred expression in a dictionary value".to_string(),
-                ),
-                TextRange::new(star_start, value.end()),
+                ParseErrorType::InvalidDictValueUnpacking { double_starred },
+                TextRange::new(start, value.end()),
             );
             return value;
         }
@@ -3395,9 +3598,15 @@ impl<'src> Parser<'src> {
         key: Option<Expr>,
         value: Expr,
         start: TextSize,
+        unpacking: Option<TextRange>,
     ) -> ast::ExprDictComp {
         let generators = self.parse_generators();
 
+        if self.at(TokenKind::Colon)
+            && let Some(stars) = unpacking
+        {
+            self.add_error(ParseErrorType::InvalidDictUnpacking, stars);
+        }
         self.expect(TokenKind::Rbrace);
 
         ast::ExprDictComp {
@@ -3475,6 +3684,7 @@ impl<'src> Parser<'src> {
             );
         }
 
+        let errors_start = self.errors.len();
         let parsed_expr = match context.starred_expression_precedence() {
             StarredExpressionPrecedence::Conditional => self
                 .parse_conditional_expression_or_higher_impl(
@@ -3485,9 +3695,32 @@ impl<'src> Parser<'src> {
                     context.disallow_starred_expressions(),
                 ),
             StarredExpressionPrecedence::BitwiseOr => {
-                self.parse_expression_with_bitwise_or_precedence()
+                let value = self
+                    .parse_conditional_expression_without_comma_check(ExpressionContext::default());
+                let is_generator = self.errors.len() == errors_start
+                    && context.is_starred_generator_allowed()
+                    && matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For);
+                if !is_generator {
+                    self.validate_unpacking_precedence(&value, start, false);
+                }
+                value
             }
         };
+        // CPython retries invalid_starred_expression_unpacking only after a
+        // failed parse. Its conditional rule also applies to call arguments.
+        if errors_start == 0
+            && self.errors.is_empty()
+            && self.deferred_starred_unpacking_error.is_none()
+            && !parsed_expr.is_parenthesized
+            && parsed_expr.expr.is_if_expr()
+        {
+            self.deferred_starred_unpacking_error = Some(crate::ParseError {
+                error: ParseErrorType::InvalidConditionalUnpacking {
+                    double_starred: false,
+                },
+                location: TextRange::new(start, parsed_expr.end()),
+            });
+        }
 
         ast::ExprStarred {
             value: Box::new(parsed_expr.expr),
@@ -3730,13 +3963,25 @@ impl<'src> Parser<'src> {
 
         let test = self.parse_simple_expression(ExpressionContext::default());
 
-        if self.expect(TokenKind::Else)
-            && (!self.at_expr()
-                || matches!(
-                    self.current_token_kind(),
-                    TokenKind::Star | TokenKind::DoubleStar | TokenKind::Yield
-                ))
+        let has_else = self.expect(TokenKind::Else);
+        if has_else
+            && matches!(
+                self.current_token_kind(),
+                TokenKind::Star | TokenKind::DoubleStar
+            )
         {
+            self.add_error(
+                ParseErrorType::InvalidConditionalBranchUnpacking {
+                    double_starred: self.at(TokenKind::DoubleStar),
+                },
+                self.current_token_range(),
+            );
+            // Recover the operand rather than treating `**` as a binary power
+            // with an empty left-hand side outside its parent range.
+            if self.at(TokenKind::DoubleStar) {
+                self.bump(TokenKind::DoubleStar);
+            }
+        } else if has_else && (!self.at_expr() || self.at(TokenKind::Yield)) {
             // test_err if_expr_statement_after_else
             // x = 1 if 1 else pass
             // x = 1 if 1 else
@@ -3975,6 +4220,10 @@ bitflags! {
         /// This flag is set when the `for` keyword, or `async` starting `async for`, should be
         /// excluded from an expression.
         const EXCLUDE_FOR = 1 << 4;
+
+        /// The first element after `(` may become a generator expression. Its starred
+        /// operand can use full expression precedence if a comprehension clause follows.
+        const ALLOW_STARRED_GENERATOR = 1 << 5;
     }
 }
 
@@ -4045,6 +4294,16 @@ impl ExpressionContext {
     /// Returns a new [`ExpressionContext`] which excludes `for` from an expression.
     fn with_for_excluded(self) -> Self {
         ExpressionContext(self.0 | ExpressionContextFlags::EXCLUDE_FOR)
+    }
+
+    /// Allow the first parenthesized starred element to become a generator element.
+    fn with_starred_generator_allowed(self) -> Self {
+        ExpressionContext(self.0 | ExpressionContextFlags::ALLOW_STARRED_GENERATOR)
+    }
+
+    const fn is_starred_generator_allowed(self) -> bool {
+        self.0
+            .contains(ExpressionContextFlags::ALLOW_STARRED_GENERATOR)
     }
 
     /// Returns `true` if the `in` keyword should be excluded from a comparison expression.

@@ -96,7 +96,7 @@ Module(
 2 | # it's actually a comprehension.
 3 |
 4 | {**x: y for x, y in data}
-  |  ^ Syntax Error: invalid syntax
+  |  ^^^ Syntax Error: cannot use dict unpacking in a dictionary key
 5 |
 6 | # TODO(dhruvmanila): This test case fails because there's no way to represent `**y`
   |

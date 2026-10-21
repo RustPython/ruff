@@ -1,0 +1,123 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/concat_uneven.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..84,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..83,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 44..83,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 44..49,
+                                    id: Name("print"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 49..83,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    StringLiteral(
+                                        ExprStringLiteral {
+                                            node_index: NodeIndex(None),
+                                            range: 61..76,
+                                            value: StringLiteralValue {
+                                                inner: Concatenated(
+                                                    ConcatenatedStringLiteral {
+                                                        strings: [
+                                                            StringLiteral {
+                                                                range: 61..68,
+                                                                node_index: NodeIndex(None),
+                                                                value: "first",
+                                                                flags: StringLiteralFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Empty,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                            StringLiteral {
+                                                                range: 70..76,
+                                                                node_index: NodeIndex(None),
+                                                                value: "last",
+                                                                flags: StringLiteralFlags {
+                                                                    quote_style: Double,
+                                                                    prefix: Empty,
+                                                                    triple_quoted: false,
+                                                                    unclosed: false,
+                                                                },
+                                                            },
+                                                        ],
+                                                        value: "firstlast",
+                                                    },
+                                                ),
+                                            },
+                                        },
+                                    ),
+                                ],
+                                keywords: [
+                                    Keyword {
+                                        range: 78..81,
+                                        node_index: NodeIndex(None),
+                                        arg: Some(
+                                            Identifier {
+                                                id: Name("x"),
+                                                range: 78..79,
+                                                node_index: NodeIndex(None),
+                                            },
+                                        ),
+                                        value: NumberLiteral(
+                                            ExprNumberLiteral {
+                                                node_index: NodeIndex(None),
+                                                range: 80..81,
+                                                value: Int(
+                                                    1,
+                                                ),
+                                            },
+                                        ),
+                                    },
+                                ],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+2 | print(
+3 |           "first"
+4 |  "last"
+  |        ^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 |  x=1
+6 | )
+  |
+
+
+  |
+3 |           "first"
+4 |  "last"
+5 |  x=1
+  |  ^ Syntax Error: invalid syntax
+6 | )
+  |

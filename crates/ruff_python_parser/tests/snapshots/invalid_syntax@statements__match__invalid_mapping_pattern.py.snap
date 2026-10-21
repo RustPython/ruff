@@ -625,7 +625,7 @@ Module(
 13 | # Multiple double star patterns are not allowed
 14 | match subject:
 15 |     case {**rest, None: 1}:
-   |                   ^^^^^^^ Syntax Error: pattern cannot follow a double star pattern
+   |             ^^^^ Syntax Error: double star pattern must be the last (right-most) subpattern in the mapping pattern
 16 |         pass
 17 |     case {**rest1, **rest2, None: 1}:
    |
@@ -645,7 +645,7 @@ Module(
 15 |     case {**rest, None: 1}:
 16 |         pass
 17 |     case {**rest1, **rest2, None: 1}:
-   |                             ^^^^^^^ Syntax Error: pattern cannot follow a double star pattern
+   |                      ^^^^^ Syntax Error: double star pattern must be the last (right-most) subpattern in the mapping pattern
 18 |         pass
 19 |     case {**rest1, None: 1, **rest2}:
    |
@@ -655,7 +655,7 @@ Module(
 17 |     case {**rest1, **rest2, None: 1}:
 18 |         pass
 19 |     case {**rest1, None: 1, **rest2}:
-   |                    ^^^^^^^ Syntax Error: pattern cannot follow a double star pattern
+   |             ^^^^^ Syntax Error: double star pattern must be the last (right-most) subpattern in the mapping pattern
 20 |         pass
    |
 

@@ -220,7 +220,7 @@ Module(
 
   |
 1 | def foo(a, *args, *, b): ...
-  |                   ^ Syntax Error: * argument may appear only once
+  |                   ^ Syntax Error: * may appear only once
 2 | def foo(a, *args, b, c, *): ...
   |
 

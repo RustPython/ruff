@@ -31,6 +31,7 @@ use crate::{Parsed, Tokens};
 
 pub use crate::parser::options::ParseOptions;
 
+mod case_diagnostics;
 mod expression;
 mod helpers;
 mod options;
@@ -81,6 +82,10 @@ pub(crate) struct Parser<'src> {
 
     /// Stores all the syntax errors found during the parsing.
     errors: Vec<ParseError>,
+
+    /// The first conditional unpacking error from the invalid-grammar fallback,
+    /// used only when the overall parse fails.
+    deferred_starred_unpacking_error: Option<ParseError>,
 
     /// Stores non-fatal syntax errors found during parsing, such as version-related errors.
     unsupported_syntax_errors: Vec<UnsupportedSyntaxError>,
@@ -163,6 +168,7 @@ impl<'src> Parser<'src> {
             options,
             source,
             errors: Vec::new(),
+            deferred_starred_unpacking_error: None,
             unsupported_syntax_errors: Vec::new(),
             tokens,
             name_interner: NameInterner::default(),
@@ -283,6 +289,14 @@ impl<'src> Parser<'src> {
         );
         // TODO consider re-integrating lexical error handling into the parser?
         let mut parse_errors = self.errors;
+        if !parse_errors.is_empty()
+            && let Some(error) = self.deferred_starred_unpacking_error
+        {
+            // CPython retries its invalid grammar rules only after a parse failure.
+            // Preserve encounter order, including nested operands whose ranges begin
+            // after the outer expression's later error. Semantic errors occur later.
+            parse_errors.insert(0, error);
+        }
         let (tokens, lex_errors) = self.tokens.finish();
 
         // Fast path for when there are no lex errors.
@@ -1154,22 +1168,27 @@ impl<'src> Parser<'src> {
         {
             // Only `from ... import` names before the newline and `with` items before the `:` have
             // a rule for a trailing comma. Otherwise parsing fails at the token after the comma.
-            let (message, range) = match recovery_context_kind {
+            let (error, range) = match recovery_context_kind {
                 RecoveryContextKind::ImportFromAsNames(Parenthesized::No)
                     if self.at(TokenKind::Newline) =>
                 {
                     (
-                        "trailing comma not allowed without surrounding parentheses",
+                        ParseErrorType::OtherError(
+                            "trailing comma not allowed without surrounding parentheses"
+                                .to_string(),
+                        ),
                         self.current_token_range(),
                     )
                 }
-                RecoveryContextKind::WithItems(_) if self.at(TokenKind::Colon) => (
-                    "the last 'with' item has a trailing comma",
-                    trailing_comma_range,
+                RecoveryContextKind::WithItems(_) if self.at(TokenKind::Colon) => {
+                    (ParseErrorType::TrailingCommaInWith, trailing_comma_range)
+                }
+                _ => (
+                    ParseErrorType::OtherError("invalid syntax".to_string()),
+                    self.current_token_range(),
                 ),
-                _ => ("invalid syntax", self.current_token_range()),
             };
-            self.add_error(ParseErrorType::OtherError(message.to_string()), range);
+            self.add_error(error, range);
         }
 
         self.recovery_context = saved_context;
@@ -1193,6 +1212,7 @@ impl<'src> Parser<'src> {
         ParserCheckpoint {
             tokens: self.tokens.checkpoint(),
             errors_position: self.errors.len(),
+            had_deferred_starred_unpacking_error: self.deferred_starred_unpacking_error.is_some(),
             unsupported_syntax_errors_position: self.unsupported_syntax_errors.len(),
             current_token_id: self.current_token_id,
             prev_token_end: self.prev_token_end,
@@ -1205,6 +1225,7 @@ impl<'src> Parser<'src> {
         let ParserCheckpoint {
             tokens,
             errors_position,
+            had_deferred_starred_unpacking_error,
             unsupported_syntax_errors_position,
             current_token_id,
             prev_token_end,
@@ -1213,6 +1234,9 @@ impl<'src> Parser<'src> {
 
         self.tokens.rewind(tokens);
         self.errors.truncate(errors_position);
+        if !had_deferred_starred_unpacking_error {
+            self.deferred_starred_unpacking_error = None;
+        }
         self.unsupported_syntax_errors
             .truncate(unsupported_syntax_errors_position);
         self.current_token_id = current_token_id;
@@ -1244,6 +1268,7 @@ impl IpyEscapeContext {
 struct ParserCheckpoint {
     tokens: TokenSourceCheckpoint,
     errors_position: usize,
+    had_deferred_starred_unpacking_error: bool,
     unsupported_syntax_errors_position: usize,
     current_token_id: TokenId,
     prev_token_end: TextSize,
@@ -2033,7 +2058,10 @@ fn prioritize_tokenizer_error(
     let mut lexer = Lexer::new(source, mode, start_offset);
     // The starts of the tokens at which parsing stops without reading ahead.
     let mut stops = Vec::new();
+    let mut replacement_hint = ReplacementFieldHint::new(first.as_ref());
+    let mut replacement_hint_wins = false;
     let (tokenizer_error, in_interpolated_string, detected) = loop {
+        let replacement_field = lexer.replacement_field();
         let in_interpolated_string = lexer.in_interpolated_string();
         let previous_errors = lexer.errors().len();
         let kind = lexer.next_token();
@@ -2041,21 +2069,26 @@ fn prioritize_tokenizer_error(
             .iter()
             .find(|error| error.error().is_tokenizer_error())
         {
+            replacement_hint_wins =
+                replacement_hint.is_unclosed_field_hint(error.error(), replacement_field);
             // A missing closing brace or a bracket that closes a replacement field is found at
             // the token that shows it.
             let detected = match error.error() {
                 LexicalErrorType::FStringError(
                     InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
                     | InterpolatedStringErrorType::UnmatchedBracket(_),
                 )
                 | LexicalErrorType::TStringError(
                     InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
                     | InterpolatedStringErrorType::UnmatchedBracket(_),
                 ) => error.location().start(),
                 _ => lexer.offset(),
             };
             break (error.clone(), in_interpolated_string, detected);
         }
+        replacement_hint.token(kind, lexer.current_range(), replacement_field);
         if matches!(
             kind,
             TokenKind::Colon | TokenKind::Semi | TokenKind::Unknown
@@ -2063,6 +2096,16 @@ fn prioritize_tokenizer_error(
             stops.push(lexer.current_range().start());
         }
         if kind == TokenKind::EndOfFile {
+            if let Some(start) = replacement_hint.unclosed_format_spec {
+                let error = LexicalError::new(
+                    LexicalErrorType::UnclosedBracket {
+                        opening: '{',
+                        incomplete: false,
+                    },
+                    TextRange::empty(start),
+                );
+                break (error, false, lexer.offset());
+            }
             return;
         }
     };
@@ -2071,7 +2114,12 @@ fn prioritize_tokenizer_error(
         move_to_front(errors, ParseError::from(tokenizer_error));
         return;
     };
-    let first_start = first.location.start();
+    let first_start = match &first.error {
+        ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+            expression_range, ..
+        } => expression_range.start(),
+        _ => first.location.start(),
+    };
     let error_start = match tokenizer_error.error() {
         LexicalErrorType::UnclosedBracket { .. } => {
             unclosed_bracket_recovery.map_or(first_start, |start| start.max(first_start))
@@ -2086,7 +2134,8 @@ fn prioritize_tokenizer_error(
             LexicalErrorType::UnicodeEscapeError { .. } | LexicalErrorType::BytesEscapeError { .. }
         )
     );
-    let wins = detected <= first_start
+    let wins = replacement_hint_wins
+        || detected <= first_start
         || (!in_interpolated_string
             && !escape_error
             && match tokenizer_error.error() {
@@ -2121,6 +2170,91 @@ fn prioritize_tokenizer_error(
         _ => tokenizer_error,
     };
     move_to_front(errors, ParseError::from(front));
+}
+
+/// Tracks the grammar boundaries after an expression hint while the unrecovered token stream
+/// is read. A replacement field keeps reading to its separator; an inner display or a debug /
+/// conversion separator can already establish the hint before a later missing brace is found.
+struct ReplacementFieldHint {
+    range: Option<TextRange>,
+    field: Option<TextSize>,
+    stopped: bool,
+    unclosed_format_spec: Option<TextSize>,
+}
+impl ReplacementFieldHint {
+    fn new(first: Option<&ParseError>) -> Self {
+        let range = first.and_then(|error| match &error.error {
+            ParseErrorType::MissingCommaAfterConcatenatedLiteral {
+                expression_range, ..
+            } => Some(*expression_range),
+            ParseErrorType::OtherError(message)
+                if matches!(
+                    message.as_str(),
+                    "invalid syntax. Perhaps you forgot a comma?"
+                        | "invalid syntax. Is this intended to be part of the string?"
+                ) =>
+            {
+                Some(error.location)
+            }
+            _ => None,
+        });
+        Self {
+            range,
+            field: None,
+            stopped: false,
+            unclosed_format_spec: None,
+        }
+    }
+
+    fn token(&mut self, kind: TokenKind, range: TextRange, field: Option<(TextSize, bool)>) {
+        let Some(hint) = self.range else {
+            return;
+        };
+        if range.contains(hint.start()) {
+            self.field = field.map(|(start, _)| start);
+        }
+        if range.start() < hint.end() || self.field.is_none() {
+            return;
+        }
+        // The hint covers both expressions. A later expression token establishes the hint;
+        // only the format-specifier and string-end tokens still belong to this field.
+        if !kind.is_trivia()
+            && !matches!(
+                kind,
+                TokenKind::Colon
+                    | TokenKind::FStringMiddle
+                    | TokenKind::TStringMiddle
+                    | TokenKind::FStringEnd
+                    | TokenKind::TStringEnd
+                    | TokenKind::EndOfFile
+            )
+        {
+            self.stopped = true;
+        }
+        if kind.is_interpolated_string_end() && !self.stopped {
+            self.unclosed_format_spec = field
+                .filter(|(start, format)| *format && Some(*start) == self.field)
+                .map(|(start, _)| start);
+        }
+    }
+
+    fn is_unclosed_field_hint(
+        &self,
+        error: &LexicalErrorType,
+        field: Option<(TextSize, bool)>,
+    ) -> bool {
+        self.field.is_some()
+            && self.field == field.map(|(start, _)| start)
+            && !self.stopped
+            && matches!(
+                error,
+                LexicalErrorType::FStringError(
+                    InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                ) | LexicalErrorType::TStringError(
+                    InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                )
+            )
+    }
 }
 
 /// Moves `error` to the front of `errors`, removing an equal error elsewhere.

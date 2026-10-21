@@ -92,6 +92,11 @@ impl InterpolatedStringContext {
         current_nesting.saturating_sub(self.nesting)
     }
 
+    /// Returns the nesting level immediately outside the current replacement field.
+    pub(crate) const fn replacement_field_nesting(&self, current_nesting: u32) -> u32 {
+        self.nesting + self.format_spec_depth - self.is_in_format_spec(current_nesting) as u32
+    }
+
     /// Returns `true` if the lexer is in an f-string expression or t-string interpolation i.e., between
     /// two curly braces.
     pub(crate) const fn is_in_interpolation(&self, current_nesting: u32) -> bool {
