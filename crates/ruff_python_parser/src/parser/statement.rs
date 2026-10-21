@@ -3738,9 +3738,7 @@ impl<'src> Parser<'src> {
                             // def foo(a, *args1, *args2, b): ...
                             // def foo(a, *args1, b, c, *args2): ...
                             parser.add_error(
-                                ParseErrorType::OtherError(
-                                    "* argument may appear only once".to_string(),
-                                ),
+                                ParseErrorType::OtherError("* may appear only once".to_string()),
                                 star_range,
                             );
                         }
@@ -3760,7 +3758,7 @@ impl<'src> Parser<'src> {
                             // def foo(a, *args, *, b): ...
                             // def foo(a, *args, b, c, *): ...
                             let message = if parser.at(TokenKind::Comma) {
-                                "* argument may appear only once"
+                                "* may appear only once"
                             } else {
                                 "invalid syntax"
                             };
@@ -3846,7 +3844,7 @@ impl<'src> Parser<'src> {
                         // def foo(/, a): ...
                         parser.add_error(
                             ParseErrorType::OtherError(
-                                "at least one argument must precede /".to_string(),
+                                "at least one parameter must precede /".to_string(),
                             ),
                             slash_range,
                         );

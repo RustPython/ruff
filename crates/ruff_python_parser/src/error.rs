@@ -609,22 +609,22 @@ impl std::fmt::Display for ParseErrorType {
             }
             ParseErrorType::EmptyTypeParams => f.write_str("Type parameter list cannot be empty"),
             ParseErrorType::ParamAfterVarKeywordParam => {
-                f.write_str("arguments cannot follow var-keyword argument")
+                f.write_str("parameters cannot follow var-keyword parameter")
             }
             ParseErrorType::NonDefaultParamAfterDefaultParam => {
                 f.write_str("parameter without a default follows parameter with a default")
             }
             ParseErrorType::ExpectedKeywordParam => {
-                f.write_str("named arguments must follow bare *")
+                f.write_str("named parameters must follow bare *")
             }
             ParseErrorType::VarKeywordParameterWithDefault => {
-                f.write_str("var-keyword argument cannot have default value")
+                f.write_str("var-keyword parameter cannot have default value")
             }
             ParseErrorType::ExpectedColonAfterDictionaryKey => {
                 f.write_str("':' expected after dictionary key")
             }
             ParseErrorType::VarParameterWithDefault => {
-                f.write_str("var-positional argument cannot have default value")
+                f.write_str("var-positional parameter cannot have default value")
             }
             ParseErrorType::InvalidStarPatternUsage => {
                 f.write_str("cannot use starred expression here")
