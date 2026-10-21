@@ -93,4 +93,4 @@ Module(
 
   |
 1 | def foo(a, **kwargs1, **kwargs2): ...
-  |                       ^^ Syntax Error: arguments cannot follow var-keyword argument
+  |                       ^^ Syntax Error: parameters cannot follow var-keyword parameter
