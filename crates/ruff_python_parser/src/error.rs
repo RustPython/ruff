@@ -90,6 +90,8 @@ impl Display for UnicodeEscapeErrorKind {
 pub enum InterpolatedStringErrorType {
     /// Expected a right brace after an opened left brace.
     UnclosedLbrace,
+    /// Expected a right brace for a replacement field opened on an earlier line.
+    UnclosedLbraceOnLine { opening_line: u32 },
     /// An invalid conversion flag was encountered.
     InvalidConversionFlag,
     /// A single right brace was encountered.
@@ -126,6 +128,9 @@ impl std::fmt::Display for InterpolatedStringErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::UnclosedLbrace => f.write_str("expecting '}'"),
+            Self::UnclosedLbraceOnLine { opening_line } => {
+                write!(f, "expecting '}}' to close '{{' on line {opening_line}")
+            }
             Self::InvalidConversionFlag => write!(f, "invalid conversion character"),
             Self::SingleRbrace => f.write_str("single '}' is not allowed"),
             Self::UnterminatedString { .. } => write!(f, "unterminated string"),
@@ -928,8 +933,14 @@ impl LexicalErrorType {
         matches!(
             self,
             Self::UnclosedStringError { .. }
-                | Self::FStringError(InterpolatedStringErrorType::UnclosedLbrace)
-                | Self::TStringError(InterpolatedStringErrorType::UnclosedLbrace)
+                | Self::FStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                        | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                )
+                | Self::TStringError(
+                    InterpolatedStringErrorType::UnclosedLbrace
+                        | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
+                )
         )
     }
 
@@ -951,6 +962,7 @@ impl LexicalErrorType {
                     | InterpolatedStringErrorType::SingleRbrace
                     | InterpolatedStringErrorType::NewlineInFormatSpec
                     | InterpolatedStringErrorType::UnclosedLbrace
+                    | InterpolatedStringErrorType::UnclosedLbraceOnLine { .. }
                     | InterpolatedStringErrorType::UnmatchedBracket(_)
             ),
             Self::UnclosedStringError { .. }
