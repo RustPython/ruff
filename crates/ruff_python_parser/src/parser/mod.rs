@@ -60,12 +60,6 @@ impl NameInterner {
     }
 }
 
-// Stack probes access thread-local state, so avoid them while recursive parser calls remain
-// shallow. `STACK_RED_ZONE` must cover the stack used before the first deferred probe.
-const STACK_RED_ZONE: usize = 100 * 1024;
-const STACK_SIZE: usize = 1024 * 1024;
-const MAX_UNCHECKED_RECURSION_DEPTH: usize = 20;
-
 #[derive(Debug)]
 pub(crate) struct Parser<'src> {
     source: &'src str,
@@ -115,6 +109,7 @@ pub(crate) struct Parser<'src> {
     replacement_field: Option<(InterpolatedStringKind, usize)>,
 
     /// Number of active recursive statement, expression, and pattern parsing operations.
+    #[cfg(feature = "stacker")]
     recursion_depth: usize,
 
     /// Reusable, nesting-safe scratch storage for expression lists.
@@ -173,6 +168,7 @@ impl<'src> Parser<'src> {
             first_unclosed_bracket_recovery: None,
             interpolated_string_escape_error: None,
             replacement_field: None,
+            #[cfg(feature = "stacker")]
             recursion_depth: 0,
             current_token_id: TokenId::default(),
             expr_scratch: ScratchBuffer::with_capacity(16),
@@ -184,33 +180,13 @@ impl<'src> Parser<'src> {
         }
     }
 
-    /// Grows the stack for recursive parser calls only after shallow nesting is exceeded.
-    #[inline]
-    fn with_recursion<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
-        self.recursion_depth += 1;
-
-        let result = if self.recursion_depth > MAX_UNCHECKED_RECURSION_DEPTH {
-            self.grow_stack(f)
-        } else {
-            f(self)
-        };
-
-        self.recursion_depth -= 1;
-        result
-    }
-
-    #[cold]
-    fn grow_stack<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
-        stacker::maybe_grow(STACK_RED_ZONE, STACK_SIZE, || f(self))
-    }
-
     /// Consumes the [`Parser`] and returns the parsed [`Parsed`].
     pub(crate) fn parse(mut self) -> Parsed<Mod> {
-        let syntax = stacker::maybe_grow(STACK_RED_ZONE, STACK_SIZE, || match self.options.mode {
+        let syntax = self.maybe_grow_stack(|parser| match parser.options.mode {
             Mode::Expression | Mode::ParenthesizedExpression => {
-                Mod::Expression(self.parse_single_expression())
+                Mod::Expression(parser.parse_single_expression())
             }
-            Mode::Module | Mode::Ipython => Mod::Module(self.parse_module()),
+            Mode::Module | Mode::Ipython => Mod::Module(parser.parse_module()),
         });
 
         self.finish(syntax)
@@ -1218,6 +1194,53 @@ impl<'src> Parser<'src> {
         self.current_token_id = current_token_id;
         self.prev_token_end = prev_token_end;
         self.recovery_context = recovery_context;
+    }
+}
+
+#[cfg(feature = "stacker")]
+impl Parser<'_> {
+    // Stack probes access thread-local state, so avoid them while recursive parser calls remain
+    // shallow. `STACK_RED_ZONE` must cover the stack used before the first deferred probe.
+    const STACK_RED_ZONE: usize = 100 * 1024;
+    const STACK_SIZE: usize = 1024 * 1024;
+    const MAX_UNCHECKED_RECURSION_DEPTH: usize = 20;
+
+    #[inline]
+    fn maybe_grow_stack<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        stacker::maybe_grow(Self::STACK_RED_ZONE, Self::STACK_SIZE, || f(self))
+    }
+
+    /// Grows the stack for recursive parser calls only after shallow nesting is exceeded.
+    #[inline]
+    fn with_recursion<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        self.recursion_depth += 1;
+
+        let result = if self.recursion_depth > Self::MAX_UNCHECKED_RECURSION_DEPTH {
+            self.grow_stack(f)
+        } else {
+            f(self)
+        };
+
+        self.recursion_depth -= 1;
+        result
+    }
+
+    #[cold]
+    fn grow_stack<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        self.maybe_grow_stack(f)
+    }
+}
+
+#[cfg(not(feature = "stacker"))]
+impl Parser<'_> {
+    #[inline]
+    fn maybe_grow_stack<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        f(self)
+    }
+
+    #[inline]
+    fn with_recursion<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        f(self)
     }
 }
 
