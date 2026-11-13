@@ -823,6 +823,10 @@ pub enum LexicalErrorType {
         escaped_end_quote: bool,
         detected_line: u32,
     },
+    /// The interpreter could not load the Unicode name provider for a `\N` escape.
+    UnicodeNameProviderUnavailable,
+    /// A format-spec decoder failure propagates its original exception, not `SyntaxError`.
+    FormatSpecDecodeError(Box<LexicalErrorType>),
     /// An escape sequence in a string literal cannot be decoded. `start` and `end` are the
     /// inclusive positions of the escape sequence in the string content, where a non-ASCII
     /// character counts as its ten-character `\U` escape.
@@ -949,6 +953,8 @@ impl LexicalErrorType {
     pub fn is_tokenizer_error(&self) -> bool {
         match self {
             Self::StringError
+            | Self::FormatSpecDecodeError(_)
+            | Self::UnicodeNameProviderUnavailable
             | Self::UnicodeEscapeError { .. }
             | Self::BytesEscapeError { .. }
             | Self::InvalidByteLiteral
@@ -1006,6 +1012,8 @@ impl std::fmt::Display for LexicalErrorType {
             Self::InvalidByteLiteral => {
                 write!(f, "bytes can only contain ASCII literal characters")
             }
+            Self::FormatSpecDecodeError(error) => std::fmt::Display::fmt(error, f),
+            Self::UnicodeNameProviderUnavailable => write!(f, "(unicode error) {}", crate::UnicodeNameProviderUnavailable),
             Self::UnicodeEscapeError { kind, start, end } => write!(
                 f,
                 "(unicode error) 'unicodeescape' codec can't decode bytes in position {start}-{end}: {kind}"
