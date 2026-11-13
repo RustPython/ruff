@@ -97,6 +97,7 @@ pub(crate) fn duplicate_literal_member<'a>(checker: &Checker, expr: &'a Expr) {
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                     ctx: ExprContext::Load,
                     parenthesized: false,
+                    runtime_elts: None,
                 })
             }),
             value: subscript.value.clone(),

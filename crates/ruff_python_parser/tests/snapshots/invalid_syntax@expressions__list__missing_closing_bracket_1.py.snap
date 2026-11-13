@@ -44,18 +44,30 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
   |
+2 | # is considered to be part of the list.
+3 |
+4 | [
+  | ^ Syntax Error: '[' was never closed
+5 |
+6 | x + y
+  |
+
+
+  |
 4 | [
 5 |
 6 | x + y
-  |      ^ Syntax Error: unexpected EOF while parsing
+  |      ^ Syntax Error: invalid syntax

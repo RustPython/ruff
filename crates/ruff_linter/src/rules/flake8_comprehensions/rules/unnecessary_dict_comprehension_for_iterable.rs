@@ -216,6 +216,8 @@ fn fix_unnecessary_dict_comprehension(value: &Expr, generator: &Comprehension) -
         keywords: std::iter::empty().collect(),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_args: None,
+        runtime_bases: None,
     };
     Expr::Call(ExprCall {
         func: Box::new(Expr::Name(ExprName {

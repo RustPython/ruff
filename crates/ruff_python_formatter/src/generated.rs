@@ -1814,6 +1814,42 @@ impl<'ast> IntoFormat<PyFormatContext<'ast>> for ast::ExprEllipsisLiteral {
     }
 }
 
+impl FormatRule<ast::ExprConstant, PyFormatContext<'_>>
+    for crate::expression::expr_constant::FormatExprConstant
+{
+    #[inline]
+    fn fmt(&self, node: &ast::ExprConstant, f: &mut PyFormatter) -> FormatResult<()> {
+        FormatNodeRule::<ast::ExprConstant>::fmt(self, node, f)
+    }
+}
+impl<'ast> AsFormat<PyFormatContext<'ast>> for ast::ExprConstant {
+    type Format<'a> = FormatRefWithRule<
+        'a,
+        ast::ExprConstant,
+        crate::expression::expr_constant::FormatExprConstant,
+        PyFormatContext<'ast>,
+    >;
+    fn format(&self) -> Self::Format<'_> {
+        FormatRefWithRule::new(
+            self,
+            crate::expression::expr_constant::FormatExprConstant::default(),
+        )
+    }
+}
+impl<'ast> IntoFormat<PyFormatContext<'ast>> for ast::ExprConstant {
+    type Format = FormatOwnedWithRule<
+        ast::ExprConstant,
+        crate::expression::expr_constant::FormatExprConstant,
+        PyFormatContext<'ast>,
+    >;
+    fn into_format(self) -> Self::Format {
+        FormatOwnedWithRule::new(
+            self,
+            crate::expression::expr_constant::FormatExprConstant::default(),
+        )
+    }
+}
+
 impl FormatRule<ast::ExprAttribute, PyFormatContext<'_>>
     for crate::expression::expr_attribute::FormatExprAttribute
 {

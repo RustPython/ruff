@@ -37,6 +37,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -62,12 +63,17 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -106,6 +112,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -122,12 +129,17 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -157,6 +169,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -173,6 +186,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -198,6 +212,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -223,56 +238,60 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
   |
-3 |   except:
-4 |       pass
-5 | / except* ExceptionGroup:
-6 | |     pass
-  | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
-7 |   try:
-8 |       pass
+3 | except:
+4 |     pass
+5 | except* ExceptionGroup:
+  | ^^^^^^^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
+6 |     pass
+7 | try:
   |
 
 
    |
- 9 |   except* ExceptionGroup:
-10 |       pass
-11 | / except:
-12 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
-13 |   try:
-14 |       pass
+ 9 | except* ExceptionGroup:
+10 |     pass
+11 | except:
+   | ^^^^^^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
+12 |     pass
+13 | try:
    |
 
 
    |
-17 |   except:
-18 |       pass
-19 | / except* ExceptionGroup:
-20 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
-21 |   except* ExceptionGroup:
-22 |       pass
+17 | except:
+18 |     pass
+19 | except* ExceptionGroup:
+   | ^^^^^^^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
+20 |     pass
+21 | except* ExceptionGroup:
    |
 
 
    |
-19 |   except* ExceptionGroup:
-20 |       pass
-21 | / except* ExceptionGroup:
-22 | |     pass
-   | |________^ Syntax Error: Cannot have both 'except' and 'except*' on the same 'try'
+19 | except* ExceptionGroup:
+20 |     pass
+21 | except* ExceptionGroup:
+   | ^^^^^^^ Syntax Error: cannot have both 'except' and 'except*' on the same 'try'
+22 |     pass
+   |

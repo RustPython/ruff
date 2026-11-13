@@ -176,6 +176,7 @@ fn compare(left: &Expr, cmp_op: CmpOp, right: &Expr) -> Expr {
         operands: Box::from([left.clone(), right.clone()]),
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_comparators: None,
     })
 }
 
@@ -395,6 +396,8 @@ impl UnittestAssert {
                         keywords: std::iter::empty().collect(),
                         range: TextRange::default(),
                         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                        runtime_args: None,
+                        runtime_bases: None,
                     },
                     range_start: ruff_text_size::TextSize::default(),
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,
@@ -444,6 +447,8 @@ impl UnittestAssert {
                         keywords: std::iter::empty().collect(),
                         range: TextRange::default(),
                         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                        runtime_args: None,
+                        runtime_bases: None,
                     },
                     range_start: ruff_text_size::TextSize::default(),
                     node_index: ruff_python_ast::AtomicNodeIndex::NONE,

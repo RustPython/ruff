@@ -40,6 +40,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -87,9 +88,11 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_values: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -145,9 +148,11 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_elts: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -215,9 +220,11 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -225,7 +232,7 @@ Module(
 
   |
 1 | del x + 1
-  |     ^^^^^ Syntax Error: Invalid delete target
+  |     ^^^^^ Syntax Error: cannot delete expression
 2 | del {'x': 1}
 3 | del {'x', 'y'}
   |
@@ -234,7 +241,7 @@ Module(
   |
 1 | del x + 1
 2 | del {'x': 1}
-  |     ^^^^^^^^ Syntax Error: Invalid delete target
+  |     ^^^^^^^^ Syntax Error: cannot delete dict literal
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
   |
@@ -244,7 +251,7 @@ Module(
 1 | del x + 1
 2 | del {'x': 1}
 3 | del {'x', 'y'}
-  |     ^^^^^^^^^^ Syntax Error: Invalid delete target
+  |     ^^^^^^^^^^ Syntax Error: cannot delete set display
 4 | del None, True, False, 1, 1.0, "abc"
   |
 
@@ -253,39 +260,39 @@ Module(
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |     ^^^^ Syntax Error: Invalid delete target
+  |     ^^^^ Syntax Error: cannot delete None
 
 
   |
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |           ^^^^ Syntax Error: Invalid delete target
+  |           ^^^^ Syntax Error: cannot delete True
 
 
   |
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |                 ^^^^^ Syntax Error: Invalid delete target
+  |                 ^^^^^ Syntax Error: cannot delete False
 
 
   |
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |                        ^ Syntax Error: Invalid delete target
+  |                        ^ Syntax Error: cannot delete literal
 
 
   |
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |                           ^^^ Syntax Error: Invalid delete target
+  |                           ^^^ Syntax Error: cannot delete literal
 
 
   |
 2 | del {'x': 1}
 3 | del {'x', 'y'}
 4 | del None, True, False, 1, 1.0, "abc"
-  |                                ^^^^^ Syntax Error: Invalid delete target
+  |                                ^^^^^ Syntax Error: cannot delete literal

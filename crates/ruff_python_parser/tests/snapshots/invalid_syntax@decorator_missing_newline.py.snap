@@ -43,6 +43,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -59,6 +60,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -94,6 +99,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -110,6 +116,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -151,9 +161,12 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -161,7 +174,7 @@ Module(
 
   |
 1 | @x def foo(): ...
-  |    ^^^ Syntax Error: Expected newline, found `def`
+  |    ^^^ Syntax Error: invalid syntax
 2 | @x async def foo(): ...
 3 | @x class Foo: ...
   |
@@ -170,7 +183,7 @@ Module(
   |
 1 | @x def foo(): ...
 2 | @x async def foo(): ...
-  |    ^^^^^ Syntax Error: Expected newline, found `async`
+  |    ^^^^^ Syntax Error: invalid syntax
 3 | @x class Foo: ...
   |
 
@@ -179,4 +192,4 @@ Module(
 1 | @x def foo(): ...
 2 | @x async def foo(): ...
 3 | @x class Foo: ...
-  |    ^^^^^ Syntax Error: Expected newline, found `class`
+  |    ^^^^^ Syntax Error: invalid syntax

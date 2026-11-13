@@ -45,6 +45,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -92,6 +93,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -135,6 +137,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -182,9 +185,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -192,7 +197,7 @@ Module(
 
   |
 1 | from x import *, a
-  |               ^^^^ Syntax Error: Star import must be the only import
+  |               ^^^^ Syntax Error: star import must be the only import
 2 | from x import a, *, b
 3 | from x import *, a as b
   |
@@ -201,7 +206,7 @@ Module(
   |
 1 | from x import *, a
 2 | from x import a, *, b
-  |               ^^^^^^^ Syntax Error: Star import must be the only import
+  |               ^^^^^^^ Syntax Error: star import must be the only import
 3 | from x import *, a as b
 4 | from x import *, *, a
   |
@@ -211,7 +216,7 @@ Module(
 1 | from x import *, a
 2 | from x import a, *, b
 3 | from x import *, a as b
-  |               ^^^^^^^^^ Syntax Error: Star import must be the only import
+  |               ^^^^^^^^^ Syntax Error: star import must be the only import
 4 | from x import *, *, a
   |
 
@@ -220,4 +225,4 @@ Module(
 2 | from x import a, *, b
 3 | from x import *, a as b
 4 | from x import *, *, a
-  |               ^^^^^^^ Syntax Error: Star import must be the only import
+  |               ^^^^^^^ Syntax Error: star import must be the only import

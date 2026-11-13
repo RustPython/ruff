@@ -49,6 +49,7 @@ impl<'ast> SourceOrderVisitor<'ast> for Collector<'_> {
                 is_lazy: _,
                 range: _,
                 node_index: _,
+                runtime_level: _,
             }) => {
                 let module = module.as_deref();
                 let level = *level;
@@ -106,6 +107,7 @@ impl<'ast> SourceOrderVisitor<'ast> for Collector<'_> {
                 elif_else_clauses,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 // Skip TYPE_CHECKING blocks if not requested
                 if self.type_checking_imports || !is_type_checking_condition(test) {

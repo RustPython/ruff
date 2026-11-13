@@ -230,6 +230,7 @@ impl<'a> StringLiteralDisplay<'a> {
                 elts,
                 range,
                 node_index: _,
+                runtime_elts: _,
             }) => {
                 let kind = DisplayKind::Sequence(SequenceKind::Set);
                 Self {

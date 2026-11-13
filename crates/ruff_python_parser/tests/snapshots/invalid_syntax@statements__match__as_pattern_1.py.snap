@@ -66,11 +66,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -80,7 +82,7 @@ Module(
 3 |     #             complex literal pattern
 4 |     #             v
 5 |     case (x as y) + 1j:
-  |           ^^^^^^ Syntax Error: Expected a real number in complex literal pattern
+  |           ^^^^^^ Syntax Error: expected a real number in complex literal pattern
 6 |     #     ^^^^^^
 7 |     #    as-pattern
   |

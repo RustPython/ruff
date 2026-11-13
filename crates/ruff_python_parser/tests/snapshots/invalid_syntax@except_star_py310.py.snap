@@ -58,6 +58,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -89,6 +90,7 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                         ExceptHandler(
@@ -120,15 +122,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -138,7 +146,7 @@ Module(
 1 | # parse_options: {"target-version": "3.10"}
 2 | try: ...
 3 | except* ValueError: ...
-  |       ^ Syntax Error: Cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)
+  |       ^ Syntax Error: cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)
 4 | except* KeyError: ...
 5 | except    *     Error: ...
   |
@@ -148,7 +156,7 @@ Module(
 2 | try: ...
 3 | except* ValueError: ...
 4 | except* KeyError: ...
-  |       ^ Syntax Error: Cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)
+  |       ^ Syntax Error: cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)
 5 | except    *     Error: ...
   |
 
@@ -157,4 +165,4 @@ Module(
 3 | except* ValueError: ...
 4 | except* KeyError: ...
 5 | except    *     Error: ...
-  |           ^ Syntax Error: Cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)
+  |           ^ Syntax Error: cannot use `except*` on Python 3.10 (syntax was added in Python 3.11)

@@ -224,6 +224,7 @@ fn create_fix(
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                 ctx: ExprContext::Load,
                 parenthesized: true,
+                runtime_elts: None,
             })
         } else {
             literal_elements[0].clone()

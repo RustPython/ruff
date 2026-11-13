@@ -26,6 +26,8 @@ expression: suite
                             },
                         ),
                     },
+                    runtime_template_str: None,
+                    runtime_values: None,
                 },
             ),
         },

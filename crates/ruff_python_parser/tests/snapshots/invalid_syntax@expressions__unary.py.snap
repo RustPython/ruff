@@ -47,6 +47,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -54,4 +55,9 @@ Module(
 
   |
 1 | not x := 1
-  |       ^^ Syntax Error: Expected a statement
+  | ^^^^^ Syntax Error: cannot use assignment expressions with expression
+
+
+  |
+1 | not x := 1
+  |       ^^ Syntax Error: invalid syntax

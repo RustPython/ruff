@@ -99,6 +99,7 @@ Module(
                                         ],
                                         ctx: Load,
                                         parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             ),
@@ -107,6 +108,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -115,7 +117,7 @@ Module(
   |
 1 | # Unparenthesized named expressions are not allowed
 2 | yield x := 1
-  |         ^^ Syntax Error: Expected a statement
+  |         ^^ Syntax Error: invalid syntax
 3 |
 4 | yield 1, x := 2, 3
   |
@@ -125,4 +127,4 @@ Module(
 2 | yield x := 1
 3 |
 4 | yield 1, x := 2, 3
-  |            ^^ Syntax Error: Expected `,`, found `:=`
+  |            ^^ Syntax Error: invalid syntax

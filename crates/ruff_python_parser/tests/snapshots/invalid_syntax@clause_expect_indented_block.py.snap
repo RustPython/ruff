@@ -23,6 +23,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             Pass(
@@ -44,9 +45,11 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -56,7 +59,7 @@ Module(
 1 | # Here, the error is highlighted at the `pass` token
 2 | if True:
 3 | pass
-  | ^^^^ Syntax Error: Expected an indented block after `if` statement
+  | ^^^^ Syntax Error: expected an indented block after 'if' statement on line 2
 4 | # The parser is at the end of the program, so let's highlight
 5 | # at the newline token after `:`
   |
@@ -66,4 +69,4 @@ Module(
 4 | # The parser is at the end of the program, so let's highlight
 5 | # at the newline token after `:`
 6 | if True:
-  |         ^ Syntax Error: Expected an indented block after `if` statement
+  |         ^ Syntax Error: expected an indented block after 'if' statement on line 6

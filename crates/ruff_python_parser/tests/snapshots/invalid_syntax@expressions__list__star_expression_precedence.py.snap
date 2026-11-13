@@ -44,6 +44,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -86,6 +87,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_comparators: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -101,6 +103,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -146,6 +149,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -186,6 +190,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -201,6 +206,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -241,6 +247,7 @@ Module(
                                                         },
                                                     ),
                                                 ],
+                                                runtime_values: None,
                                             },
                                         ),
                                         ctx: Load,
@@ -256,6 +263,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -315,6 +323,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -354,6 +363,8 @@ Module(
                                                                         node_index: NodeIndex(None),
                                                                     },
                                                                     annotation: None,
+                                                                    runtime_type_comment: None,
+                                                                    runtime_type_comment_bytes: None,
                                                                 },
                                                                 default: None,
                                                             },
@@ -361,6 +372,7 @@ Module(
                                                         vararg: None,
                                                         kwonlyargs: [],
                                                         kwarg: None,
+                                                        runtime_defaults: None,
                                                     },
                                                 ),
                                                 body: Name(
@@ -386,6 +398,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -439,11 +452,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -453,7 +468,7 @@ Module(
 1 | # For list expression, the minimum binding power of star expression is bitwise or.
 2 |
 3 | [(*x), y]
-  |   ^^ Syntax Error: Starred expression cannot be used here
+  |   ^^ Syntax Error: cannot use starred expression here
 4 | [*x in y, z]
 5 | [*not x, z]
   |
@@ -462,7 +477,7 @@ Module(
   |
 3 | [(*x), y]
 4 | [*x in y, z]
-  |   ^^^^^^ Syntax Error: Comparison expression cannot be used here
+  |   ^^^^^^ Syntax Error: comparison expression cannot be used here
 5 | [*not x, z]
 6 | [*x and y, z]
   |
@@ -472,7 +487,7 @@ Module(
 3 | [(*x), y]
 4 | [*x in y, z]
 5 | [*not x, z]
-  |   ^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^ Syntax Error: boolean expression cannot be used here
 6 | [*x and y, z]
 7 | [*x or y, z]
   |
@@ -482,7 +497,7 @@ Module(
 4 | [*x in y, z]
 5 | [*not x, z]
 6 | [*x and y, z]
-  |   ^^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^^^ Syntax Error: boolean expression cannot be used here
 7 | [*x or y, z]
 8 | [*x if True else y, z]
   |
@@ -492,7 +507,7 @@ Module(
 5 | [*not x, z]
 6 | [*x and y, z]
 7 | [*x or y, z]
-  |   ^^^^^^ Syntax Error: Boolean expression cannot be used here
+  |   ^^^^^^ Syntax Error: boolean expression cannot be used here
 8 | [*x if True else y, z]
 9 | [*lambda x: x, z]
   |
@@ -502,7 +517,7 @@ Module(
  6 | [*x and y, z]
  7 | [*x or y, z]
  8 | [*x if True else y, z]
-   |   ^^^^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |   ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
  9 | [*lambda x: x, z]
 10 | [*x := 2, z]
    |
@@ -512,7 +527,7 @@ Module(
  7 | [*x or y, z]
  8 | [*x if True else y, z]
  9 | [*lambda x: x, z]
-   |   ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |   ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 10 | [*x := 2, z]
    |
 
@@ -521,4 +536,4 @@ Module(
  8 | [*x if True else y, z]
  9 | [*lambda x: x, z]
 10 | [*x := 2, z]
-   |  ^^ Syntax Error: Assignment expression target must be an identifier
+   |  ^^ Syntax Error: cannot use assignment expressions with starred

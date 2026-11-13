@@ -118,6 +118,7 @@ impl FormatNodeRule<ExprTuple> for FormatExprTuple {
             range: _,
             node_index: _,
             parenthesized: is_parenthesized,
+            runtime_elts: _,
         } = item;
 
         let comments = f.context().comments().clone();

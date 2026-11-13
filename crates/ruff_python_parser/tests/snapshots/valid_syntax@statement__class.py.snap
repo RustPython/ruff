@@ -36,6 +36,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -55,6 +57,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -87,6 +91,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -94,6 +100,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -104,9 +111,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -176,6 +189,8 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -192,6 +207,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -227,6 +244,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -259,6 +277,7 @@ Module(
                                                         ],
                                                         ctx: Store,
                                                         parenthesized: false,
+                                                        runtime_elts: None,
                                                     },
                                                 ),
                                             ],
@@ -270,12 +289,21 @@ Module(
                                                     ctx: Load,
                                                 },
                                             ),
+                                            runtime_targets: None,
+                                            runtime_type_comment: None,
+                                            runtime_type_comment_bytes: None,
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -312,6 +340,8 @@ Module(
                                 ),
                             ],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -344,6 +374,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -351,6 +383,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -361,6 +394,10 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                         FunctionDef(
@@ -392,6 +429,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -407,6 +446,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: Some(
                                                 StringLiteral(
@@ -436,6 +477,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                                 returns: None,
                                 body: [
@@ -446,9 +488,15 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_decorator_list: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
+                                runtime_body: None,
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -480,6 +528,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -488,6 +537,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -504,6 +555,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -544,6 +597,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -552,6 +606,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -568,6 +624,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -608,6 +666,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -616,6 +675,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -632,6 +693,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -696,6 +759,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -704,6 +768,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -720,6 +786,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -771,6 +839,7 @@ Module(
                                                     ],
                                                     ctx: Load,
                                                     parenthesized: true,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
@@ -778,6 +847,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -786,6 +856,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -802,6 +874,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -846,6 +920,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -854,6 +929,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -870,6 +947,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -914,6 +993,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -922,6 +1002,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -938,6 +1020,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -968,6 +1052,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -976,6 +1061,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -992,6 +1079,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -1067,6 +1156,7 @@ Module(
                                                                     ],
                                                                     ctx: Load,
                                                                     parenthesized: false,
+                                                                    runtime_elts: None,
                                                                 },
                                                             ),
                                                             ctx: Load,
@@ -1079,6 +1169,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -1087,6 +1178,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -1103,6 +1196,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -1170,6 +1265,7 @@ Module(
                                                                     ],
                                                                     ctx: Load,
                                                                     parenthesized: false,
+                                                                    runtime_elts: None,
                                                                 },
                                                             ),
                                                             ctx: Load,
@@ -1182,6 +1278,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -1190,6 +1287,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -1206,6 +1305,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -1236,6 +1337,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -1244,6 +1346,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -1260,6 +1364,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -1310,12 +1416,14 @@ Module(
                                                         ),
                                                     ],
                                                     ctx: Load,
+                                                    runtime_elts: None,
                                                 },
                                             ),
                                         ),
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -1324,6 +1432,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -1340,6 +1450,8 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -1417,6 +1529,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     arguments: Some(
@@ -1425,6 +1538,8 @@ Module(
                             node_index: NodeIndex(None),
                             args: [],
                             keywords: [],
+                            runtime_args: None,
+                            runtime_bases: None,
                         },
                     ),
                     body: [
@@ -1435,9 +1550,12 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

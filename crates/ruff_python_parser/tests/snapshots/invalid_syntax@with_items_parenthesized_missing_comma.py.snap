@@ -57,6 +57,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -115,6 +118,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -190,6 +196,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -274,6 +283,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -309,6 +321,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: true,
+                                    runtime_elts: None,
                                 },
                             ),
                             optional_vars: None,
@@ -328,9 +341,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -338,7 +355,15 @@ Module(
 
   |
 1 | with (item1 item2): ...
-  |             ^^^^^ Syntax Error: Expected `,`, found identifier
+  |       ^^^^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+2 | with (item1 as f1 item2): ...
+3 | with (item1, item2 item3, item4): ...
+  |
+
+
+  |
+1 | with (item1 item2): ...
+  |             ^^^^^ Syntax Error: invalid syntax
 2 | with (item1 as f1 item2): ...
 3 | with (item1, item2 item3, item4): ...
   |
@@ -347,7 +372,16 @@ Module(
   |
 1 | with (item1 item2): ...
 2 | with (item1 as f1 item2): ...
-  |                   ^^^^^ Syntax Error: Expected `,`, found identifier
+  |                ^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+3 | with (item1, item2 item3, item4): ...
+4 | with (item1, item2 as f1 item3, item4): ...
+  |
+
+
+  |
+1 | with (item1 item2): ...
+2 | with (item1 as f1 item2): ...
+  |                   ^^^^^ Syntax Error: invalid syntax
 3 | with (item1, item2 item3, item4): ...
 4 | with (item1, item2 as f1 item3, item4): ...
   |
@@ -357,7 +391,17 @@ Module(
 1 | with (item1 item2): ...
 2 | with (item1 as f1 item2): ...
 3 | with (item1, item2 item3, item4): ...
-  |                    ^^^^^ Syntax Error: Expected `,`, found identifier
+  |              ^^^^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+4 | with (item1, item2 as f1 item3, item4): ...
+5 | with (item1, item2: ...
+  |
+
+
+  |
+1 | with (item1 item2): ...
+2 | with (item1 as f1 item2): ...
+3 | with (item1, item2 item3, item4): ...
+  |                    ^^^^^ Syntax Error: invalid syntax
 4 | with (item1, item2 as f1 item3, item4): ...
 5 | with (item1, item2: ...
   |
@@ -367,7 +411,16 @@ Module(
 2 | with (item1 as f1 item2): ...
 3 | with (item1, item2 item3, item4): ...
 4 | with (item1, item2 as f1 item3, item4): ...
-  |                          ^^^^^ Syntax Error: Expected `,`, found identifier
+  |                       ^^^^^^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+5 | with (item1, item2: ...
+  |
+
+
+  |
+2 | with (item1 as f1 item2): ...
+3 | with (item1, item2 item3, item4): ...
+4 | with (item1, item2 as f1 item3, item4): ...
+  |                          ^^^^^ Syntax Error: invalid syntax
 5 | with (item1, item2: ...
   |
 
@@ -376,4 +429,4 @@ Module(
 3 | with (item1, item2 item3, item4): ...
 4 | with (item1, item2 as f1 item3, item4): ...
 5 | with (item1, item2: ...
-  |                   ^ Syntax Error: Expected `)`, found `:`
+  |                   ^ Syntax Error: invalid syntax

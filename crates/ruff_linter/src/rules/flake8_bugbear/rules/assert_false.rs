@@ -71,6 +71,8 @@ fn assertion_error(msg: Option<&Expr>) -> Stmt {
                 keywords: std::iter::empty().collect(),
                 range: TextRange::default(),
                 node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+                runtime_args: None,
+                runtime_bases: None,
             },
             range_start: ruff_text_size::TextSize::default(),
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,

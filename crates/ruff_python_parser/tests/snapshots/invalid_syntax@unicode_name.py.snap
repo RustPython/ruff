@@ -227,6 +227,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -235,7 +236,7 @@ Module(
   |
 1 | # Named escapes require the registered spaces and hyphens, ignoring ASCII case.
 2 | '\N{LOWLINE}'
-  |     ^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-10: unknown Unicode character name
 3 | '\N{LOW_LINE}'
 4 | '\N{FULL S-T-O-P}'
   |
@@ -245,7 +246,7 @@ Module(
 1 | # Named escapes require the registered spaces and hyphens, ignoring ASCII case.
 2 | '\N{LOWLINE}'
 3 | '\N{LOW_LINE}'
-  |     ^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-11: unknown Unicode character name
 4 | '\N{FULL S-T-O-P}'
 5 | '\N{ FULL STOP}'
   |
@@ -255,7 +256,7 @@ Module(
 2 | '\N{LOWLINE}'
 3 | '\N{LOW_LINE}'
 4 | '\N{FULL S-T-O-P}'
-  |     ^^^^^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-15: unknown Unicode character name
 5 | '\N{ FULL STOP}'
 6 | '\N{new_line}'
   |
@@ -265,7 +266,7 @@ Module(
 3 | '\N{LOW_LINE}'
 4 | '\N{FULL S-T-O-P}'
 5 | '\N{ FULL STOP}'
-  |     ^^^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-13: unknown Unicode character name
 6 | '\N{new_line}'
 7 | '\N{HANGULSYLLABLEGA}'
   |
@@ -275,7 +276,7 @@ Module(
 4 | '\N{FULL S-T-O-P}'
 5 | '\N{ FULL STOP}'
 6 | '\N{new_line}'
-  |     ^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-11: unknown Unicode character name
 7 | '\N{HANGULSYLLABLEGA}'
 8 | '\N{CJKUNIFIEDIDEOGRAPH4E00}'
   |
@@ -285,7 +286,7 @@ Module(
 5 | '\N{ FULL STOP}'
 6 | '\N{new_line}'
 7 | '\N{HANGULSYLLABLEGA}'
-  |     ^^^^^^^^^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-19: unknown Unicode character name
 8 | '\N{CJKUNIFIEDIDEOGRAPH4E00}'
 9 | '\N{-}'
   |
@@ -295,7 +296,7 @@ Module(
 6 | '\N{new_line}'
 7 | '\N{HANGULSYLLABLEGA}'
 8 | '\N{CJKUNIFIEDIDEOGRAPH4E00}'
-  |     ^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-26: unknown Unicode character name
 9 | '\N{-}'
   |
 
@@ -304,4 +305,4 @@ Module(
 7 | '\N{HANGULSYLLABLEGA}'
 8 | '\N{CJKUNIFIEDIDEOGRAPH4E00}'
 9 | '\N{-}'
-  |     ^ Syntax Error: Got unexpected unicode
+  | ^^^^^^^ Syntax Error: (unicode error) 'unicodeescape' codec can't decode bytes in position 0-4: unknown Unicode character name

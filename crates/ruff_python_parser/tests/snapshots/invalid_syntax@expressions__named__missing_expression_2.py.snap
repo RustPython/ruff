@@ -59,6 +59,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -72,19 +74,31 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
 ## Errors
 
   |
+1 | # Missing expression, instead there's a function definition
+2 |
+3 | (x :=
+  | ^ Syntax Error: '(' was never closed
+4 |
+5 | def foo():
+  |
+
+
+  |
 3 | (x :=
 4 |
 5 | def foo():
-  | ^^^ Syntax Error: Expected an identifier, but found a keyword `def` that cannot be used here
+  | ^^^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -93,7 +107,7 @@ Module(
 3 | (x :=
 4 |
 5 | def foo():
-  |     ^^^ Syntax Error: Expected `)`, found identifier
+  |     ^^^ Syntax Error: invalid syntax
 6 |     pass
   |
 
@@ -101,10 +115,10 @@ Module(
   |
 5 | def foo():
 6 |     pass
-  |     ^^^^ Syntax Error: Expected an identifier, but found a keyword `pass` that cannot be used here
+  |     ^^^^ Syntax Error: invalid syntax
 
 
   |
 5 | def foo():
 6 |     pass
-  |         ^ Syntax Error: unexpected EOF while parsing
+  |         ^ Syntax Error: invalid syntax

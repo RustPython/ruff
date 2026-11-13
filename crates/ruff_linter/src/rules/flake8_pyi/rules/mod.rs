@@ -146,6 +146,7 @@ fn generate_union_fix(
             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
             ctx: ExprContext::Load,
             parenthesized: false,
+            runtime_elts: None,
         })),
         ctx: ExprContext::Load,
     });

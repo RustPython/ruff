@@ -320,6 +320,7 @@ impl ModuleName {
             is_lazy: _,
             range: _,
             node_index: _,
+            runtime_level: _,
         } = node;
         Self::from_identifier_parts(db, importing_file, module.as_deref(), *level)
     }

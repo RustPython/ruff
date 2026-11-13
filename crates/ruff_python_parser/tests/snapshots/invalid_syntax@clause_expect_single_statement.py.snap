@@ -23,6 +23,7 @@ Module(
                     ),
                     body: [],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
             If(
@@ -45,9 +46,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -55,4 +58,4 @@ Module(
 
   |
 1 | if True: if True: pass
-  |          ^^ Syntax Error: Expected a simple statement
+  |          ^^ Syntax Error: expected a simple statement

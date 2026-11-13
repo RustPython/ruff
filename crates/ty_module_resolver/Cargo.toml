@@ -13,7 +13,7 @@ license = { workspace = true }
 [dependencies]
 ruff_db = { workspace = true }
 ruff_memory_usage = { workspace = true }
-ruff_python_ast = { workspace = true, features = ["salsa"] }
+ruff_python_ast = { workspace = true }
 ruff_python_stdlib = { workspace = true }
 
 anyhow = { workspace = true }

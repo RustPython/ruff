@@ -15,7 +15,7 @@
 //! have the same shape in that they evaluate to the same value.
 
 use crate as ast;
-use crate::{Expr, Number};
+use crate::{ConstantValue, Expr, Number};
 use std::borrow::Cow;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -189,6 +189,7 @@ fn match_singleton_fields(node: &ast::PatternMatchSingleton) -> ast::Singleton {
 
 fn match_sequence_fields(node: &ast::PatternMatchSequence) -> ComparablePatternSlice<'_> {
     let ast::PatternMatchSequence {
+        runtime_patterns: _,
         patterns,
         range: _,
         node_index: _,
@@ -205,6 +206,8 @@ struct MatchMappingFields<'a> {
 
 fn match_mapping_fields(node: &ast::PatternMatchMapping) -> MatchMappingFields<'_> {
     let ast::PatternMatchMapping {
+        runtime_keys: _,
+        runtime_patterns: _,
         keys,
         patterns,
         rest,
@@ -227,6 +230,9 @@ struct MatchClassFields<'a> {
 
 fn match_class_fields(node: &ast::PatternMatchClass) -> MatchClassFields<'_> {
     let ast::PatternMatchClass {
+        runtime_patterns: _,
+        runtime_kwd_attrs: _,
+        runtime_kwd_patterns: _,
         cls,
         arguments:
             ast::PatternArguments {
@@ -275,6 +281,7 @@ fn match_as_fields(node: &ast::PatternMatchAs) -> MatchAsFields<'_> {
 
 fn match_or_fields(node: &ast::PatternMatchOr) -> ComparablePatternSlice<'_> {
     let ast::PatternMatchOr {
+        runtime_patterns: _,
         patterns,
         range: _,
         node_index: _,
@@ -292,6 +299,7 @@ struct ComparableMatchCase<'a> {
 impl<'a> From<&'a ast::MatchCase> for ComparableMatchCase<'a> {
     fn from(match_case: &'a ast::MatchCase) -> Self {
         let ast::MatchCase {
+            runtime_body: _,
             pattern,
             guard,
             body,
@@ -371,6 +379,44 @@ impl Hash for ComparableNumber<'_> {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum ComparableConstantValue<'a> {
+    None,
+    Boolean(bool),
+    Str(&'a str),
+    Bytes(Cow<'a, [u8]>),
+    Integer(&'a str),
+    Tuple(Vec<Self>),
+    Frozenset(Vec<Self>),
+    Float(u64),
+    Complex { real: u64, imag: u64 },
+    Ellipsis,
+}
+
+impl<'a> From<&'a ConstantValue> for ComparableConstantValue<'a> {
+    fn from(value: &'a ConstantValue) -> Self {
+        match value {
+            ConstantValue::None => Self::None,
+            ConstantValue::Boolean(value) => Self::Boolean(*value),
+            ConstantValue::Str(value) => Self::Str(value),
+            ConstantValue::Bytes(value) => Self::Bytes(Cow::from(value.as_ref())),
+            ConstantValue::Integer(value) => Self::Integer(value),
+            ConstantValue::Tuple(elements) => {
+                Self::Tuple(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Frozenset(elements) => {
+                Self::Frozenset(elements.iter().map(Into::into).collect())
+            }
+            ConstantValue::Float(value) => Self::Float(value.to_bits()),
+            ConstantValue::Complex { real, imag } => Self::Complex {
+                real: real.to_bits(),
+                imag: imag.to_bits(),
+            },
+            ConstantValue::Ellipsis => Self::Ellipsis,
+        }
+    }
+}
+
 /// Borrows a sequence and converts each element as it is visited.
 struct ComparableSlice<'a, T, C> {
     items: &'a [T],
@@ -437,6 +483,8 @@ struct ComparableArguments<'a> {
 impl<'a> From<&'a ast::Arguments> for ComparableArguments<'a> {
     fn from(arguments: &'a ast::Arguments) -> Self {
         let ast::Arguments {
+            runtime_args: _,
+            runtime_bases: _,
             args,
             keywords,
             range: _,
@@ -484,6 +532,7 @@ struct ComparableParametersFields<'a> {
 impl<'a> From<&'a ast::Parameters> for ComparableParametersFields<'a> {
     fn from(parameters: &'a ast::Parameters) -> Self {
         let ast::Parameters {
+            runtime_defaults: _,
             posonlyargs,
             args,
             vararg,
@@ -511,6 +560,8 @@ struct ComparableParameter<'a> {
 impl<'a> From<&'a ast::Parameter> for ComparableParameter<'a> {
     fn from(arg: &'a ast::Parameter) -> Self {
         let ast::Parameter {
+            runtime_type_comment: _,
+            runtime_type_comment_bytes: _,
             name,
             annotation,
             range: _,
@@ -576,6 +627,8 @@ struct ComparableComprehension<'a> {
 impl<'a> From<&'a ast::Comprehension> for ComparableComprehension<'a> {
     fn from(comprehension: &'a ast::Comprehension) -> Self {
         let ast::Comprehension {
+            runtime_ifs: _,
+            runtime_is_async: _,
             target,
             iter,
             ifs,
@@ -602,6 +655,7 @@ struct ComparableExceptHandler<'a> {
 impl<'a> From<&'a ast::ExceptHandler> for ComparableExceptHandler<'a> {
     fn from(except_handler: &'a ast::ExceptHandler) -> Self {
         let ast::ExceptHandler::ExceptHandler(ast::ExceptHandlerExceptHandler {
+            runtime_body: _,
             type_,
             name,
             body,
@@ -824,6 +878,9 @@ struct InterpolationFields<'a> {
 
 fn interpolation_fields(node: &ast::InterpolatedElement) -> InterpolationFields<'_> {
     let ast::InterpolatedElement {
+        runtime_str: _,
+        runtime_interpolation_format_spec: _,
+        runtime_formatted_value_format_spec: _,
         expression,
         debug_text,
         conversion,
@@ -855,6 +912,8 @@ struct ComparableElifElseClause<'a> {
 impl<'a> From<&'a ast::ElifElseClause> for ComparableElifElseClause<'a> {
     fn from(elif_else_clause: &'a ast::ElifElseClause) -> Self {
         let ast::ElifElseClause {
+            runtime_body: _,
+            runtime_orelse: _,
             range: _,
             node_index: _,
             test,
@@ -976,6 +1035,7 @@ compare_enum!(ComparableExpr(ExprRef) {
     StringLiteral => string_literal_fields,
     BytesLiteral => bytes_literal_fields,
     NumberLiteral => number_literal_fields,
+    Constant => expr_constant_fields,
     BooleanLiteral => boolean_literal_fields,
     NoneLiteral(ast::ExprNoneLiteral { range: _, node_index: _ }),
     EllipsisLiteral(ast::ExprEllipsisLiteral { range: _, node_index: _ }),
@@ -1015,6 +1075,7 @@ struct BoolOpFields<'a> {
 
 fn bool_op_fields(node: &ast::ExprBoolOp) -> BoolOpFields<'_> {
     let ast::ExprBoolOp {
+        runtime_values: _,
         op,
         values,
         range: _,
@@ -1129,6 +1190,7 @@ fn if_fields(node: &ast::ExprIf) -> IfFields<'_> {
 
 fn dict_fields(node: &ast::ExprDict) -> ComparableSlice<'_, ast::DictItem, ComparableDictItem<'_>> {
     let ast::ExprDict {
+        runtime_values: _,
         items,
         range: _,
         node_index: _,
@@ -1138,6 +1200,7 @@ fn dict_fields(node: &ast::ExprDict) -> ComparableSlice<'_, ast::DictItem, Compa
 
 fn set_fields(node: &ast::ExprSet) -> ComparableExprSlice<'_> {
     let ast::ExprSet {
+        runtime_elts: _,
         elts,
         range: _,
         node_index: _,
@@ -1247,6 +1310,7 @@ struct CompareFields<'a> {
 
 fn compare_fields(node: &ast::ExprCompare) -> CompareFields<'_> {
     let ast::ExprCompare {
+        runtime_comparators: _,
         ops,
         operands,
         range: _,
@@ -1279,6 +1343,8 @@ fn call_fields(node: &ast::ExprCall) -> CallFields<'_> {
 
 fn f_string_fields(node: &ast::ExprFString) -> ComparableInterpolatedString<'_> {
     let ast::ExprFString {
+        runtime_joined_str: _,
+        runtime_values: _,
         value,
         range: _,
         node_index: _,
@@ -1288,6 +1354,8 @@ fn f_string_fields(node: &ast::ExprFString) -> ComparableInterpolatedString<'_> 
 
 fn t_string_fields(node: &ast::ExprTString) -> ComparableInterpolatedString<'_> {
     let ast::ExprTString {
+        runtime_template_str: _,
+        runtime_values: _,
         value,
         range: _,
         node_index: _,
@@ -1395,6 +1463,7 @@ fn name_fields(node: &ast::ExprName) -> &str {
 
 fn list_fields(node: &ast::ExprList) -> ComparableExprSlice<'_> {
     let ast::ExprList {
+        runtime_elts: _,
         elts,
         ctx: _,
         range: _,
@@ -1405,6 +1474,7 @@ fn list_fields(node: &ast::ExprList) -> ComparableExprSlice<'_> {
 
 fn tuple_fields(node: &ast::ExprTuple) -> ComparableExprSlice<'_> {
     let ast::ExprTuple {
+        runtime_elts: _,
         elts,
         ctx: _,
         range: _,
@@ -1519,6 +1589,7 @@ type ComparableTypeParams<'a> = ComparableSlice<'a, ast::TypeParam, ComparableTy
 impl<'a> From<&'a ast::TypeParams> for ComparableTypeParams<'a> {
     fn from(params: &'a ast::TypeParams) -> Self {
         let ast::TypeParams {
+            runtime_type_params: _,
             type_params,
             range: _,
             node_index: _,
@@ -1646,6 +1717,10 @@ struct StmtFunctionDefFields<'a> {
 
 fn stmt_function_def_fields(node: &ast::StmtFunctionDef) -> StmtFunctionDefFields<'_> {
     let ast::StmtFunctionDef {
+        runtime_decorator_list: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
         is_async,
         name,
         parameters,
@@ -1678,6 +1753,8 @@ struct StmtClassDefFields<'a> {
 
 fn stmt_class_def_fields(node: &ast::StmtClassDef) -> StmtClassDefFields<'_> {
     let ast::StmtClassDef {
+        runtime_decorator_list: _,
+        runtime_body: _,
         name,
         arguments,
         body,
@@ -1706,6 +1783,7 @@ fn stmt_return_fields(node: &ast::StmtReturn) -> Option<ComparableExpr<'_>> {
 
 fn stmt_delete_fields(node: &ast::StmtDelete) -> ComparableExprSlice<'_> {
     let ast::StmtDelete {
+        runtime_targets: _,
         targets,
         range: _,
         node_index: _,
@@ -1743,6 +1821,9 @@ struct StmtAssignFields<'a> {
 
 fn stmt_assign_fields(node: &ast::StmtAssign) -> StmtAssignFields<'_> {
     let ast::StmtAssign {
+        runtime_targets: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
         targets,
         value,
         range: _,
@@ -1786,6 +1867,7 @@ struct StmtAnnAssignFields<'a> {
 
 fn stmt_ann_assign_fields(node: &ast::StmtAnnAssign) -> StmtAnnAssignFields<'_> {
     let ast::StmtAnnAssign {
+        runtime_simple: _,
         target,
         annotation,
         value,
@@ -1812,6 +1894,10 @@ struct StmtForFields<'a> {
 
 fn stmt_for_fields(node: &ast::StmtFor) -> StmtForFields<'_> {
     let ast::StmtFor {
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
+        runtime_orelse: _,
         is_async,
         target,
         iter,
@@ -1838,6 +1924,8 @@ struct StmtWhileFields<'a> {
 
 fn stmt_while_fields(node: &ast::StmtWhile) -> StmtWhileFields<'_> {
     let ast::StmtWhile {
+        runtime_body: _,
+        runtime_orelse: _,
         test,
         body,
         orelse,
@@ -1860,6 +1948,7 @@ struct StmtIfFields<'a> {
 
 fn stmt_if_fields(node: &ast::StmtIf) -> StmtIfFields<'_> {
     let ast::StmtIf {
+        runtime_body: _,
         test,
         body,
         elif_else_clauses,
@@ -1882,6 +1971,9 @@ struct StmtWithFields<'a> {
 
 fn stmt_with_fields(node: &ast::StmtWith) -> StmtWithFields<'_> {
     let ast::StmtWith {
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
         is_async,
         items,
         body,
@@ -1944,6 +2036,10 @@ struct StmtTryFields<'a> {
 
 fn stmt_try_fields(node: &ast::StmtTry) -> StmtTryFields<'_> {
     let ast::StmtTry {
+        runtime_body: _,
+        runtime_handlers: _,
+        runtime_orelse: _,
+        runtime_finalbody: _,
         body,
         handlers,
         orelse,
@@ -2009,6 +2105,7 @@ struct StmtImportFromFields<'a> {
 
 fn stmt_import_from_fields(node: &ast::StmtImportFrom) -> StmtImportFromFields<'_> {
     let ast::StmtImportFrom {
+        runtime_level: _,
         module,
         names,
         level,
@@ -2081,6 +2178,7 @@ compare_enum!(ComparableMod(Mod) {
 
 fn mod_module_fields(node: &ast::ModModule) -> ComparableStmtSlice<'_> {
     let ast::ModModule {
+        runtime_body: _,
         body,
         range: _,
         node_index: _,
@@ -2248,6 +2346,12 @@ impl<'a> From<&'a Expr> for HashableExpr<'a> {
                 Expr::BooleanLiteral(boolean) => Some(HashableNumber::real(HashableReal::Integer(
                     i128::from(u8::from(boolean.value)),
                 ))),
+                Expr::Constant(ast::ExprConstant {
+                    value: ConstantValue::Boolean(value),
+                    ..
+                }) => Some(HashableNumber::real(HashableReal::Integer(i128::from(
+                    u8::from(*value),
+                )))),
                 Expr::NumberLiteral(number) => match &number.value {
                     Number::Int(int) => HashableReal::from_int(int).map(HashableNumber::real),
                     Number::Float(float) => {
@@ -2297,4 +2401,15 @@ impl<'a> From<&'a Expr> for HashableExpr<'a> {
 
         Self(as_hashable(expr))
     }
+}
+
+fn expr_constant_fields(node: &ast::ExprConstant) -> ComparableConstantValue<'_> {
+    let ast::ExprConstant {
+        value,
+        node_index: _,
+        range: _,
+        kind: _,
+        invalid_type: _,
+    } = node;
+    ComparableConstantValue::from(value)
 }

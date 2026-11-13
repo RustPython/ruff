@@ -57,6 +57,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -119,6 +122,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -155,9 +161,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -167,7 +177,7 @@ Module(
 3 | # is parsed as a tuple, but this will always cause a runtime error, so we flag it
 4 | # anyway
 5 | with (foo, bar): ...
-  |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+  |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
 6 | with (
 7 |   foo,
   |
@@ -177,7 +187,7 @@ Module(
 4 | # anyway
 5 | with (foo, bar): ...
 6 | with (
-  |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+  |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
 7 |   foo,
 8 |   bar,
   |
@@ -187,4 +197,4 @@ Module(
  9 |   baz,
 10 | ): ...
 11 | with (foo,): ...
-   |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+   |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)

@@ -24,6 +24,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -40,6 +41,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -64,6 +66,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -103,6 +106,7 @@ Module(
                                 ],
                                 ctx: Del,
                                 parenthesized: true,
+                                runtime_elts: None,
                             },
                         ),
                         Name(
@@ -114,6 +118,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -144,9 +149,11 @@ Module(
                                     ),
                                 ],
                                 ctx: Del,
+                                runtime_elts: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -190,6 +197,7 @@ Module(
                                                 ),
                                             ],
                                             ctx: Del,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     Name(
@@ -202,9 +210,11 @@ Module(
                                     ),
                                 ],
                                 ctx: Del,
+                                runtime_elts: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -233,6 +243,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -264,6 +275,7 @@ Module(
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
             Delete(
@@ -330,12 +342,15 @@ Module(
                                 ],
                                 ctx: Del,
                                 parenthesized: true,
+                                runtime_elts: None,
                             },
                         ),
                     ],
+                    runtime_targets: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

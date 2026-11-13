@@ -35,9 +35,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -45,4 +47,4 @@ Module(
 
   |
 1 | from x import (*)
-  |               ^^ Syntax Error: Star import cannot be parenthesized
+  |               ^^ Syntax Error: star import cannot be parenthesized

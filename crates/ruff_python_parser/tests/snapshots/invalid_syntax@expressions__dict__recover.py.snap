@@ -28,6 +28,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -86,6 +87,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -122,6 +124,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -180,6 +183,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -215,6 +219,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -240,6 +245,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -305,6 +311,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -393,6 +400,7 @@ Module(
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -417,18 +425,11 @@ Module(
                                             },
                                         ),
                                     ),
-                                    value: Starred(
-                                        ExprStarred {
+                                    value: Name(
+                                        ExprName {
                                             node_index: NodeIndex(None),
-                                            range: 335..337,
-                                            value: Name(
-                                                ExprName {
-                                                    node_index: NodeIndex(None),
-                                                    range: 336..337,
-                                                    id: Name("y"),
-                                                    ctx: Load,
-                                                },
-                                            ),
+                                            range: 336..337,
+                                            id: Name("y"),
                                             ctx: Load,
                                         },
                                     ),
@@ -444,28 +445,23 @@ Module(
                                             },
                                         ),
                                     ),
-                                    value: Starred(
-                                        ExprStarred {
+                                    value: Name(
+                                        ExprName {
                                             node_index: NodeIndex(None),
-                                            range: 342..344,
-                                            value: Name(
-                                                ExprName {
-                                                    node_index: NodeIndex(None),
-                                                    range: 343..344,
-                                                    id: Name("a"),
-                                                    ctx: Load,
-                                                },
-                                            ),
+                                            range: 343..344,
+                                            id: Name("a"),
                                             ctx: Load,
                                         },
                                     ),
                                 },
                             ],
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -475,7 +471,7 @@ Module(
 1 | # Test cases for dictionary expressions where the parser recovers from a syntax error.
 2 |
 3 | {,}
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 4 |
 5 | {1: 2,,3: 4}
   |
@@ -485,7 +481,7 @@ Module(
 3 | {,}
 4 |
 5 | {1: 2,,3: 4}
-  |       ^ Syntax Error: Expected an expression or a '}'
+  |       ^ Syntax Error: invalid syntax
 6 |
 7 | {1: 2,,}
   |
@@ -495,7 +491,7 @@ Module(
 5 | {1: 2,,3: 4}
 6 |
 7 | {1: 2,,}
-  |       ^ Syntax Error: Expected an expression or a '}'
+  |       ^ Syntax Error: invalid syntax
 8 |
 9 | # Missing comma
   |
@@ -504,7 +500,16 @@ Module(
    |
  9 | # Missing comma
 10 | {1: 2 3: 4}
-   |       ^ Syntax Error: Expected `,`, found int
+   |     ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+11 |
+12 | # No value
+   |
+
+
+   |
+ 9 | # Missing comma
+10 | {1: 2 3: 4}
+   |       ^ Syntax Error: invalid syntax
 11 |
 12 | # No value
    |
@@ -513,7 +518,16 @@ Module(
    |
 12 | # No value
 13 | {1: }
-   |     ^ Syntax Error: Expected an expression
+   |   ^ Syntax Error: expression expected after dictionary key and ':'
+14 |
+15 | # No value for double star unpacking
+   |
+
+
+   |
+12 | # No value
+13 | {1: }
+   |     ^ Syntax Error: invalid syntax
 14 |
 15 | # No value for double star unpacking
    |
@@ -522,7 +536,7 @@ Module(
    |
 15 | # No value for double star unpacking
 16 | {**}
-   |    ^ Syntax Error: Expected an expression
+   |    ^ Syntax Error: invalid syntax
 17 | {x: y, **, a: b}
    |
 
@@ -531,7 +545,7 @@ Module(
 15 | # No value for double star unpacking
 16 | {**}
 17 | {x: y, **, a: b}
-   |          ^ Syntax Error: Expected an expression
+   |          ^ Syntax Error: invalid syntax
 18 |
 19 | # This is not a double star unpacking
    |
@@ -540,7 +554,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |  ^^ Syntax Error: Starred expression cannot be used here
+   |  ^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -548,7 +562,7 @@ Module(
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
-   |               ^^ Syntax Error: Starred expression cannot be used here
+   |               ^ Syntax Error: invalid syntax
 24 | {x: *y, z: *a}
    |
 
@@ -557,11 +571,11 @@ Module(
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |     ^^ Syntax Error: Starred expression cannot be used here
+   |     ^^ Syntax Error: cannot use a starred expression in a dictionary value
 
 
    |
 22 | # Star expression not allowed here
 23 | {*x: y, z: a, *b: c}
 24 | {x: *y, z: *a}
-   |            ^^ Syntax Error: Starred expression cannot be used here
+   |            ^^ Syntax Error: cannot use a starred expression in a dictionary value

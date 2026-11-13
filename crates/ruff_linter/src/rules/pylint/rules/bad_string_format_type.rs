@@ -243,6 +243,7 @@ pub(crate) fn bad_string_format_type(
             items,
             range: _,
             node_index: _,
+            runtime_values: _,
         }) => is_valid_dict(&format_strings, items),
         _ => is_valid_constant(&format_strings, &bin_op.right),
     };

@@ -5550,6 +5550,7 @@ impl<'db> Parameters<'db> {
             kwarg,
             range: _,
             node_index: _,
+            runtime_defaults: _,
         } = parameters;
 
         let default_type = |param: &ast::ParameterWithDefault| {

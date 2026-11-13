@@ -189,6 +189,7 @@ fn affix_removal_data_stmt(if_stmt: &ast::StmtIf) -> Option<RemoveAffixData<'_>>
         elif_else_clauses,
         range: _,
         node_index: _,
+        runtime_body: _,
     } = if_stmt;
 
     // Cannot safely transform, e.g.,
@@ -222,6 +223,9 @@ fn affix_removal_data_stmt(if_stmt: &ast::StmtIf) -> Option<RemoveAffixData<'_>>
         targets,
         range: _,
         node_index: _,
+        runtime_targets: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
     } = statement.as_assign_stmt()?;
     let [target] = targets.as_slice() else {
         return None;

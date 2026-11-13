@@ -54,12 +54,17 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -105,15 +110,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -123,7 +134,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except yield x:
-  |        ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |        ^^^^^^^ Syntax Error: yield expression cannot be used here
 4 |     pass
 5 | try:
   |
@@ -133,6 +144,6 @@ Module(
 5 | try:
 6 |     pass
 7 | except* *x:
-  |         ^^ Syntax Error: Starred expression cannot be used here
+  |         ^ Syntax Error: invalid syntax
 8 |     pass
   |

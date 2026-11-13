@@ -67,6 +67,7 @@ pub(crate) fn annotate_imports<'a>(
                     is_lazy,
                     range: _,
                     node_index: _,
+                    runtime_level: _,
                 }) => {
                     // Find comments above.
                     let mut atop = vec![];

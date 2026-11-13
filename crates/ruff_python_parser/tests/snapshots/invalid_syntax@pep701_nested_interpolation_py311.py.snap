@@ -79,6 +79,9 @@ Module(
                                                                         debug_text: None,
                                                                         conversion: None,
                                                                         format_spec: None,
+                                                                        runtime_str: None,
+                                                                        runtime_interpolation_format_spec: None,
+                                                                        runtime_formatted_value_format_spec: None,
                                                                     },
                                                                 ),
                                                                 Literal(
@@ -91,6 +94,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -103,6 +109,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -176,6 +184,9 @@ Module(
                                                                         debug_text: None,
                                                                         conversion: None,
                                                                         format_spec: None,
+                                                                        runtime_str: None,
+                                                                        runtime_interpolation_format_spec: None,
+                                                                        runtime_formatted_value_format_spec: None,
                                                                     },
                                                                 ),
                                                                 Literal(
@@ -188,6 +199,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -200,11 +214,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -214,7 +231,7 @@ Module(
 1 | # parse_options: {"target-version": "3.11"}
 2 | # nested interpolations also need to be checked
 3 | f'{1: abcd "{'aa'}" }'
-  |              ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |              ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 4 | f'{1: abcd "{"\n"}" }'
   |
 
@@ -223,4 +240,4 @@ Module(
 2 | # nested interpolations also need to be checked
 3 | f'{1: abcd "{'aa'}" }'
 4 | f'{1: abcd "{"\n"}" }'
-  |               ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |               ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)

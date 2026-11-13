@@ -76,6 +76,8 @@ pub(crate) fn unnecessary_list_cast(checker: &Checker, iter: &Expr, body: &[Stmt
                 keywords: _,
                 range: _,
                 node_index: _,
+                runtime_args: _,
+                runtime_bases: _,
             },
         range_start: _,
         node_index: _,

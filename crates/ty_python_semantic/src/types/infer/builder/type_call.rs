@@ -39,6 +39,8 @@ impl<'db> TypeInferenceBuilder<'db, '_> {
             keywords,
             range: _,
             node_index: _,
+            runtime_args: _,
+            runtime_bases: _,
         } = &call_expr.arguments;
 
         for keyword in keywords {

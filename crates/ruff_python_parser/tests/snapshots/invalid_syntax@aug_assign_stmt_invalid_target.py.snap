@@ -199,6 +199,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -206,7 +207,7 @@ Module(
 
   |
 1 | 1 += 1
-  | ^ Syntax Error: Invalid augmented assignment target
+  | ^ Syntax Error: 'literal' is an illegal expression for augmented assignment
 2 | "a" += "b"
 3 | *x += 1
   |
@@ -215,7 +216,7 @@ Module(
   |
 1 | 1 += 1
 2 | "a" += "b"
-  | ^^^ Syntax Error: Invalid augmented assignment target
+  | ^^^ Syntax Error: 'literal' is an illegal expression for augmented assignment
 3 | *x += 1
 4 | pass += 1
   |
@@ -225,7 +226,7 @@ Module(
 1 | 1 += 1
 2 | "a" += "b"
 3 | *x += 1
-  | ^^ Syntax Error: Invalid augmented assignment target
+  | ^^ Syntax Error: 'starred' is an illegal expression for augmented assignment
 4 | pass += 1
 5 | x += pass
   |
@@ -235,7 +236,7 @@ Module(
 2 | "a" += "b"
 3 | *x += 1
 4 | pass += 1
-  |      ^^ Syntax Error: Expected a statement
+  |      ^^ Syntax Error: invalid syntax
 5 | x += pass
 6 | (x + y) += 1
   |
@@ -245,7 +246,7 @@ Module(
 3 | *x += 1
 4 | pass += 1
 5 | x += pass
-  |      ^^^^ Syntax Error: Expected an identifier, but found a keyword `pass` that cannot be used here
+  |      ^^^^ Syntax Error: invalid syntax
 6 | (x + y) += 1
   |
 
@@ -254,4 +255,4 @@ Module(
 4 | pass += 1
 5 | x += pass
 6 | (x + y) += 1
-  |  ^^^^^ Syntax Error: Invalid augmented assignment target
+  |  ^^^^^ Syntax Error: 'expression' is an illegal expression for augmented assignment

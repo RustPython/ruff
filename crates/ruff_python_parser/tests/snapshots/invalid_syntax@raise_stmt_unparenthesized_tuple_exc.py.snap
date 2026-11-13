@@ -31,6 +31,7 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
@@ -66,6 +67,7 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
@@ -101,6 +103,7 @@ Module(
                                 ],
                                 ctx: Load,
                                 parenthesized: false,
+                                runtime_elts: None,
                             },
                         ),
                     ),
@@ -117,6 +120,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -124,7 +128,7 @@ Module(
 
   |
 1 | raise x,
-  |       ^^ Syntax Error: Unparenthesized tuple expression cannot be used here
+  |       ^^ Syntax Error: unparenthesized tuple expression cannot be used here
 2 | raise x, y
 3 | raise x, y from z
   |
@@ -133,7 +137,7 @@ Module(
   |
 1 | raise x,
 2 | raise x, y
-  |       ^^^^ Syntax Error: Unparenthesized tuple expression cannot be used here
+  |       ^^^^ Syntax Error: unparenthesized tuple expression cannot be used here
 3 | raise x, y from z
   |
 
@@ -142,4 +146,4 @@ Module(
 1 | raise x,
 2 | raise x, y
 3 | raise x, y from z
-  |       ^^^^ Syntax Error: Unparenthesized tuple expression cannot be used here
+  |       ^^^^ Syntax Error: unparenthesized tuple expression cannot be used here

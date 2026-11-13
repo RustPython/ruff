@@ -126,6 +126,8 @@ impl<'a> ClauseHeader<'a> {
                 decorator_list: _,
                 name: _,
                 body: _,
+                runtime_decorator_list: _,
+                runtime_body: _,
             }) => {
                 if let Some(type_params) = type_params.as_deref() {
                     visit(type_params, visitor);
@@ -145,6 +147,10 @@ impl<'a> ClauseHeader<'a> {
                 name: _,
                 returns,
                 body: _,
+                runtime_decorator_list: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
             }) => {
                 if let Some(type_params) = type_params.as_deref() {
                     visit(type_params, visitor);
@@ -161,6 +167,7 @@ impl<'a> ClauseHeader<'a> {
                 node_index: _,
                 body: _,
                 elif_else_clauses: _,
+                runtime_body: _,
             }) => {
                 visit(test.as_ref(), visitor);
             }
@@ -169,6 +176,8 @@ impl<'a> ClauseHeader<'a> {
                 range: _,
                 node_index: _,
                 body: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 if let Some(test) = test.as_ref() {
                     visit(test, visitor);
@@ -181,6 +190,7 @@ impl<'a> ClauseHeader<'a> {
                 node_index: _,
                 name: _,
                 body: _,
+                runtime_body: _,
             }) => {
                 if let Some(type_expr) = type_expr.as_deref() {
                     visit(type_expr, visitor);
@@ -200,6 +210,7 @@ impl<'a> ClauseHeader<'a> {
                 range: _,
                 node_index: _,
                 body: _,
+                runtime_body: _,
             }) => {
                 visit(pattern, visitor);
 
@@ -215,6 +226,10 @@ impl<'a> ClauseHeader<'a> {
                 is_async: _,
                 body: _,
                 orelse: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 visit(target.as_ref(), visitor);
                 visit(iter.as_ref(), visitor);
@@ -225,6 +240,8 @@ impl<'a> ClauseHeader<'a> {
                 node_index: _,
                 body: _,
                 orelse: _,
+                runtime_body: _,
+                runtime_orelse: _,
             }) => {
                 visit(test.as_ref(), visitor);
             }
@@ -234,6 +251,9 @@ impl<'a> ClauseHeader<'a> {
                 node_index: _,
                 is_async: _,
                 body: _,
+                runtime_type_comment: _,
+                runtime_type_comment_bytes: _,
+                runtime_body: _,
             }) => {
                 for item in items {
                     visit(item, visitor);

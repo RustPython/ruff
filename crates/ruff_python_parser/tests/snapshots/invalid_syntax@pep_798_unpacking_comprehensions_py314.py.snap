@@ -55,6 +55,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -106,6 +108,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -151,6 +155,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -202,6 +208,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                             parenthesized: true,
@@ -270,6 +278,8 @@ Module(
                                                     ),
                                                     ifs: [],
                                                     is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
                                                 },
                                             ],
                                             parenthesized: false,
@@ -277,12 +287,15 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -291,7 +304,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | [*x for x in y]
-  |  ^^ Syntax Error: Cannot use iterable unpacking in a list comprehension on Python 3.14 (syntax was added in Python 3.15)
+  |  ^^ Syntax Error: cannot use iterable unpacking in a list comprehension on Python 3.14 (syntax was added in Python 3.15)
 3 | {*x for x in y}
 4 | {**x for x in y}
   |
@@ -301,7 +314,7 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | [*x for x in y]
 3 | {*x for x in y}
-  |  ^^ Syntax Error: Cannot use iterable unpacking in a set comprehension on Python 3.14 (syntax was added in Python 3.15)
+  |  ^^ Syntax Error: cannot use iterable unpacking in a set comprehension on Python 3.14 (syntax was added in Python 3.15)
 4 | {**x for x in y}
 5 | (*x for x in y)
   |
@@ -311,7 +324,7 @@ Module(
 2 | [*x for x in y]
 3 | {*x for x in y}
 4 | {**x for x in y}
-  |  ^^^ Syntax Error: Cannot use dictionary unpacking in a dict comprehension on Python 3.14 (syntax was added in Python 3.15)
+  |  ^^^ Syntax Error: cannot use dictionary unpacking in a dict comprehension on Python 3.14 (syntax was added in Python 3.15)
 5 | (*x for x in y)
 6 | f(*x for x in y)
   |
@@ -321,7 +334,7 @@ Module(
 3 | {*x for x in y}
 4 | {**x for x in y}
 5 | (*x for x in y)
-  |  ^^ Syntax Error: Cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)
+  |  ^^ Syntax Error: cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)
 6 | f(*x for x in y)
   |
 
@@ -330,4 +343,4 @@ Module(
 4 | {**x for x in y}
 5 | (*x for x in y)
 6 | f(*x for x in y)
-  |   ^^ Syntax Error: Cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)
+  |   ^^ Syntax Error: cannot use iterable unpacking in a generator expression on Python 3.14 (syntax was added in Python 3.15)

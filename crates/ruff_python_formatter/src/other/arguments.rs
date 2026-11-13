@@ -20,6 +20,8 @@ impl FormatNodeRule<Arguments> for FormatArguments {
             args,
             keywords,
             node_index: _,
+            runtime_args: _,
+            runtime_bases: _,
         } = item;
         // We have a case with `f()` without any argument, which is a special case because we can
         // have a comment with no node attachment inside:

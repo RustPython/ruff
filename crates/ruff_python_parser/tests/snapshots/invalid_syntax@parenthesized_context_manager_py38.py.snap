@@ -75,6 +75,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -133,6 +136,9 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             With(
@@ -191,9 +197,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -202,7 +212,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.8"}
 2 | with (foo as x, bar as y): ...
-  |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+  |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
 3 | with (foo, bar as y): ...
 4 | with (foo as x, bar): ...
   |
@@ -212,7 +222,7 @@ Module(
 1 | # parse_options: {"target-version": "3.8"}
 2 | with (foo as x, bar as y): ...
 3 | with (foo, bar as y): ...
-  |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+  |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
 4 | with (foo as x, bar): ...
   |
 
@@ -221,4 +231,4 @@ Module(
 2 | with (foo as x, bar as y): ...
 3 | with (foo, bar as y): ...
 4 | with (foo as x, bar): ...
-  |      ^ Syntax Error: Cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)
+  |      ^ Syntax Error: cannot use parentheses within a `with` statement on Python 3.8 (syntax was added in Python 3.9)

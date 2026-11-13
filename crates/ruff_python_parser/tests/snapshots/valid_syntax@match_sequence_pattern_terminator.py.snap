@@ -64,6 +64,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 40..54,
@@ -102,6 +103,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: None,
@@ -119,6 +121,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 59..78,
@@ -157,6 +160,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_patterns: None,
                                 },
                             ),
                             guard: Some(
@@ -183,6 +187,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                         MatchCase {
                             range: 83..94,
@@ -216,11 +221,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

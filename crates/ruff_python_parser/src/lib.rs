@@ -64,8 +64,9 @@
 //! [lexer]: crate::lexer
 
 pub use crate::error::{
-    InterpolatedStringErrorType, LexicalErrorType, ParseError, ParseErrorType,
-    UnsupportedSyntaxError, UnsupportedSyntaxErrorKind,
+    BlockClause, ExpressionKind, InterpolatedStringErrorType, LexicalErrorType, NumberLiteralKind,
+    ParseError, ParseErrorType, UnicodeEscapeErrorKind, UnsupportedSyntaxError,
+    UnsupportedSyntaxErrorKind,
 };
 pub use crate::parser::ParseOptions;
 
@@ -383,6 +384,7 @@ pub fn parse_cells_unchecked(
             node_index: AtomicNodeIndex::NONE,
             range: TextRange::up_to(source.text_len()),
             body,
+            runtime_body: None,
         },
         tokens: Tokens::new(tokens),
         errors,

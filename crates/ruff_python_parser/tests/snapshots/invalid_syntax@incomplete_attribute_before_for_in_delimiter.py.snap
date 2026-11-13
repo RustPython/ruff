@@ -60,6 +60,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -116,6 +118,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: true,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -172,6 +176,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -228,6 +234,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                             parenthesized: true,
@@ -285,6 +293,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -339,9 +349,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -349,7 +364,7 @@ Module(
 
   |
 1 | [item. for item in xs]
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
   |
@@ -358,7 +373,7 @@ Module(
   |
 1 | [item. for item in xs]
 2 | [item. async for item in xs]
-  |        ^^^^^ Syntax Error: Expected an identifier
+  |        ^^^^^ Syntax Error: invalid syntax
 3 | {item. for item in xs}
 4 | (item. for item in xs)
   |
@@ -368,7 +383,7 @@ Module(
 1 | [item. for item in xs]
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 4 | (item. for item in xs)
 5 | [item for item. in xs]
   |
@@ -378,7 +393,7 @@ Module(
 2 | [item. async for item in xs]
 3 | {item. for item in xs}
 4 | (item. for item in xs)
-  |        ^^^ Syntax Error: Expected an identifier
+  |        ^^^ Syntax Error: invalid syntax
 5 | [item for item. in xs]
 6 | for item. in xs: ...
   |
@@ -388,7 +403,7 @@ Module(
 3 | {item. for item in xs}
 4 | (item. for item in xs)
 5 | [item for item. in xs]
-  |                 ^^ Syntax Error: Expected an identifier
+  |                 ^^ Syntax Error: invalid syntax
 6 | for item. in xs: ...
   |
 
@@ -397,4 +412,4 @@ Module(
 4 | (item. for item in xs)
 5 | [item for item. in xs]
 6 | for item. in xs: ...
-  |           ^^ Syntax Error: Expected an identifier
+  |           ^^ Syntax Error: invalid syntax

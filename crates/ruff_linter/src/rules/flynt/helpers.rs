@@ -10,6 +10,9 @@ fn to_interpolated_string_interpolation_element(inner: &Expr) -> ast::Interpolat
         format_spec: None,
         range: TextRange::default(),
         node_index: ruff_python_ast::AtomicNodeIndex::NONE,
+        runtime_formatted_value_format_spec: None,
+        runtime_interpolation_format_spec: None,
+        runtime_str: None,
     })
 }
 
@@ -34,6 +37,8 @@ fn is_simple_call(expr: &Expr) -> bool {
                     keywords,
                     range: _,
                     node_index: _,
+                    runtime_args: _,
+                    runtime_bases: _,
                 },
             range_start: _,
             node_index: _,

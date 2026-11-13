@@ -18,6 +18,7 @@ impl FormatNodeRule<PatternMatchOr> for FormatPatternMatchOr {
             range: _,
             node_index: _,
             patterns,
+            runtime_patterns: _,
         } = item;
         let inner = format_with(|f: &mut PyFormatter| {
             let mut patterns = patterns.iter();

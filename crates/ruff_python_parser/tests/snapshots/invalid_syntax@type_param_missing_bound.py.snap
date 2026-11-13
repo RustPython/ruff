@@ -41,6 +41,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -97,6 +98,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_type_params: None,
                         },
                     ),
                     value: Name(
@@ -110,6 +112,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -117,7 +120,7 @@ Module(
 
   |
 1 | type X[T: ] = int
-  |           ^ Syntax Error: Expected an expression
+  |           ^ Syntax Error: invalid syntax
 2 | type X[T1: , T2] = int
   |
 
@@ -125,4 +128,4 @@ Module(
   |
 1 | type X[T: ] = int
 2 | type X[T1: , T2] = int
-  |            ^ Syntax Error: Expected an expression
+  |            ^ Syntax Error: invalid syntax

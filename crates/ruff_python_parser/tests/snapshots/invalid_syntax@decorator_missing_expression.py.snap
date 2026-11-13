@@ -43,6 +43,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -59,6 +60,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -94,6 +99,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -110,6 +116,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -160,6 +170,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -176,6 +187,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             ClassDef(
@@ -216,9 +231,12 @@ Module(
                     type_params: None,
                     arguments: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -226,7 +244,7 @@ Module(
 
   |
 1 | @def foo(): ...
-  |  ^^^ Syntax Error: Expected an identifier
+  |  ^^^ Syntax Error: invalid syntax
 2 | @
 3 | def foo(): ...
   |
@@ -235,7 +253,7 @@ Module(
   |
 1 | @def foo(): ...
 2 | @
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 3 | def foo(): ...
 4 | @@
 5 | def foo(): ...
@@ -246,7 +264,7 @@ Module(
 2 | @
 3 | def foo(): ...
 4 | @@
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 5 | def foo(): ...
 6 | @test
   |
@@ -256,7 +274,7 @@ Module(
 2 | @
 3 | def foo(): ...
 4 | @@
-  |   ^ Syntax Error: Expected an expression
+  |   ^ Syntax Error: invalid syntax
 5 | def foo(): ...
 6 | @test
 7 | @
@@ -267,7 +285,7 @@ Module(
 5 | def foo(): ...
 6 | @test
 7 | @
-  |  ^ Syntax Error: Expected an expression
+  |  ^ Syntax Error: invalid syntax
 8 | class Test
   |
 
@@ -276,4 +294,4 @@ Module(
 6 | @test
 7 | @
 8 | class Test
-  |           ^ Syntax Error: Expected `:`, found newline
+  |           ^ Syntax Error: expected ':'

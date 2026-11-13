@@ -1116,6 +1116,7 @@ impl HasType for ast::Expr {
             Expr::Tuple(inner) => inner.inferred_type(model),
             Expr::Slice(inner) => inner.inferred_type(model),
             Expr::IpyEscapeCommand(inner) => inner.inferred_type(model),
+            Expr::Constant(_) => None,
         }
     }
 }

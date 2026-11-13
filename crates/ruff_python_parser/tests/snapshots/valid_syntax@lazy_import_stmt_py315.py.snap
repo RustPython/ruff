@@ -79,6 +79,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: true,
+                    runtime_level: None,
                 },
             ),
             ImportFrom(
@@ -112,6 +113,7 @@ Module(
                     ],
                     level: 0,
                     is_lazy: true,
+                    runtime_level: None,
                 },
             ),
             Assign(
@@ -137,6 +139,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Import(
@@ -189,9 +194,11 @@ Module(
                     ],
                     level: 0,
                     is_lazy: false,
+                    runtime_level: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

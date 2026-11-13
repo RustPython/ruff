@@ -53,6 +53,8 @@ impl FormatNodeRule<Comprehension> for FormatComprehension {
             iter,
             ifs,
             is_async,
+            runtime_ifs: _,
+            runtime_is_async: _,
         } = item;
 
         if *is_async {

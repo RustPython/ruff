@@ -47,6 +47,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -98,6 +102,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -132,6 +140,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_values: None,
                                 },
                             ),
                             ctx: Store,
@@ -160,6 +169,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -220,6 +233,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -264,6 +281,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -301,6 +322,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                             ),
@@ -329,6 +351,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -398,6 +424,7 @@ Module(
                                                     ),
                                                 ],
                                                 ctx: Store,
+                                                runtime_elts: None,
                                             },
                                         ),
                                         ctx: Store,
@@ -405,6 +432,7 @@ Module(
                                 ),
                             ],
                             ctx: Store,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -430,9 +458,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -440,7 +473,7 @@ Module(
 
   |
 1 | for 1 in x: ...
-  |     ^ Syntax Error: Invalid assignment target
+  |     ^ Syntax Error: cannot assign to literal
 2 | for "a" in x: ...
 3 | for *x and y in z: ...
   |
@@ -449,7 +482,7 @@ Module(
   |
 1 | for 1 in x: ...
 2 | for "a" in x: ...
-  |     ^^^ Syntax Error: Invalid assignment target
+  |     ^^^ Syntax Error: cannot assign to literal
 3 | for *x and y in z: ...
 4 | for *x | y in z: ...
   |
@@ -459,7 +492,7 @@ Module(
 1 | for 1 in x: ...
 2 | for "a" in x: ...
 3 | for *x and y in z: ...
-  |      ^^^^^^^ Syntax Error: Invalid assignment target
+  |      ^^^^^^^ Syntax Error: cannot assign to expression
 4 | for *x | y in z: ...
 5 | for await x in z: ...
   |
@@ -469,7 +502,7 @@ Module(
 2 | for "a" in x: ...
 3 | for *x and y in z: ...
 4 | for *x | y in z: ...
-  |      ^^^^^ Syntax Error: Invalid assignment target
+  |      ^^^^^ Syntax Error: cannot assign to expression
 5 | for await x in z: ...
 6 | for yield x in y: ...
   |
@@ -479,7 +512,7 @@ Module(
 3 | for *x and y in z: ...
 4 | for *x | y in z: ...
 5 | for await x in z: ...
-  |     ^^^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^^^ Syntax Error: cannot assign to await expression
 6 | for yield x in y: ...
 7 | for [x, 1, y, *["a"]] in z: ...
   |
@@ -489,7 +522,7 @@ Module(
 4 | for *x | y in z: ...
 5 | for await x in z: ...
 6 | for yield x in y: ...
-  |     ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |     ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 7 | for [x, 1, y, *["a"]] in z: ...
   |
 
@@ -498,7 +531,7 @@ Module(
 4 | for *x | y in z: ...
 5 | for await x in z: ...
 6 | for yield x in y: ...
-  |                 ^ Syntax Error: Expected `in`, found `:`
+  |                 ^ Syntax Error: invalid syntax
 7 | for [x, 1, y, *["a"]] in z: ...
   |
 
@@ -507,14 +540,7 @@ Module(
 5 | for await x in z: ...
 6 | for yield x in y: ...
 7 | for [x, 1, y, *["a"]] in z: ...
-  |         ^ Syntax Error: Invalid assignment target
-
-
-  |
-5 | for await x in z: ...
-6 | for yield x in y: ...
-7 | for [x, 1, y, *["a"]] in z: ...
-  |                 ^^^ Syntax Error: Invalid assignment target
+  |         ^ Syntax Error: cannot assign to literal
 
 
 ## Semantic Syntax Errors

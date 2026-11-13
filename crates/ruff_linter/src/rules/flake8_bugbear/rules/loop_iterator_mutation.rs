@@ -64,6 +64,10 @@ pub(crate) fn loop_iterator_mutation(checker: &Checker, stmt_for: &StmtFor) {
         is_async: _,
         range: _,
         node_index: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
+        runtime_orelse: _,
     } = stmt_for;
 
     let (index, target, iter) = match iter.as_ref() {
@@ -343,6 +347,7 @@ impl<'a> Visitor<'a> for LoopMutationsVisitor<'a> {
                 range,
                 targets,
                 node_index: _,
+                runtime_targets: _,
             }) => {
                 self.handle_delete(*range, targets);
                 visitor::walk_stmt(self, stmt);

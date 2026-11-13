@@ -49,6 +49,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -106,6 +108,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -149,6 +153,8 @@ Module(
                                                 node_index: NodeIndex(None),
                                                 args: [],
                                                 keywords: [],
+                                                runtime_args: None,
+                                                runtime_bases: None,
                                             },
                                         },
                                     ),
@@ -162,6 +168,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -210,6 +218,7 @@ Module(
                                                     },
                                                 ),
                                             ],
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -222,6 +231,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -273,6 +284,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -325,6 +338,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -375,6 +390,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -431,6 +448,8 @@ Module(
                                                                     node_index: NodeIndex(None),
                                                                 },
                                                                 annotation: None,
+                                                                runtime_type_comment: None,
+                                                                runtime_type_comment_bytes: None,
                                                             },
                                                             default: None,
                                                         },
@@ -438,6 +457,7 @@ Module(
                                                     vararg: None,
                                                     kwonlyargs: [],
                                                     kwarg: None,
+                                                    runtime_defaults: None,
                                                 },
                                             ),
                                             body: Name(
@@ -452,6 +472,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -534,14 +556,18 @@ Module(
                                                                 ),
                                                             },
                                                         ],
+                                                        runtime_values: None,
                                                     },
                                                 ),
                                             ],
                                             ctx: Load,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -574,6 +600,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -601,6 +628,10 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             Expr(
@@ -644,6 +675,7 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
@@ -671,6 +703,10 @@ Module(
                     ),
                     body: [],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             Expr(
@@ -727,6 +763,8 @@ Module(
                                         ),
                                     ],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -788,6 +826,8 @@ Module(
                                         ),
                                     ],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -847,6 +887,8 @@ Module(
                                         ),
                                     ],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -912,6 +954,8 @@ Module(
                                                                         node_index: NodeIndex(None),
                                                                     },
                                                                     annotation: None,
+                                                                    runtime_type_comment: None,
+                                                                    runtime_type_comment_bytes: None,
                                                                 },
                                                                 default: None,
                                                             },
@@ -919,6 +963,7 @@ Module(
                                                         vararg: None,
                                                         kwonlyargs: [],
                                                         kwarg: None,
+                                                        runtime_defaults: None,
                                                     },
                                                 ),
                                                 body: Name(
@@ -933,6 +978,8 @@ Module(
                                         ),
                                     ],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -1006,6 +1053,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -1079,6 +1128,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -1086,6 +1137,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -1094,7 +1146,7 @@ Module(
   |
 1 | # Invalid target
 2 | [x for 1 in y]
-  |        ^ Syntax Error: Invalid assignment target
+  |        ^ Syntax Error: cannot assign to literal
 3 | [x for 'a' in y]
 4 | [x for call() in y]
   |
@@ -1104,7 +1156,7 @@ Module(
 1 | # Invalid target
 2 | [x for 1 in y]
 3 | [x for 'a' in y]
-  |        ^^^ Syntax Error: Invalid assignment target
+  |        ^^^ Syntax Error: cannot assign to literal
 4 | [x for call() in y]
 5 | [x for {a, b} in y]
   |
@@ -1114,7 +1166,7 @@ Module(
 2 | [x for 1 in y]
 3 | [x for 'a' in y]
 4 | [x for call() in y]
-  |        ^^^^^^ Syntax Error: Invalid assignment target
+  |        ^^^^^^ Syntax Error: cannot assign to function call
 5 | [x for {a, b} in y]
   |
 
@@ -1123,7 +1175,7 @@ Module(
 3 | [x for 'a' in y]
 4 | [x for call() in y]
 5 | [x for {a, b} in y]
-  |        ^^^^^^ Syntax Error: Invalid assignment target
+  |        ^^^^^^ Syntax Error: cannot assign to set display
 6 |
 7 | # Invalid iter
   |
@@ -1132,7 +1184,7 @@ Module(
    |
  7 | # Invalid iter
  8 | [x for x in *y]
-   |             ^^ Syntax Error: Starred expression cannot be used here
+   |             ^ Syntax Error: invalid syntax
  9 | [x for x in yield y]
 10 | [x for x in yield from y]
    |
@@ -1142,7 +1194,7 @@ Module(
  7 | # Invalid iter
  8 | [x for x in *y]
  9 | [x for x in yield y]
-   |             ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |             ^^^^^^^ Syntax Error: yield expression cannot be used here
 10 | [x for x in yield from y]
 11 | [x for x in lambda y: y]
    |
@@ -1152,7 +1204,7 @@ Module(
  8 | [x for x in *y]
  9 | [x for x in yield y]
 10 | [x for x in yield from y]
-   |             ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |             ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
    |
@@ -1162,7 +1214,7 @@ Module(
  9 | [x for x in yield y]
 10 | [x for x in yield from y]
 11 | [x for x in lambda y: y]
-   |             ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |             ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
    |
@@ -1172,7 +1224,7 @@ Module(
 10 | [x for x in yield from y]
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
-   |  ^^ Syntax Error: Expected an expression
+   |  ^^ Syntax Error: invalid syntax
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
    |
@@ -1182,7 +1234,7 @@ Module(
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
-   |      ^^^ Syntax Error: Expected `]`, found `for`
+   |  ^^^ Syntax Error: did you forget parentheses around the comprehension target?
 14 | [*x, *y for x in y]
    |
 
@@ -1191,7 +1243,7 @@ Module(
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
-   |                ^ Syntax Error: Expected `:`, found `]`
+   |      ^^^ Syntax Error: invalid syntax
 14 | [*x, *y for x in y]
    |
 
@@ -1200,7 +1252,16 @@ Module(
 11 | [x for x in lambda y: y]
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
-   |                 ^ Syntax Error: Expected a statement
+   |                ^ Syntax Error: unmatched ']'
+14 | [*x, *y for x in y]
+   |
+
+
+   |
+11 | [x for x in lambda y: y]
+12 | [**x for x in [{1: 2}]]
+13 | [*x, for x in y]
+   |                 ^ Syntax Error: invalid syntax
 14 | [*x, *y for x in y]
 15 |
 16 | # Invalid if
@@ -1211,7 +1272,7 @@ Module(
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
-   |         ^^^ Syntax Error: Expected `]`, found `for`
+   |  ^^^^^^ Syntax Error: did you forget parentheses around the comprehension target?
 15 |
 16 | # Invalid if
    |
@@ -1221,7 +1282,7 @@ Module(
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
-   |                   ^ Syntax Error: Expected `:`, found `]`
+   |         ^^^ Syntax Error: invalid syntax
 15 |
 16 | # Invalid if
    |
@@ -1231,7 +1292,17 @@ Module(
 12 | [**x for x in [{1: 2}]]
 13 | [*x, for x in y]
 14 | [*x, *y for x in y]
-   |                    ^ Syntax Error: Expected a statement
+   |                   ^ Syntax Error: unmatched ']'
+15 |
+16 | # Invalid if
+   |
+
+
+   |
+12 | [**x for x in [{1: 2}]]
+13 | [*x, for x in y]
+14 | [*x, *y for x in y]
+   |                    ^ Syntax Error: invalid syntax
 15 |
 16 | # Invalid if
 17 | [x for x in data if *y]
@@ -1241,7 +1312,7 @@ Module(
    |
 16 | # Invalid if
 17 | [x for x in data if *y]
-   |                     ^^ Syntax Error: Starred expression cannot be used here
+   |                     ^ Syntax Error: invalid syntax
 18 | [x for x in data if yield y]
 19 | [x for x in data if yield from y]
    |
@@ -1251,7 +1322,7 @@ Module(
 16 | # Invalid if
 17 | [x for x in data if *y]
 18 | [x for x in data if yield y]
-   |                     ^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                     ^^^^^^^ Syntax Error: yield expression cannot be used here
 19 | [x for x in data if yield from y]
 20 | [x for x in data if lambda y: y]
    |
@@ -1261,7 +1332,7 @@ Module(
 17 | [x for x in data if *y]
 18 | [x for x in data if yield y]
 19 | [x for x in data if yield from y]
-   |                     ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+   |                     ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
    |
@@ -1271,7 +1342,7 @@ Module(
 18 | [x for x in data if yield y]
 19 | [x for x in data if yield from y]
 20 | [x for x in data if lambda y: y]
-   |                     ^^^^^^^^^^^ Syntax Error: Lambda expression cannot be used here
+   |                     ^^^^^^^^^^^ Syntax Error: lambda expression cannot be used here
 21 | [*x if x else y for x in z]
 22 | [x if x else *y for x in z]
    |
@@ -1281,7 +1352,7 @@ Module(
 19 | [x for x in data if yield from y]
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
-   |   ^^^^^^^^^^^^^ Syntax Error: Conditional expression cannot be used here
+   |   ^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
 22 | [x if x else *y for x in z]
    |
 
@@ -1290,7 +1361,7 @@ Module(
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
 22 | [x if x else *y for x in z]
-   |              ^^ Syntax Error: Starred expression cannot be used here
+   |              ^ Syntax Error: expected expression after 'else', but statement is given
 
 
 ## Unsupported Syntax Errors
@@ -1299,6 +1370,6 @@ Module(
 19 | [x for x in data if yield from y]
 20 | [x for x in data if lambda y: y]
 21 | [*x if x else y for x in z]
-   |  ^^^^^^^^^^^^^^ Syntax Error: Cannot use iterable unpacking in a list comprehension on Python 3.14 (syntax was added in Python 3.15)
+   |  ^^^^^^^^^^^^^^ Syntax Error: cannot use iterable unpacking in a list comprehension on Python 3.14 (syntax was added in Python 3.15)
 22 | [x if x else *y for x in z]
    |

@@ -52,6 +52,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             ctx: Store,
@@ -80,6 +81,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -116,6 +121,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             slice: NumberLiteral(
@@ -153,6 +159,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -189,6 +199,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             attr: Identifier {
@@ -222,9 +233,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```

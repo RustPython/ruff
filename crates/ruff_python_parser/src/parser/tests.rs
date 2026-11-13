@@ -1,7 +1,10 @@
 use ruff_python_ast::{Expr, InterpolatedStringElement, IpyEscapeKind, Number, Stmt};
 use ruff_text_size::{Ranged, TextRange, TextSize};
 
-use crate::{Mode, ParseOptions, parse, parse_cells_unchecked, parse_expression, parse_module};
+use crate::{
+    LexicalErrorType, Mode, ParseErrorType, ParseOptions, parse, parse_cells_unchecked,
+    parse_expression, parse_module, parse_unchecked,
+};
 
 #[test]
 fn test_modes() {
@@ -371,18 +374,35 @@ fn cells_module_range_spans_source() {
 mod stack_growth {
     use std::assert_matches;
 
-    use ruff_python_ast::Stmt;
+    use ruff_python_ast::{ModModule, Stmt};
 
-    use crate::{Mode, ParseOptions, parse_module};
+    use crate::{
+        LexicalErrorType, Mode, ParseErrorType, ParseOptions, Parsed, parse_module, parse_unchecked,
+    };
 
     // Keep recursive ASTs shallow enough for Windows's 1 MiB test-thread stacks.
     const RECURSIVE_AST_TEST_DEPTH: usize = 1_000;
 
+    /// Parses the module `source`, which nests brackets deeper than allowed, and asserts that this is
+    /// its only error.
+    fn parse_too_deeply_nested(source: &str) -> Parsed<ModModule> {
+        let parsed = parse_unchecked(source, ParseOptions::from(Mode::Module))
+            .try_into_module()
+            .unwrap();
+        assert!(!parsed.errors().is_empty());
+        for error in parsed.errors() {
+            assert_eq!(
+                error.error,
+                ParseErrorType::Lexical(LexicalErrorType::TooDeeplyNestedBrackets)
+            );
+        }
+        parsed
+    }
+
     #[test]
     fn nested_parens_grow_stack() {
         let src = format!("{}1{}", "(".repeat(1_000), ")".repeat(1_000));
-        let parsed = stacker::grow(32 * 1024, || parse_module(&src));
-        assert!(parsed.is_ok());
+        stacker::grow(32 * 1024, || parse_too_deeply_nested(&src));
     }
 
     #[test]
@@ -392,7 +412,7 @@ mod stack_growth {
             "(".repeat(1_000),
             ")".repeat(1_000),
         );
-        let parsed = parse_module(&src).unwrap();
+        let parsed = parse_too_deeply_nested(&src);
 
         assert_matches!(parsed.suite().first(), Some(Stmt::Assign(_)));
         assert_matches!(parsed.suite().last(), Some(Stmt::Assign(_)));
@@ -401,6 +421,7 @@ mod stack_growth {
     #[test]
     fn nested_def_blocks_grow_stack() {
         // Each nested function crosses the suite boundary where the parser rechecks the stack.
+        // Indentation stops at 99 levels, so the deeper blocks are reported instead of parsed.
         let depth = RECURSIVE_AST_TEST_DEPTH;
         let mut src = String::new();
         for i in 0..depth {
@@ -409,25 +430,29 @@ mod stack_growth {
         }
         src.push_str(&"\t".repeat(depth));
         src.push_str("pass\n");
-        parse_module(&src).unwrap();
+        let error = parse_module(&src).unwrap_err();
+        assert_eq!(
+            error.error,
+            ParseErrorType::Lexical(LexicalErrorType::TooDeepIndentation)
+        );
     }
 
     #[test]
     fn nested_lists_grow_stack() {
         let src = format!("{}1{}", "[".repeat(1_000), "]".repeat(1_000));
-        parse_module(&src).unwrap();
+        parse_too_deeply_nested(&src);
     }
 
     #[test]
     fn nested_calls_grow_stack() {
         let src = format!("x = {}1{}", "f(".repeat(1_000), ")".repeat(1_000));
-        parse_module(&src).unwrap();
+        parse_too_deeply_nested(&src);
     }
 
     #[test]
     fn nested_subscripts_grow_stack() {
         let src = format!("x = {}1{}", "a[".repeat(1_000), "]".repeat(1_000));
-        parse_module(&src).unwrap();
+        parse_too_deeply_nested(&src);
     }
 
     #[test]
@@ -443,7 +468,7 @@ mod stack_growth {
             src.push(')');
         }
         src.push_str(": pass\n");
-        parse_module(&src).unwrap();
+        parse_too_deeply_nested(&src);
     }
 
     #[test]
@@ -472,7 +497,7 @@ mod stack_growth {
         for _ in 0..depth {
             src.push(')');
         }
-        parse_module(&src).unwrap();
+        parse_too_deeply_nested(&src);
     }
 
     #[test]
@@ -536,4 +561,81 @@ mod stack_growth {
         let source = format!("{}True\n", "not ".repeat(depth));
         parse_module(&source).unwrap();
     }
+}
+
+fn first_error(source: &str) -> ParseErrorType {
+    parse_unchecked(source, ParseOptions::from(Mode::Module)).errors()[0]
+        .error
+        .clone()
+}
+
+#[test]
+fn unclosed_bracket_at_end_is_incomplete() {
+    assert_eq!(
+        first_error("x = [\n1,\n"),
+        ParseErrorType::Lexical(LexicalErrorType::UnclosedBracket {
+            opening: '[',
+            incomplete: true,
+        })
+    );
+}
+
+#[test]
+fn unclosed_bracket_in_place_of_earlier_error_is_complete() {
+    assert_eq!(
+        first_error("x = [\nx for x\nin raise(3)\nof x\n"),
+        ParseErrorType::Lexical(LexicalErrorType::UnclosedBracket {
+            opening: '[',
+            incomplete: false,
+        })
+    );
+}
+
+#[test]
+fn unclosed_bracket_after_same_line_error() {
+    assert_eq!(first_error("def f(:\n").to_string(), "invalid syntax");
+}
+
+#[test]
+fn number_literal_errors() {
+    for (source, message) in [
+        ("0x\n", "invalid hexadecimal literal"),
+        ("0o9\n", "invalid digit '9' in octal literal"),
+        ("0b1_2\n", "invalid digit '2' in binary literal"),
+        ("1_\n", "invalid decimal literal"),
+        ("1e+x\n", "invalid decimal literal"),
+        ("1abc\n", "invalid decimal literal"),
+        ("1jx\n", "invalid imaginary literal"),
+        (
+            "0012\n",
+            "leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers",
+        ),
+    ] {
+        assert_eq!(first_error(source).to_string(), message, "{source:?}");
+    }
+}
+
+#[test]
+fn number_literal_before_keyword() {
+    assert!(parse_unchecked("1if x else 2\n", ParseOptions::from(Mode::Module)).has_valid_syntax());
+}
+
+#[test]
+fn incompatible_string_prefixes() {
+    assert_eq!(
+        first_error("x = bu''\n"),
+        ParseErrorType::Lexical(LexicalErrorType::IncompatibleStringPrefixes {
+            first: 'u',
+            second: 'b',
+        })
+    );
+    assert!(parse_unchecked("ub = 1\n", ParseOptions::from(Mode::Module)).has_valid_syntax());
+}
+
+#[test]
+fn non_printable_character() {
+    assert_eq!(
+        first_error("x = \u{a0}\n").to_string(),
+        "invalid non-printable character U+00A0"
+    );
 }

@@ -32,6 +32,7 @@ Module(
                     ),
                     value: None,
                     simple: true,
+                    runtime_simple: None,
                 },
             ),
             Assign(
@@ -56,6 +57,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Expr(
@@ -101,9 +105,13 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -111,7 +119,7 @@ Module(
 
   |
 1 | a: type X = int
-  |         ^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |         ^ Syntax Error: invalid syntax
 2 | lambda: type X = int
   |
 
@@ -119,4 +127,4 @@ Module(
   |
 1 | a: type X = int
 2 | lambda: type X = int
-  |              ^ Syntax Error: Simple statements must be separated by newlines or semicolons
+  |              ^ Syntax Error: invalid syntax

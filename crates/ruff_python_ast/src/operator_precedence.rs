@@ -69,6 +69,7 @@ impl OperatorPrecedence {
             | ExprRef::StringLiteral(_)
             | ExprRef::BytesLiteral(_)
             | ExprRef::NumberLiteral(_)
+            | ExprRef::Constant(_)
             | ExprRef::BooleanLiteral(_)
             | ExprRef::NoneLiteral(_)
             | ExprRef::EllipsisLiteral(_)

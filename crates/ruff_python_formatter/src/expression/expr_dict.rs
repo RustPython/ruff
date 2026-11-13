@@ -17,6 +17,7 @@ impl FormatNodeRule<ExprDict> for FormatExprDict {
             range: _,
             node_index: _,
             items,
+            runtime_values: _,
         } = item;
 
         let comments = f.context().comments().clone();

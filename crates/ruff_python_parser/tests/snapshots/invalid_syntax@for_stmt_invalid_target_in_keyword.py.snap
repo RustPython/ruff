@@ -56,10 +56,13 @@ Module(
                                                     },
                                                 ),
                                             ],
+                                            runtime_comparators: None,
                                         },
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -86,6 +89,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -122,6 +129,7 @@ Module(
                                             },
                                         ),
                                     ],
+                                    runtime_comparators: None,
                                 },
                             ),
                             arguments: Arguments {
@@ -129,6 +137,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -155,6 +165,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -187,6 +201,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_comparators: None,
                         },
                     ),
                     iter: Name(
@@ -212,6 +227,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -249,6 +268,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                                 Name(
@@ -262,6 +282,7 @@ Module(
                             ],
                             ctx: Store,
                             parenthesized: true,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -287,6 +308,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -324,6 +349,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                                 Name(
@@ -336,6 +362,7 @@ Module(
                                 ),
                             ],
                             ctx: Store,
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -361,6 +388,10 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
             For(
@@ -398,6 +429,7 @@ Module(
                                                 },
                                             ),
                                         ],
+                                        runtime_comparators: None,
                                     },
                                 ),
                                 Name(
@@ -409,6 +441,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_elts: None,
                         },
                     ),
                     iter: Name(
@@ -434,9 +467,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -444,7 +482,7 @@ Module(
 
   |
 1 | for d(x in y) in target: ...
-  |     ^^^^^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^^^^^ Syntax Error: cannot assign to function call
 2 | for (x in y)() in iter: ...
 3 | for (x in y) in iter: ...
   |
@@ -453,7 +491,7 @@ Module(
   |
 1 | for d(x in y) in target: ...
 2 | for (x in y)() in iter: ...
-  |     ^^^^^^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^^^^^^ Syntax Error: cannot assign to function call
 3 | for (x in y) in iter: ...
 4 | for (x in y, z) in iter: ...
   |
@@ -463,7 +501,7 @@ Module(
 1 | for d(x in y) in target: ...
 2 | for (x in y)() in iter: ...
 3 | for (x in y) in iter: ...
-  |      ^^^^^^ Syntax Error: Invalid assignment target
+  |              ^^ Syntax Error: invalid syntax
 4 | for (x in y, z) in iter: ...
 5 | for [x in y, z] in iter: ...
   |
@@ -473,7 +511,7 @@ Module(
 2 | for (x in y)() in iter: ...
 3 | for (x in y) in iter: ...
 4 | for (x in y, z) in iter: ...
-  |      ^^^^^^ Syntax Error: Invalid assignment target
+  |                 ^^ Syntax Error: invalid syntax
 5 | for [x in y, z] in iter: ...
 6 | for {x in y, z} in iter: ...
   |
@@ -483,7 +521,7 @@ Module(
 3 | for (x in y) in iter: ...
 4 | for (x in y, z) in iter: ...
 5 | for [x in y, z] in iter: ...
-  |      ^^^^^^ Syntax Error: Invalid assignment target
+  |                 ^^ Syntax Error: invalid syntax
 6 | for {x in y, z} in iter: ...
   |
 
@@ -492,4 +530,4 @@ Module(
 4 | for (x in y, z) in iter: ...
 5 | for [x in y, z] in iter: ...
 6 | for {x in y, z} in iter: ...
-  |     ^^^^^^^^^^^ Syntax Error: Invalid assignment target
+  |     ^^^^^^^^^^^ Syntax Error: cannot assign to set display

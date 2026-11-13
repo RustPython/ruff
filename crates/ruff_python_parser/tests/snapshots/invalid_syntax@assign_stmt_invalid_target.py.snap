@@ -34,6 +34,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -68,6 +71,9 @@ Module(
                             ),
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -118,6 +124,9 @@ Module(
                             ctx: Load,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
             Assign(
@@ -174,6 +183,7 @@ Module(
                                     ),
                                 ],
                                 ctx: Store,
+                                runtime_elts: None,
                             },
                         ),
                     ],
@@ -226,11 +236,16 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -238,7 +253,7 @@ Module(
 
   |
 1 | 1 = 1
-  | ^ Syntax Error: Invalid assignment target
+  | ^ Syntax Error: cannot assign to literal here. Maybe you meant '==' instead of '='?
 2 | x = 1 = 2
 3 | x = 1 = y = 2 = z
   |
@@ -247,7 +262,7 @@ Module(
   |
 1 | 1 = 1
 2 | x = 1 = 2
-  |     ^ Syntax Error: Invalid assignment target
+  |     ^ Syntax Error: cannot assign to literal
 3 | x = 1 = y = 2 = z
 4 | ["a", "b"] = ["a", "b"]
   |
@@ -257,7 +272,7 @@ Module(
 1 | 1 = 1
 2 | x = 1 = 2
 3 | x = 1 = y = 2 = z
-  |     ^ Syntax Error: Invalid assignment target
+  |     ^ Syntax Error: cannot assign to literal
 4 | ["a", "b"] = ["a", "b"]
   |
 
@@ -266,7 +281,7 @@ Module(
 1 | 1 = 1
 2 | x = 1 = 2
 3 | x = 1 = y = 2 = z
-  |             ^ Syntax Error: Invalid assignment target
+  |             ^ Syntax Error: cannot assign to literal
 4 | ["a", "b"] = ["a", "b"]
   |
 
@@ -275,11 +290,11 @@ Module(
 2 | x = 1 = 2
 3 | x = 1 = y = 2 = z
 4 | ["a", "b"] = ["a", "b"]
-  |  ^^^ Syntax Error: Invalid assignment target
+  |  ^^^ Syntax Error: cannot assign to literal
 
 
   |
 2 | x = 1 = 2
 3 | x = 1 = y = 2 = z
 4 | ["a", "b"] = ["a", "b"]
-  |       ^^^ Syntax Error: Invalid assignment target
+  |       ^^^ Syntax Error: cannot assign to literal

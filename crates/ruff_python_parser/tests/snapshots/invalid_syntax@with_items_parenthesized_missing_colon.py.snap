@@ -51,9 +51,13 @@ Module(
                             },
                         ),
                     ],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -62,6 +66,6 @@ Module(
   |
 1 | # `)` followed by a newline
 2 | with (item1, item2)
-  |                    ^ Syntax Error: Expected `:`, found newline
+  |                    ^ Syntax Error: expected ':'
 3 |     pass
   |

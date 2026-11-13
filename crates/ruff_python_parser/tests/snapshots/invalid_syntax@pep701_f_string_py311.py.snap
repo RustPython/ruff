@@ -74,6 +74,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -86,6 +89,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -159,12 +164,17 @@ Module(
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -177,6 +187,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -245,6 +257,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -257,6 +272,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -377,6 +394,9 @@ Module(
                                                                                                                                                                                                                     debug_text: None,
                                                                                                                                                                                                                     conversion: None,
                                                                                                                                                                                                                     format_spec: None,
+                                                                                                                                                                                                                    runtime_str: None,
+                                                                                                                                                                                                                    runtime_interpolation_format_spec: None,
+                                                                                                                                                                                                                    runtime_formatted_value_format_spec: None,
                                                                                                                                                                                                                 },
                                                                                                                                                                                                             ),
                                                                                                                                                                                                         ],
@@ -389,11 +409,16 @@ Module(
                                                                                                                                                                                                     },
                                                                                                                                                                                                 ),
                                                                                                                                                                                             },
+                                                                                                                                                                                            runtime_joined_str: None,
+                                                                                                                                                                                            runtime_values: None,
                                                                                                                                                                                         },
                                                                                                                                                                                     ),
                                                                                                                                                                                     debug_text: None,
                                                                                                                                                                                     conversion: None,
                                                                                                                                                                                     format_spec: None,
+                                                                                                                                                                                    runtime_str: None,
+                                                                                                                                                                                    runtime_interpolation_format_spec: None,
+                                                                                                                                                                                    runtime_formatted_value_format_spec: None,
                                                                                                                                                                                 },
                                                                                                                                                                             ),
                                                                                                                                                                         ],
@@ -406,11 +431,16 @@ Module(
                                                                                                                                                                     },
                                                                                                                                                                 ),
                                                                                                                                                             },
+                                                                                                                                                            runtime_joined_str: None,
+                                                                                                                                                            runtime_values: None,
                                                                                                                                                         },
                                                                                                                                                     ),
                                                                                                                                                     debug_text: None,
                                                                                                                                                     conversion: None,
                                                                                                                                                     format_spec: None,
+                                                                                                                                                    runtime_str: None,
+                                                                                                                                                    runtime_interpolation_format_spec: None,
+                                                                                                                                                    runtime_formatted_value_format_spec: None,
                                                                                                                                                 },
                                                                                                                                             ),
                                                                                                                                         ],
@@ -423,11 +453,16 @@ Module(
                                                                                                                                     },
                                                                                                                                 ),
                                                                                                                             },
+                                                                                                                            runtime_joined_str: None,
+                                                                                                                            runtime_values: None,
                                                                                                                         },
                                                                                                                     ),
                                                                                                                     debug_text: None,
                                                                                                                     conversion: None,
                                                                                                                     format_spec: None,
+                                                                                                                    runtime_str: None,
+                                                                                                                    runtime_interpolation_format_spec: None,
+                                                                                                                    runtime_formatted_value_format_spec: None,
                                                                                                                 },
                                                                                                             ),
                                                                                                         ],
@@ -440,11 +475,16 @@ Module(
                                                                                                     },
                                                                                                 ),
                                                                                             },
+                                                                                            runtime_joined_str: None,
+                                                                                            runtime_values: None,
                                                                                         },
                                                                                     ),
                                                                                     debug_text: None,
                                                                                     conversion: None,
                                                                                     format_spec: None,
+                                                                                    runtime_str: None,
+                                                                                    runtime_interpolation_format_spec: None,
+                                                                                    runtime_formatted_value_format_spec: None,
                                                                                 },
                                                                             ),
                                                                         ],
@@ -457,11 +497,16 @@ Module(
                                                                     },
                                                                 ),
                                                             },
+                                                            runtime_joined_str: None,
+                                                            runtime_values: None,
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -474,6 +519,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -534,6 +581,9 @@ Module(
                                                                                     debug_text: None,
                                                                                     conversion: None,
                                                                                     format_spec: None,
+                                                                                    runtime_str: None,
+                                                                                    runtime_interpolation_format_spec: None,
+                                                                                    runtime_formatted_value_format_spec: None,
                                                                                 },
                                                                             ),
                                                                             Literal(
@@ -553,11 +603,16 @@ Module(
                                                                     },
                                                                 ),
                                                             },
+                                                            runtime_joined_str: None,
+                                                            runtime_values: None,
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                             Literal(
@@ -577,6 +632,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -611,6 +668,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -623,6 +683,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -663,6 +725,9 @@ Module(
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                             Literal(
@@ -682,6 +747,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -729,6 +796,9 @@ Module(
                                                                                     debug_text: None,
                                                                                     conversion: None,
                                                                                     format_spec: None,
+                                                                                    runtime_str: None,
+                                                                                    runtime_interpolation_format_spec: None,
+                                                                                    runtime_formatted_value_format_spec: None,
                                                                                 },
                                                                             ),
                                                                         ],
@@ -741,11 +811,16 @@ Module(
                                                                     },
                                                                 ),
                                                             },
+                                                            runtime_joined_str: None,
+                                                            runtime_values: None,
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -758,6 +833,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -891,16 +968,22 @@ Module(
                                                                                 ),
                                                                             ],
                                                                             ctx: Load,
+                                                                            runtime_elts: None,
                                                                         },
                                                                     ),
                                                                 ],
                                                                 keywords: [],
+                                                                runtime_args: None,
+                                                                runtime_bases: None,
                                                             },
                                                         },
                                                     ),
                                                     debug_text: None,
                                                     conversion: None,
                                                     format_spec: None,
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -913,11 +996,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -926,7 +1012,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.11"}
 2 | f'Magic wand: { bag['wand'] }'     # nested quotes
-  |                     ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |                     ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 3 | f"{'\n'.join(a)}"                  # escape sequence
 4 | f'''A complex trick: {
   |
@@ -936,7 +1022,7 @@ Module(
 1 | # parse_options: {"target-version": "3.11"}
 2 | f'Magic wand: { bag['wand'] }'     # nested quotes
 3 | f"{'\n'.join(a)}"                  # escape sequence
-  |     ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |     ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
 4 | f'''A complex trick: {
 5 |     bag['bag']                     # comment
   |
@@ -946,7 +1032,7 @@ Module(
 3 | f"{'\n'.join(a)}"                  # escape sequence
 4 | f'''A complex trick: {
 5 |     bag['bag']                     # comment
-  |                                    ^^^^^^^^^ Syntax Error: Cannot use comments in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |                                    ^^^^^^^^^ Syntax Error: cannot use comments in f-strings on Python 3.11 (syntax was added in Python 3.12)
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
   |
@@ -956,7 +1042,7 @@ Module(
 5 |     bag['bag']                     # comment
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
-  |                 ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |                 ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
 9 | f"{
   |
@@ -966,7 +1052,7 @@ Module(
 5 |     bag['bag']                     # comment
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
-  |              ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |              ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
 9 | f"{
   |
@@ -976,7 +1062,7 @@ Module(
 5 |     bag['bag']                     # comment
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
-  |           ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |           ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
 9 | f"{
   |
@@ -986,7 +1072,7 @@ Module(
 5 |     bag['bag']                     # comment
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
-  |        ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |        ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
 9 | f"{
   |
@@ -996,7 +1082,7 @@ Module(
 5 |     bag['bag']                     # comment
 6 | }'''
 7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
-  |     ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+  |     ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
 9 | f"{
   |
@@ -1006,7 +1092,7 @@ Module(
  6 | }'''
  7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
  8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
-   |         ^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |         ^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
  9 | f"{
 10 |     1
    |
@@ -1016,7 +1102,7 @@ Module(
  7 | f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"  # arbitrary nesting
  8 | f"{f'''{"nested"} inner'''} outer" # nested (triple) quotes
  9 | f"{
-   |   ^ Syntax Error: Cannot use line breaks in non-triple-quoted f-string replacement fields on Python 3.11 (syntax was added in Python 3.12)
+   |   ^ Syntax Error: cannot use line breaks in non-triple-quoted f-string replacement fields on Python 3.11 (syntax was added in Python 3.12)
 10 |     1
 11 | }"
    |
@@ -1026,7 +1112,7 @@ Module(
 10 |     1
 11 | }"
 12 | f"test {a \
-   |           ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |           ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
    |
@@ -1036,7 +1122,7 @@ Module(
 12 | f"test {a \
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
-   |       ^^^ Syntax Error: Cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |       ^^^ Syntax Error: cannot reuse outer quote character in f-strings on Python 3.11 (syntax was added in Python 3.12)
 15 | f"{'\n'.join(['\t', '\v', '\r'])}"  # multiple escape sequences, multiple errors
    |
 
@@ -1045,25 +1131,25 @@ Module(
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
 15 | f"{'\n'.join(['\t', '\v', '\r'])}"  # multiple escape sequences, multiple errors
-   |     ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |     ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
 
 
    |
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
 15 | f"{'\n'.join(['\t', '\v', '\r'])}"  # multiple escape sequences, multiple errors
-   |                ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |                ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
 
 
    |
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
 15 | f"{'\n'.join(['\t', '\v', '\r'])}"  # multiple escape sequences, multiple errors
-   |                      ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |                      ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
 
 
    |
 13 |     } more"                        # line continuation
 14 | f"""{f"""{x}"""}"""                # mark the whole triple quote
 15 | f"{'\n'.join(['\t', '\v', '\r'])}"  # multiple escape sequences, multiple errors
-   |                            ^ Syntax Error: Cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)
+   |                            ^ Syntax Error: cannot use an escape sequence (backslash) in f-strings on Python 3.11 (syntax was added in Python 3.12)

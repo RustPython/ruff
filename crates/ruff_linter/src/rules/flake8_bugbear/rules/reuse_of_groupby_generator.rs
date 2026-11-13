@@ -158,6 +158,7 @@ impl<'a> Visitor<'a> for GroupNameFinder<'a> {
                 elif_else_clauses,
                 range: _,
                 node_index: _,
+                runtime_body: _,
             }) => {
                 // Visit the test before pushing the branch counters as it
                 // is evaluated unconditionally.

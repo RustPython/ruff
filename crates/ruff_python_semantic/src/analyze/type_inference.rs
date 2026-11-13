@@ -342,6 +342,7 @@ impl From<&Expr> for ResolvedPythonType {
                 ResolvedPythonType::Unknown
             }
             Expr::Lambda(_)
+            | Expr::Constant(_)
             | Expr::Await(_)
             | Expr::Yield(_)
             | Expr::YieldFrom(_)

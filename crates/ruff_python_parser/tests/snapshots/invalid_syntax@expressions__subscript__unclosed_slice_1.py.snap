@@ -70,6 +70,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -83,9 +85,11 @@ Module(
                     ),
                     value: None,
                     simple: false,
+                    runtime_simple: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -93,9 +97,17 @@ Module(
 
   |
 1 | x[::
+  |  ^ Syntax Error: '[' was never closed
 2 |
 3 | def foo():
-  | ^^^ Syntax Error: Expected an identifier, but found a keyword `def` that cannot be used here
+  |
+
+
+  |
+1 | x[::
+2 |
+3 | def foo():
+  | ^^^ Syntax Error: invalid syntax
 4 |     pass
   |
 
@@ -104,7 +116,25 @@ Module(
 1 | x[::
 2 |
 3 | def foo():
-  |     ^^^ Syntax Error: Expected `]`, found identifier
+  |     ^^^ Syntax Error: invalid syntax
+4 |     pass
+  |
+
+
+  |
+1 | / x[::
+2 | |
+3 | | def foo():
+  | |_________^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+4 |       pass
+  |
+
+
+  |
+1 | x[::
+2 |
+3 | def foo():
+  |     ^^^ Syntax Error: invalid syntax
 4 |     pass
   |
 
@@ -112,10 +142,10 @@ Module(
   |
 3 | def foo():
 4 |     pass
-  |     ^^^^ Syntax Error: Expected an identifier, but found a keyword `pass` that cannot be used here
+  |     ^^^^ Syntax Error: invalid syntax
 
 
   |
 3 | def foo():
 4 |     pass
-  |         ^ Syntax Error: unexpected EOF while parsing
+  |         ^ Syntax Error: invalid syntax

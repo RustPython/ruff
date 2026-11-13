@@ -31,6 +31,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -69,6 +71,7 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
@@ -94,6 +97,8 @@ Module(
                                 node_index: NodeIndex(None),
                                 args: [],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -132,11 +137,13 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
                         },
                     ],
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -144,7 +151,7 @@ Module(
 
   |
 1 | first(); match value:
-  |          ^^^^^ Syntax Error: Compound statements are not allowed on the same line as simple statements
+  |          ^^^^^ Syntax Error: invalid syntax
 2 |     case _: pass
 3 | first(); match (value):
   |
@@ -154,6 +161,6 @@ Module(
 1 | first(); match value:
 2 |     case _: pass
 3 | first(); match (value):
-  |          ^^^^^ Syntax Error: Compound statements are not allowed on the same line as simple statements
+  |          ^^^^^ Syntax Error: invalid syntax
 4 |     case _: pass
   |

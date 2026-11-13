@@ -36,6 +36,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -43,6 +45,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: Yield(
@@ -91,6 +94,8 @@ Module(
                                                     node_index: NodeIndex(None),
                                                 },
                                                 annotation: None,
+                                                runtime_type_comment: None,
+                                                runtime_type_comment_bytes: None,
                                             },
                                             default: None,
                                         },
@@ -98,6 +103,7 @@ Module(
                                     vararg: None,
                                     kwonlyargs: [],
                                     kwarg: None,
+                                    runtime_defaults: None,
                                 },
                             ),
                             body: YieldFrom(
@@ -119,6 +125,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -126,7 +133,7 @@ Module(
 
   |
 1 | lambda x: yield y
-  |           ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^ Syntax Error: yield expression cannot be used here
 2 | lambda x: yield from y
   |
 
@@ -134,4 +141,4 @@ Module(
   |
 1 | lambda x: yield y
 2 | lambda x: yield from y
-  |           ^^^^^^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^^^^^^^^^^^ Syntax Error: yield expression cannot be used here

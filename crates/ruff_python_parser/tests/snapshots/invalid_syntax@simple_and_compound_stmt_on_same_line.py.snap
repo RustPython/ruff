@@ -59,9 +59,11 @@ Module(
                         ),
                     ],
                     elif_else_clauses: [],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -69,4 +71,4 @@ Module(
 
   |
 1 | a; if b: pass; b
-  |    ^^ Syntax Error: Compound statements are not allowed on the same line as simple statements
+  |    ^^ Syntax Error: invalid syntax

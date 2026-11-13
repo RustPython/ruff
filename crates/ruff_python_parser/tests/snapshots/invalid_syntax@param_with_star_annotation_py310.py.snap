@@ -53,10 +53,13 @@ Module(
                                         },
                                     ),
                                 ),
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -73,9 +76,14 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -84,4 +92,4 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.10"}
 2 | def foo(*args: *Ts): ...
-  |                ^^^ Syntax Error: Cannot use star annotation on Python 3.10 (syntax was added in Python 3.11)
+  |                ^^^ Syntax Error: cannot use star annotation on Python 3.10 (syntax was added in Python 3.11)

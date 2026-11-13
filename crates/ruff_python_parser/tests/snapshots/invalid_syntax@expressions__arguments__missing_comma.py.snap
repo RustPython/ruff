@@ -48,12 +48,15 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -61,4 +64,9 @@ Module(
 
   |
 1 | call(x y)
-  |        ^ Syntax Error: Expected `,`, found identifier
+  |      ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+1 | call(x y)
+  |        ^ Syntax Error: invalid syntax

@@ -53,6 +53,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -65,11 +68,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -78,4 +84,4 @@ Module(
   |
 5 | f'''{foo:.3f
 6 | '''
-  | ^^^ Syntax Error: f-string: expecting `}`
+  | ^^^ Syntax Error: f-string: expecting '}', or format specs

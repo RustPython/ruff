@@ -52,6 +52,7 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
@@ -70,12 +71,17 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: false,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
             Try(
@@ -120,6 +126,7 @@ Module(
                                             ],
                                             ctx: Load,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                 ),
@@ -138,15 +145,21 @@ Module(
                                         },
                                     ),
                                 ],
+                                runtime_body: None,
                             },
                         ),
                     ],
                     orelse: [],
                     finalbody: [],
                     is_star: true,
+                    runtime_body: None,
+                    runtime_handlers: None,
+                    runtime_orelse: None,
+                    runtime_finalbody: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -156,7 +169,7 @@ Module(
 1 | try:
 2 |     pass
 3 | except x, y as exc:
-  |        ^^^^ Syntax Error: Multiple exception types must be parenthesized when using `as`
+  |        ^^^^^^^^^^^ Syntax Error: multiple exception types must be parenthesized when using 'as'
 4 |     pass
 5 | try:
   |
@@ -166,6 +179,6 @@ Module(
 5 | try:
 6 |     pass
 7 | except* x, y as eg:
-  |         ^^^^ Syntax Error: Multiple exception types must be parenthesized when using `as`
+  |         ^^^^^^^^^^ Syntax Error: multiple exception types must be parenthesized when using 'as'
 8 |     pass
   |

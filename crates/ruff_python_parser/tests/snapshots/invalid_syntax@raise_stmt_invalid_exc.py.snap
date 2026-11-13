@@ -92,6 +92,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -99,7 +100,7 @@ Module(
 
   |
 1 | raise *x
-  |       ^^ Syntax Error: Starred expression cannot be used here
+  |       ^ Syntax Error: invalid syntax
 2 | raise yield x
 3 | raise x := 1
   |
@@ -108,7 +109,7 @@ Module(
   |
 1 | raise *x
 2 | raise yield x
-  |       ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |       ^^^^^^^ Syntax Error: yield expression cannot be used here
 3 | raise x := 1
   |
 
@@ -117,4 +118,4 @@ Module(
 1 | raise *x
 2 | raise yield x
 3 | raise x := 1
-  |         ^^ Syntax Error: Expected a statement
+  |         ^^ Syntax Error: invalid syntax

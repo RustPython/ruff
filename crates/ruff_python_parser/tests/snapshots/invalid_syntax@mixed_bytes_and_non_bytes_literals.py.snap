@@ -101,6 +101,8 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -166,11 +168,14 @@ Module(
                                     ],
                                 ),
                             },
+                            runtime_joined_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -178,7 +183,7 @@ Module(
 
   |
 1 | 'first' b'second'
-  | ^^^^^^^^^^^^^^^^^ Syntax Error: Bytes literal cannot be mixed with non-bytes literals
+  | ^^^^^^^^^^^^^^^^^ Syntax Error: cannot mix bytes and nonbytes literals
 2 | f'first' b'second'
 3 | 'first' f'second' b'third'
   |
@@ -187,7 +192,7 @@ Module(
   |
 1 | 'first' b'second'
 2 | f'first' b'second'
-  | ^^^^^^^^^^^^^^^^^^ Syntax Error: Bytes literal cannot be mixed with non-bytes literals
+  | ^^^^^^^^^^^^^^^^^^ Syntax Error: cannot mix bytes and nonbytes literals
 3 | 'first' f'second' b'third'
   |
 
@@ -196,4 +201,4 @@ Module(
 1 | 'first' b'second'
 2 | f'first' b'second'
 3 | 'first' f'second' b'third'
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: Bytes literal cannot be mixed with non-bytes literals
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^ Syntax Error: cannot mix bytes and nonbytes literals

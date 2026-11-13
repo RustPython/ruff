@@ -24,6 +24,8 @@ impl FormatNodeRule<StmtClassDef> for FormatStmtClassDef {
             body,
             type_params,
             decorator_list,
+            runtime_decorator_list: _,
+            runtime_body: _,
         } = item;
 
         let comments = f.context().comments().clone();

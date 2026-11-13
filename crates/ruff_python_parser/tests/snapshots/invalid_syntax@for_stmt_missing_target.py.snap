@@ -46,9 +46,14 @@ Module(
                         ),
                     ],
                     orelse: [],
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
+                    runtime_orelse: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -56,4 +61,4 @@ Module(
 
   |
 1 | for in x: ...
-  |     ^^ Syntax Error: Expected an identifier
+  |     ^^ Syntax Error: invalid syntax

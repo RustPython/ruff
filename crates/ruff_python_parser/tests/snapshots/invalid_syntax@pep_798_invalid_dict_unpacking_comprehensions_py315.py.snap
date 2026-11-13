@@ -71,6 +71,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -83,6 +84,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -107,18 +110,11 @@ Module(
                                     },
                                 ),
                             ),
-                            value: Starred(
-                                ExprStarred {
+                            value: Name(
+                                ExprName {
                                     node_index: NodeIndex(None),
-                                    range: 74..76,
-                                    value: Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 75..76,
-                                            id: Name("v"),
-                                            ctx: Load,
-                                        },
-                                    ),
+                                    range: 75..76,
+                                    id: Name("v"),
                                     ctx: Load,
                                 },
                             ),
@@ -150,6 +146,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -162,6 +159,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -222,6 +221,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -234,6 +234,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -294,6 +296,7 @@ Module(
                                             ],
                                             ctx: Store,
                                             parenthesized: false,
+                                            runtime_elts: None,
                                         },
                                     ),
                                     iter: Name(
@@ -306,6 +309,8 @@ Module(
                                     ),
                                     ifs: [],
                                     is_async: false,
+                                    runtime_ifs: None,
+                                    runtime_is_async: None,
                                 },
                             ],
                         },
@@ -313,6 +318,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -321,7 +327,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.15"}
 2 | {*k: v for k, v in items}
-  |  ^^ Syntax Error: Starred expression cannot be used here
+  |  ^ Syntax Error: invalid syntax
 3 | {k: *v for k, v in items}
 4 | {**k: v for k, v in items}
   |
@@ -331,7 +337,7 @@ Module(
 1 | # parse_options: {"target-version": "3.15"}
 2 | {*k: v for k, v in items}
 3 | {k: *v for k, v in items}
-  |     ^^ Syntax Error: Starred expression cannot be used here
+  |     ^^ Syntax Error: cannot use a starred expression in a dictionary value
 4 | {**k: v for k, v in items}
 5 | {k: **v for k, v in items}
   |
@@ -341,7 +347,7 @@ Module(
 2 | {*k: v for k, v in items}
 3 | {k: *v for k, v in items}
 4 | {**k: v for k, v in items}
-  |  ^^^ Syntax Error: Starred expression cannot be used here
+  |  ^ Syntax Error: invalid syntax
 5 | {k: **v for k, v in items}
   |
 
@@ -350,4 +356,4 @@ Module(
 3 | {k: *v for k, v in items}
 4 | {**k: v for k, v in items}
 5 | {k: **v for k, v in items}
-  |     ^^^ Syntax Error: Starred expression cannot be used here
+  |     ^ Syntax Error: invalid syntax

@@ -13,7 +13,7 @@ Module(
             FunctionDef(
                 StmtFunctionDef {
                     node_index: NodeIndex(None),
-                    range: 0..23,
+                    range: 0..22,
                     is_async: false,
                     decorator_list: [],
                     name: Identifier {
@@ -23,7 +23,7 @@ Module(
                     },
                     type_params: None,
                     parameters: Parameters {
-                        range: 7..17,
+                        range: 7..18,
                         node_index: NodeIndex(None),
                         posonlyargs: [],
                         args: [
@@ -39,6 +39,8 @@ Module(
                                         node_index: NodeIndex(None),
                                     },
                                     annotation: None,
+                                    runtime_type_comment: None,
+                                    runtime_type_comment_bytes: None,
                                 },
                                 default: None,
                             },
@@ -53,21 +55,24 @@ Module(
                                     node_index: NodeIndex(None),
                                 },
                                 annotation: None,
+                                runtime_type_comment: None,
+                                runtime_type_comment_bytes: None,
                             },
                         ),
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
                         Expr(
                             StmtExpr {
                                 node_index: NodeIndex(None),
-                                range: 17..23,
+                                range: 18..22,
                                 value: Tuple(
                                     ExprTuple {
                                         node_index: NodeIndex(None),
-                                        range: 17..23,
+                                        range: 18..22,
                                         elts: [
                                             NumberLiteral(
                                                 ExprNumberLiteral {
@@ -89,12 +94,17 @@ Module(
                                             ),
                                         ],
                                         ctx: Load,
-                                        parenthesized: true,
+                                        parenthesized: false,
+                                        runtime_elts: None,
                                     },
                                 ),
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             Expr(
@@ -110,6 +120,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -117,19 +128,29 @@ Module(
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                 ^ Syntax Error: Parameter with `*` or `**` cannot have default value
+  |                 ^ Syntax Error: var-positional argument cannot have default value
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                  ^ Syntax Error: Expected `)`, found `(`
+  |                  ^ Syntax Error: invalid syntax
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                        ^ Syntax Error: Expected newline, found `)`
+  |                   ^ Syntax Error: invalid syntax
 
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                         ^ Syntax Error: Expected a statement
+  |                       ^ Syntax Error: invalid syntax
+
+
+  |
+1 | def foo(a, *args=(1, 2)): ...
+  |                        ^ Syntax Error: unmatched ')'
+
+
+  |
+1 | def foo(a, *args=(1, 2)): ...
+  |                         ^ Syntax Error: invalid syntax

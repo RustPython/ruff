@@ -102,6 +102,10 @@ fn format_function_header(f: &mut PyFormatter, item: &StmtFunctionDef) -> Format
         parameters,
         returns,
         body: _,
+        runtime_decorator_list: _,
+        runtime_type_comment: _,
+        runtime_type_comment_bytes: _,
+        runtime_body: _,
     } = item;
 
     let comments = f.context().comments().clone();

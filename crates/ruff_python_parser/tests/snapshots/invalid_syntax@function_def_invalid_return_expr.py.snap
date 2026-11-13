@@ -30,38 +30,45 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
-                    returns: Some(
-                        Starred(
-                            ExprStarred {
+                    returns: None,
+                    body: [
+                        AnnAssign(
+                            StmtAnnAssign {
                                 node_index: NodeIndex(None),
-                                range: 13..17,
-                                value: Name(
-                                    ExprName {
+                                range: 13..22,
+                                target: Starred(
+                                    ExprStarred {
                                         node_index: NodeIndex(None),
-                                        range: 14..17,
-                                        id: Name("int"),
-                                        ctx: Load,
+                                        range: 13..17,
+                                        value: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 14..17,
+                                                id: Name("int"),
+                                                ctx: Store,
+                                            },
+                                        ),
+                                        ctx: Store,
                                     },
                                 ),
-                                ctx: Load,
-                            },
-                        ),
-                    ),
-                    body: [
-                        Expr(
-                            StmtExpr {
-                                node_index: NodeIndex(None),
-                                range: 19..22,
-                                value: EllipsisLiteral(
+                                annotation: EllipsisLiteral(
                                     ExprEllipsisLiteral {
                                         node_index: NodeIndex(None),
                                         range: 19..22,
                                     },
                                 ),
+                                value: None,
+                                simple: false,
+                                runtime_simple: None,
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -84,6 +91,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: Some(
                         Starred(
@@ -116,6 +124,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -138,42 +150,50 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
-                    returns: Some(
-                        Yield(
-                            ExprYield {
-                                node_index: NodeIndex(None),
-                                range: 61..68,
-                                value: Some(
-                                    Name(
-                                        ExprName {
-                                            node_index: NodeIndex(None),
-                                            range: 67..68,
-                                            id: Name("x"),
-                                            ctx: Load,
-                                        },
-                                    ),
-                                ),
-                            },
-                        ),
-                    ),
+                    returns: None,
                     body: [
-                        Expr(
-                            StmtExpr {
+                        AnnAssign(
+                            StmtAnnAssign {
                                 node_index: NodeIndex(None),
-                                range: 70..73,
-                                value: EllipsisLiteral(
+                                range: 61..73,
+                                target: Yield(
+                                    ExprYield {
+                                        node_index: NodeIndex(None),
+                                        range: 61..68,
+                                        value: Some(
+                                            Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 67..68,
+                                                    id: Name("x"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                annotation: EllipsisLiteral(
                                     ExprEllipsisLiteral {
                                         node_index: NodeIndex(None),
                                         range: 70..73,
                                     },
                                 ),
+                                value: None,
+                                simple: false,
+                                runtime_simple: None,
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -181,7 +201,15 @@ Module(
 
   |
 1 | def foo() -> *int: ...
-  |              ^^^^ Syntax Error: Starred expression cannot be used here
+  |           ^^ Syntax Error: expected ':'
+2 | def foo() -> (*int): ...
+3 | def foo() -> yield x: ...
+  |
+
+
+  |
+1 | def foo() -> *int: ...
+  |              ^ Syntax Error: expected ':'
 2 | def foo() -> (*int): ...
 3 | def foo() -> yield x: ...
   |
@@ -190,7 +218,7 @@ Module(
   |
 1 | def foo() -> *int: ...
 2 | def foo() -> (*int): ...
-  |               ^^^^ Syntax Error: Starred expression cannot be used here
+  |               ^^^^ Syntax Error: cannot use starred expression here
 3 | def foo() -> yield x: ...
   |
 
@@ -199,13 +227,11 @@ Module(
 1 | def foo() -> *int: ...
 2 | def foo() -> (*int): ...
 3 | def foo() -> yield x: ...
-  |              ^^^^^^^ Syntax Error: Yield expression cannot be used here
+  |           ^^ Syntax Error: expected ':'
 
-
-## Semantic Syntax Errors
 
   |
 1 | def foo() -> *int: ...
 2 | def foo() -> (*int): ...
 3 | def foo() -> yield x: ...
-  |              ^^^^^^^ Syntax Error: yield expression cannot be used within a type annotation
+  |              ^^^^^ Syntax Error: expected ':'

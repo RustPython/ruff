@@ -48,11 +48,13 @@ Module(
                                 ),
                             ],
                             ctx: Load,
+                            runtime_elts: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -61,4 +63,10 @@ Module(
   |
 1 | # The comma between the first two elements is expected in `parse_list_expression`.
 2 | [0, 1 2]
-  |       ^ Syntax Error: Expected `,`, found int
+  |     ^^^ Syntax Error: invalid syntax. Perhaps you forgot a comma?
+
+
+  |
+1 | # The comma between the first two elements is expected in `parse_list_expression`.
+2 | [0, 1 2]
+  |       ^ Syntax Error: invalid syntax

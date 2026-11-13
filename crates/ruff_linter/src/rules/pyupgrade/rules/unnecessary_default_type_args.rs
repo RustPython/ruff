@@ -87,6 +87,7 @@ pub(crate) fn unnecessary_default_type_args(checker: &Checker, expr: &Expr) {
         range: _,
         node_index: _,
         parenthesized: _,
+        runtime_elts: _,
     }) = slice.as_ref()
     else {
         return;
@@ -131,6 +132,7 @@ pub(crate) fn unnecessary_default_type_args(checker: &Checker, expr: &Expr) {
                             range: TextRange::default(),
                             node_index: ruff_python_ast::AtomicNodeIndex::NONE,
                             parenthesized: true,
+                            runtime_elts: None,
                         })
                     }),
                     ctx: ast::ExprContext::Load,

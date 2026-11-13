@@ -56,22 +56,22 @@ package = "ruff_notebook"
 package = "ruff_options_metadata"
 
 [[doctest]]
-package = "ruff_python_ast"
+package = "rustpython-ruff_python_ast"
 
 [[doctest]]
-package = "ruff_python_parser"
+package = "rustpython-ruff_python_parser"
 
 [[doctest]]
 package = "ruff_python_stdlib"
 
 [[doctest]]
-package = "ruff_python_trivia"
+package = "rustpython-ruff_python_trivia"
 
 [[doctest]]
-package = "ruff_source_file"
+package = "rustpython-ruff_source_file"
 
 [[doctest]]
-package = "ruff_text_size"
+package = "rustpython-ruff_text_size"
 
 [[doctest]]
 package = "ruff_workspace"

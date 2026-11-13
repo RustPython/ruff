@@ -52,6 +52,9 @@ Module(
                                                             elements: [],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -64,6 +67,8 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
@@ -118,6 +123,9 @@ Module(
                                                             ],
                                                         },
                                                     ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
                                                 },
                                             ),
                                         ],
@@ -130,11 +138,14 @@ Module(
                                     },
                                 ),
                             },
+                            runtime_template_str: None,
+                            runtime_values: None,
                         },
                     ),
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -143,7 +154,7 @@ Module(
   |
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"hello {x:"
-  |            ^ Syntax Error: t-string: expecting `}`
+  |            ^ Syntax Error: t-string: expecting '}', or format specs
 3 | t"hello {x:.3f"
   |
 
@@ -152,4 +163,4 @@ Module(
 1 | # parse_options: {"target-version": "3.14"}
 2 | t"hello {x:"
 3 | t"hello {x:.3f"
-  |               ^ Syntax Error: t-string: expecting `}`
+  |               ^ Syntax Error: t-string: expecting '}', or format specs

@@ -76,6 +76,7 @@ Module(
                                     ],
                                     ctx: Load,
                                     parenthesized: false,
+                                    runtime_elts: None,
                                 },
                             ),
                         },
@@ -83,6 +84,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -92,7 +94,7 @@ Module(
 1 | # Yield from doesn't allow top-level starred expression unlike yield
 2 |
 3 | yield from *x
-  |            ^^ Syntax Error: Starred expression cannot be used here
+  |            ^ Syntax Error: invalid syntax
 4 | yield from *x, y
   |
 
@@ -100,4 +102,4 @@ Module(
   |
 3 | yield from *x
 4 | yield from *x, y
-  |            ^^ Syntax Error: Starred expression cannot be used here
+  |            ^ Syntax Error: invalid syntax

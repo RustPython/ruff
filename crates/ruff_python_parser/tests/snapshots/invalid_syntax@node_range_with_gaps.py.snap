@@ -30,9 +30,14 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -55,6 +60,7 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [
@@ -71,6 +77,10 @@ Module(
                             },
                         ),
                     ],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
             FunctionDef(
@@ -93,12 +103,18 @@ Module(
                         vararg: None,
                         kwonlyargs: [],
                         kwarg: None,
+                        runtime_defaults: None,
                     },
                     returns: None,
                     body: [],
+                    runtime_decorator_list: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -106,7 +122,7 @@ Module(
 
   |
 1 | def foo # comment
-  |                  ^ Syntax Error: Expected `(`, found newline
+  |                  ^ Syntax Error: expected '('
 2 | def bar(): ...
 3 | def baz
   |
@@ -115,7 +131,7 @@ Module(
   |
 1 | def foo # comment
 2 | def bar(): ...
-  | ^^^ Syntax Error: Expected `)`, found `def`
+  | ^^^ Syntax Error: invalid syntax
 3 | def baz
   |
 
@@ -124,10 +140,10 @@ Module(
 1 | def foo # comment
 2 | def bar(): ...
 3 | def baz
-  |        ^ Syntax Error: Expected `(`, found newline
+  |        ^ Syntax Error: expected '('
 
 
   |
 2 | def bar(): ...
 3 | def baz
-  |        ^ Syntax Error: Expected `)`, found end of file
+  |        ^ Syntax Error: invalid syntax

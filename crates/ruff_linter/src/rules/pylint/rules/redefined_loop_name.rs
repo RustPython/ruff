@@ -325,6 +325,7 @@ fn assignment_targets_from_expr<'a>(
             elts,
             range: _,
             node_index: _,
+            runtime_elts: _,
         }) => Box::new(
             elts.iter()
                 .flat_map(|elt| assignment_targets_from_expr(elt, dummy_variable_rgx)),
@@ -335,6 +336,7 @@ fn assignment_targets_from_expr<'a>(
             range: _,
             node_index: _,
             parenthesized: _,
+            runtime_elts: _,
         }) => Box::new(
             elts.iter()
                 .flat_map(|elt| assignment_targets_from_expr(elt, dummy_variable_rgx)),

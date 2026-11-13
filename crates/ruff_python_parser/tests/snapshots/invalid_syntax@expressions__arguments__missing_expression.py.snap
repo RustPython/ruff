@@ -41,6 +41,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -87,6 +89,8 @@ Module(
                                         ),
                                     },
                                 ],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -137,6 +141,8 @@ Module(
                                     ),
                                 ],
                                 keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
                             },
                         },
                     ),
@@ -157,6 +163,7 @@ Module(
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -164,7 +171,7 @@ Module(
 
   |
 1 | call( = 1)
-  |       ^ Syntax Error: Expected an expression or a ')'
+  |       ^ Syntax Error: invalid syntax
 2 | call(x = )
 3 | call(*, y)
   |
@@ -173,7 +180,15 @@ Module(
   |
 1 | call( = 1)
 2 | call(x = )
-  |          ^ Syntax Error: Expected an expression
+  |      ^^^ Syntax Error: expected argument value expression
+3 | call(*, y)
+  |
+
+
+  |
+1 | call( = 1)
+2 | call(x = )
+  |          ^ Syntax Error: invalid syntax
 3 | call(*, y)
   |
 
@@ -182,7 +197,7 @@ Module(
 1 | call( = 1)
 2 | call(x = )
 3 | call(*, y)
-  |       ^ Syntax Error: Expected an expression
+  |       ^ Syntax Error: Invalid star expression
 4 |
 5 | foo
   |

@@ -184,6 +184,7 @@ fn is_explicit_concatenation(expr: &Expr) -> Option<bool> {
         Expr::BytesLiteral(_) => Some(false),
         Expr::NoneLiteral(_) => Some(false),
         Expr::IpyEscapeCommand(_) => Some(false),
+        Expr::Constant(_) => None,
 
         // Conditionally strings.
         Expr::Named(ast::ExprNamed { value, .. }) => is_explicit_concatenation(value),

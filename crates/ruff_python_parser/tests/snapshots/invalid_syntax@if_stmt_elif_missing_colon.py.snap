@@ -52,6 +52,8 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                         ElifElseClause {
                             range: 31..45,
@@ -65,11 +67,15 @@ Module(
                                     },
                                 ),
                             ],
+                            runtime_body: None,
+                            runtime_orelse: None,
                         },
                     ],
+                    runtime_body: None,
                 },
             ),
         ],
+        runtime_body: None,
     },
 )
 ```
@@ -79,7 +85,7 @@ Module(
 1 | if x:
 2 |     pass
 3 | elif y
-  |       ^ Syntax Error: Expected `:`, found newline
+  |       ^ Syntax Error: expected ':'
 4 |     pass
 5 | else:
 6 |     pass
