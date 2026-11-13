@@ -488,7 +488,7 @@ class Base(Protocol): ...
 @runtime_checkable
 class Concrete(Base): ...
 
-@runtime_checkable  # no diagnostic
+@runtime_checkable  # ok
 class Subprotocol(Base, Protocol): ...
 ```
 
@@ -505,7 +505,7 @@ class P(Protocol): ...
 
 runtime_checkable(NotAProtocol)  # error: [invalid-argument-type] "`runtime_checkable` can only be applied to protocol classes"
 runtime_checkable_extensions(cls=NotAProtocol)  # error: [invalid-argument-type]
-runtime_checkable(P)  # no diagnostic
+runtime_checkable(P)  # ok
 ```
 
 ## `runtime_checkable` in stub files
@@ -515,7 +515,7 @@ In a stub file, a class can inherit from `Protocol` through an alias defined lat
 ```pyi
 from typing import runtime_checkable
 
-@runtime_checkable  # no diagnostic
+@runtime_checkable  # ok
 class P(ProtocolAlias): ...
 
 from typing import Protocol as ProtocolAlias
@@ -539,7 +539,7 @@ from typing import Protocol, runtime_checkable
 
 class P(Protocol): ...
 
-@runtime_checkable  # no diagnostic
+@runtime_checkable  # ok
 @lambda cls: P
 class Replaced: ...
 ```
@@ -588,19 +588,19 @@ python-version = "3.12"
 ```py
 from typing_extensions import Protocol
 
-# error: [call-non-callable]
+# error: [not-callable]
 reveal_type(Protocol())  # revealed: Unknown
 
 class MyProtocol(Protocol):
     x: int
 
-# error: [call-non-callable] "Cannot instantiate class `MyProtocol`"
+# error: [abstract-class-instantiation] "Cannot instantiate class `MyProtocol`"
 reveal_type(MyProtocol())  # revealed: MyProtocol
 
 class GenericProtocol[T](Protocol):
     x: T
 
-# error: [call-non-callable] "Cannot instantiate class `GenericProtocol`"
+# error: [abstract-class-instantiation] "Cannot instantiate class `GenericProtocol`"
 reveal_type(GenericProtocol[int]())  # revealed: GenericProtocol[int]
 ```
 
@@ -1087,7 +1087,7 @@ reveal_type(ExplicitSubclass.x)  # revealed: int
 
 def f(arg: HasXWithDefault):
     # `arg` may be an implicit subtype that does not define `x` on its class object.
-    type(arg).x  # error: [unresolved-attribute]
+    type(arg).x  # error: [missing-attribute]
 ```
 
 Assignments in a class body of a protocol -- of any kind -- are not permitted by ty unless the
@@ -1246,7 +1246,7 @@ class AssignmentForms(Protocol):
         [None for self.from_comprehension in [1]]  # error: [ambiguous-protocol-member]
 
     def augmented_assignment(self) -> None:
-        # error: [unresolved-attribute]
+        # error: [missing-attribute]
         self.augmented += 1  # snapshot: ambiguous-protocol-member
 ```
 
@@ -3030,7 +3030,7 @@ class MetaWithOverloadedSetAttr(type):
     def __setattr__(cls, attr: Literal["x"], value: Any) -> None: ...
     @overload
     def __setattr__(cls, attr: Literal["y"], value: int) -> None: ...
-    # error: [invalid-method-override]
+    # error: [incompatible-method-override]
     def __setattr__(cls, attr: str, value: object) -> None: ...
 
 class ClassWithOverloadedSetAttr(metaclass=MetaWithOverloadedSetAttr): ...
@@ -3256,8 +3256,8 @@ class C: ...
 def takes_instance(value: JustObject) -> None: ...
 def takes_class(value: type[JustObject]) -> None: ...
 
-takes_instance(object())  # no diagnostic
-takes_class(object)  # no diagnostic
+takes_instance(object())  # ok
+takes_class(object)  # ok
 
 takes_instance(C())  # error: [invalid-argument-type]
 takes_class(C)  # error: [invalid-argument-type]
@@ -3320,7 +3320,7 @@ from ty_extensions import static_assert
 from ty_extensions._internal import is_equivalent_to
 
 class ReturnsSelf(Protocol):
-    # error: [invalid-method-override]
+    # error: [incompatible-method-override]
     def __eq__(self, other: object) -> Self: ...
 
 static_assert(not is_equivalent_to(ReturnsSelf, object))
@@ -3394,6 +3394,28 @@ has_name: HasName = WithName()
 reveal_type(has_name.name)  # revealed: str
 has_name.name = "updated"
 has_name.name = 1  # error: [invalid-assignment]
+```
+
+### Setter-only descriptors
+
+Reading a protocol member decorated with a setter-only descriptor returns the descriptor itself.
+Assignments accept the setter's value type.
+
+```py
+from typing import Protocol
+
+class IntSetter:
+    def __init__(self, method: object) -> None: ...
+    def __set__(self, instance: object, value: int) -> None: ...
+
+class HasValue(Protocol):
+    @IntSetter
+    def value(self) -> None: ...
+
+def update(obj: HasValue, descriptor: IntSetter) -> None:
+    reveal_type(obj.value)  # revealed: IntSetter
+    obj.value = 1  # ok
+    obj.value = descriptor  # error: [invalid-assignment]
 ```
 
 ### `cached_property`
@@ -4032,7 +4054,7 @@ class HasGenericValue(Protocol):
     def value(self) -> object: ...
 
 def update(value: HasGenericValue, accepted: Swapped[str, int], rejected: Swapped[str, str]) -> None:
-    value.value = accepted  # no diagnostic
+    value.value = accepted  # ok
     value.value = rejected  # error: [invalid-assignment]
 ```
 
@@ -4068,7 +4090,7 @@ class HasValue(Protocol):
     def value(self) -> int: ...
 
 def _(x: HasValue, value: Recursive[int]) -> None:
-    x.value = value  # no diagnostic
+    x.value = value  # ok
     x.value = 1  # error: [invalid-assignment]
 ```
 
@@ -4122,7 +4144,7 @@ class HasPayload(Protocol):
     def value(self) -> int: ...
 
 def _(x: HasPayload, value: Payload[int]) -> None:
-    x.value = value  # no diagnostic
+    x.value = value  # ok
     x.value = 1  # error: [invalid-assignment]
 ```
 
@@ -4152,7 +4174,7 @@ class HasAlias(Protocol):
     def value(self) -> int: ...
 
 def _(x: HasAlias, value: RecursiveAlias[int]) -> None:
-    x.value = value  # no diagnostic
+    x.value = value  # ok
     x.value = 1  # error: [invalid-assignment]
 ```
 
@@ -4290,7 +4312,7 @@ class HasValue(Protocol):
     def value(self) -> int: ...
 
 def _(x: HasValue) -> None:
-    x.value = 1  # no diagnostic
+    x.value = 1  # ok
     x.value = "bad"  # error: [invalid-assignment]
 ```
 
@@ -4832,7 +4854,7 @@ class Implementation:
     def method(receiver: Receiver) -> None: ...
 
 def check(value: Implementation) -> Required:
-    return value  # no diagnostic
+    return value  # ok
 ```
 
 ## Recursive protocol receiver binding
@@ -4860,7 +4882,7 @@ class DateTime(Protocol[T]):
     def __sub__(self: DateTime[tzinfo], other: DateTime[tzinfo]) -> timedelta: ...
     @classmethod
     def now(cls, tz: Optional[tzinfo] = None) -> DateTime[Optional[tzinfo]]:
-        return datetime.now(tz)  # error: [invalid-return-type]
+        return datetime.now(tz)  # error: [invalid-explicit-return]
 ```
 
 ## Recursive protocol receiver binding with an incompatible override
@@ -4890,7 +4912,7 @@ class Compatible(SupportsMethod[T_co]):
         raise NotImplementedError
 
 class Incompatible(SupportsMethod[T_co]):
-    def method(self: "Incompatible[T]", value: int) -> Result[T]:  # error: [invalid-method-override]
+    def method(self: "Incompatible[T]", value: int) -> Result[T]:  # error: [incompatible-method-override]
         raise NotImplementedError
 ```
 
@@ -5997,7 +6019,7 @@ class NObject:
 
 class NStaticMethodShadowed(NStaticMethodGood):
     def __init__(self) -> None:
-        self.x: int = 1  # error: [invalid-attribute-override]
+        self.x: int = 1  # error: [incompatible-attribute-override]
 
 class PFactory(Protocol):
     @classmethod
@@ -6736,9 +6758,8 @@ class SequenceMaker(Protocol[T]):
 
 static_assert(is_subtype_of(TypeOf[list[int]], SequenceMaker[int]))
 
-# TODO: these should pass
-static_assert(is_subtype_of(TypeOf[tuple[str, ...]], SequenceMaker[str]))  # error: [static-assert-error]
-static_assert(is_subtype_of(TypeOf[tuple[str, ...]], SequenceMaker[int | str]))  # error: [static-assert-error]
+static_assert(is_subtype_of(TypeOf[tuple[str, ...]], SequenceMaker[str]))
+static_assert(not is_subtype_of(TypeOf[tuple[str, ...]], SequenceMaker[int | str]))
 ```
 
 Specializing a type variable to `Any` does not make variadic parameters gradual. The gradual form
@@ -6907,11 +6928,11 @@ class X(Protocol):
     x: int
 
 class YProto(X, Protocol):
-    x: None = None  # error: [invalid-attribute-override]
+    x: None = None  # error: [incompatible-attribute-override]
 
 @final
 class YNominal(X):
-    x: None = None  # error: [invalid-attribute-override]
+    x: None = None  # error: [incompatible-attribute-override]
 
 static_assert(is_subtype_of(YProto, X))
 static_assert(is_subtype_of(YNominal, X))
@@ -7765,6 +7786,32 @@ def inspect[T]() -> None:
     reveal_type(constraints.solutions_for(T, inferable=tuple[T]))  # revealed: tuple[Solution[T=int]]
 ```
 
+### Protocols in the arguments of runtime alias objects
+
+The `Node[int]` in `Tag[Node[int]]` is an argument of a runtime alias object. Comparing the return
+types of `pair` can infer `T` from the first tuple element without comparing another `Node`.
+
+```toml
+[environment]
+python-version = "3.12"
+```
+
+```py
+from __future__ import annotations
+
+from typing import Protocol
+from ty_extensions._internal import TypeOf, is_constraint_set_assignable_to
+
+type Tag[T] = int
+
+class Node[T](Protocol):
+    def pair(self) -> tuple[T, TypeOf[Tag[Node[int]]]]: ...
+
+def inspect[T]() -> None:
+    constraints = is_constraint_set_assignable_to(Node[str], Node[T])
+    reveal_type(constraints.solutions_for(T, inferable=tuple[T]))  # revealed: tuple[Solution[T=str]]
+```
+
 ### Growing aliases in recursive protocol requirements
 
 A recursive alias can change its specialization every time its definition is expanded. Finite
@@ -7954,7 +8001,7 @@ class Readable(Protocol):
 static_assert(is_subtype_of(Node[str], Node[int]))
 
 def check(node: Node[str]) -> Readable:
-    return node  # no diagnostic
+    return node  # ok
 
 T = TypeVar("T", covariant=True)
 
@@ -7965,7 +8012,7 @@ class LegacyNode(Protocol[T]):
 static_assert(is_subtype_of(LegacyNode[str], LegacyNode[int]))
 
 def check_legacy(node: LegacyNode[str]) -> Readable:
-    return node  # no diagnostic
+    return node  # ok
 ```
 
 ### Explicit receivers on overloaded recursive protocol methods
@@ -8076,7 +8123,7 @@ def extract[U](node: Node[U]) -> U:
 
 # The structural solution includes both `value`'s `Literal[1]` and `child`'s `str`.
 # Intersecting it with the inherited `Node[object]` solution preserves that precision.
-reveal_type(extract(Mismatched(1)))  # revealed: str | Literal[1]
+reveal_type(extract(Mismatched(1)))  # revealed: Literal[1] | str
 ```
 
 ### Recursive legacy generic protocol
@@ -8146,15 +8193,15 @@ from ty_extensions import static_assert
 from ty_extensions._internal import is_subtype_of, is_equivalent_to, is_disjoint_from
 
 class HasRepr(Protocol):
-    # error: [invalid-method-override]
+    # error: [incompatible-method-override]
     def __repr__(self) -> object: ...
 
 class HasReprRecursive(Protocol):
-    # error: [invalid-method-override]
+    # error: [incompatible-method-override]
     def __repr__(self) -> "HasReprRecursive": ...
 
 class HasReprRecursiveAndFoo(Protocol):
-    # error: [invalid-method-override]
+    # error: [incompatible-method-override]
     def __repr__(self) -> "HasReprRecursiveAndFoo": ...
     foo: int
 
@@ -8203,7 +8250,7 @@ class Foo(Protocol):
 
 def _(f: type[Foo]):
     reveal_type(f)  # revealed: type[Foo]
-    f.x  # error: [unresolved-attribute]
+    f.x  # error: [missing-attribute]
     f.x = 1  # error: [invalid-assignment]
     reveal_type(f.y)  # revealed: str
     f.y = "foo"  # fine
@@ -8395,7 +8442,7 @@ class MissingProperty: ...
 static_assert(not is_assignable_to(TypeOf[MissingProperty], type[PropertyProtocol]))
 
 def _(cls: type[PropertyProtocol]) -> None:
-    cls.value  # error: [unresolved-attribute]
+    cls.value  # error: [missing-attribute]
 ```
 
 Protocol and abstract class objects are accepted as inhabitants of `type[Foo]`. This is

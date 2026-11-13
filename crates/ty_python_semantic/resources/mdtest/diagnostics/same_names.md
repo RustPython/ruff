@@ -197,7 +197,7 @@ class MyClass: ...
 def get_MyClass() -> MyClass:
     from . import make_MyClass
 
-    # error: [invalid-return-type] "Return type does not match returned value: expected `package.foo.MyClass @ src/package/foo.py:1:7`, found `package.foo.MyClass @ src/package/foo.pyi:1:7`"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `package.foo.MyClass @ src/package/foo.py:1:7`, found `package.foo.MyClass @ src/package/foo.pyi:1:7`"
     return make_MyClass()
 ```
 
@@ -334,7 +334,7 @@ from typing import Iterator
 def f() -> Iterator[str]:
     import bad
 
-    # error: [invalid-return-type] "Return type does not match returned value: expected `typing.Iterator[str]`, found `bad.Iterator[str]"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `typing.Iterator[str]`, found `bad.Iterator[str]"
     return bad.bad()
 ```
 
@@ -412,7 +412,7 @@ class Model: ...
 def get_models_tuple() -> tuple[Model]:
     from module import Model
 
-    # error: [invalid-return-type] "Return type does not match returned value: expected `tuple[mdtest_snippet.Model]`, found `tuple[module.Model]`"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `tuple[mdtest_snippet.Model]`, found `tuple[module.Model]`"
     return (Model(),)
 ```
 
@@ -519,7 +519,7 @@ import first
 import second
 
 def missing_attribute(value: first.Model | second.Model) -> int:
-    # error: [unresolved-attribute] "Attribute `present` is not defined on `second.Model` in union `first.Model | second.Model`"
+    # error: [missing-union-attribute] "Attribute `present` is not defined on `second.Model` in union `first.Model | second.Model`"
     return value.present
 ```
 
@@ -558,7 +558,7 @@ type Model = first.Present | second.Model
 from alias import Model
 
 def missing_attribute(value: Model) -> int:
-    # error: [unresolved-attribute] "Attribute `present` is not defined on `second.Model` in union `alias.Model`"
+    # error: [missing-union-attribute] "Attribute `present` is not defined on `second.Model` in union `alias.Model`"
     return value.present
 ```
 
@@ -580,7 +580,7 @@ if coinflip():
 else:
     class Model: ...
 
-# error: [unresolved-attribute] "Attribute `present` is not defined on `test.Model @ src/test.py:9:11` in union `test.Model @ src/test.py:5:11 | test.Model @ src/test.py:9:11`"
+# error: [missing-union-attribute] "Attribute `present` is not defined on `test.Model @ src/test.py:9:11` in union `test.Model @ src/test.py:5:11 | test.Model @ src/test.py:9:11`"
 Model().present
 ```
 
@@ -760,7 +760,7 @@ class Different:
 import first
 import second
 
-# error: [invalid-method-override] "Base classes for class `mdtest_snippet.Model` define method `method` incompatibly: `first.Model.method` is incompatible with `Different.method`"
+# error: [incompatible-method-override] "Base classes for class `mdtest_snippet.Model` define method `method` incompatibly: `first.Model.method` is incompatible with `Different.method`"
 class Model(first.Model, second.Different): ...
 ```
 

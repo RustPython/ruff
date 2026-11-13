@@ -1,5 +1,7 @@
 //! Compatibility of the values read from and written to inherited attributes.
 
+use std::cell::{LazyCell, OnceCell};
+
 use ruff_db::diagnostic::Annotation;
 use ruff_python_ast::name::Name;
 use ruff_python_stdlib::identifiers::is_mangled_private;
@@ -9,17 +11,20 @@ use ty_python_core::{
 };
 
 use crate::{
-    Db, ProgramEnvironment,
+    Db, Program, ProgramEnvironment,
     lint::LintMetadata,
-    place::{DefinedPlace, Place, TypeOrigin},
+    place::{DefinedPlace, Place, PlaceAndQualifiers, TypeOrigin},
     types::{
-        ClassBase, ClassType, InstanceFallbackShadowsNonDataDescriptor, IntersectionType,
-        KnownInstanceType, MemberLookupPolicy, StaticClassLiteral, Type, TypeQualifiers,
+        ClassBase, ClassLiteral, ClassType, InstanceFallbackShadowsNonDataDescriptor,
+        IntersectionType, KnownInstanceType, MemberLookupPolicy, StaticClassLiteral, Type,
+        TypeQualifiers,
         attribute_write::{DescriptorSetterDomain, descriptor_setter_domain},
         class::CodeGeneratorKind,
         context::InferContext,
+        dedicated::django,
         diagnostic::{
-            INVALID_ATTRIBUTE_OVERRIDE, INVALID_MUTABLE_OVERRIDE, INVALID_PROPERTY_TYPE_OVERRIDE,
+            INCOMPATIBLE_ATTRIBUTE_OVERRIDE, INCOMPATIBLE_MUTABLE_OVERRIDE,
+            INCOMPATIBLE_PROPERTY_OVERRIDE,
         },
     },
 };
@@ -32,16 +37,33 @@ struct AttributeContract<'db> {
     read: Type<'db>,
     write: Option<Type<'db>>,
     is_property: bool,
-    is_method: bool,
+    method_kind: AttributeMethodKind,
     is_frozen_field: bool,
     qualifiers: TypeQualifiers,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum AttributeMethodKind {
+    Method,
+    Wrapper,
+    Other,
+}
+
 /// An inferred default has no declared attribute contract, but its value can still
 /// provide a call signature that an overriding method needs to preserve.
-enum MemberContract<'db> {
-    Attribute(AttributeContract<'db>),
+enum MemberContract<'db, A> {
+    Attribute(A),
     Inferred(Type<'db>),
+}
+
+/// The declaration selected from one owner, before binding descriptor access or `Self`.
+struct UnboundAttribute<'db> {
+    literal: StaticClassLiteral<'db>,
+    ty: Type<'db>,
+    class_member: PlaceAndQualifiers<'db>,
+    instance_member: PlaceAndQualifiers<'db>,
+    is_descriptor: bool,
+    is_method: bool,
 }
 
 /// Selects the declaration that supplies an attribute's override contract.
@@ -68,7 +90,7 @@ enum MemberContract<'db> {
 /// checks its explicit `str` annotation and reports the incompatible override.
 /// `Inherited` retains that `str` declaration when checking `Child`, so repeating
 /// the annotation does not report the parent's conflict again.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, get_size2::GetSize, salsa::SalsaValue)]
 enum AttributeContractKind {
     /// Prefer the class member, including inherited annotations on unannotated defaults.
     ClassBody,
@@ -117,7 +139,22 @@ fn member_contract<'db>(
     receiver: Type<'db>,
     name: &str,
     kind: AttributeContractKind,
-) -> Option<MemberContract<'db>> {
+) -> Option<MemberContract<'db, AttributeContract<'db>>> {
+    match unbound_member_contract(db, env, owner, name, kind)? {
+        MemberContract::Attribute(attribute) => Some(MemberContract::Attribute(bind_attribute(
+            db, env, owner, receiver, name, &attribute,
+        )?)),
+        MemberContract::Inferred(ty) => Some(MemberContract::Inferred(ty)),
+    }
+}
+
+fn unbound_member_contract<'db>(
+    db: &'db dyn Db,
+    env: &ProgramEnvironment<'db>,
+    owner: ClassType<'db>,
+    name: &str,
+    kind: AttributeContractKind,
+) -> Option<MemberContract<'db, UnboundAttribute<'db>>> {
     // `object.__class__` is specialized by member lookup, so its synthetic `Self` is
     // not an override contract. Likewise, not every object is hashable or has a
     // writable instance dictionary, despite the broad declarations in typeshed.
@@ -133,12 +170,15 @@ fn member_contract<'db>(
     {
         return None;
     }
-    let mut class_member = owner.own_class_member(db, env, None, name).inner;
-    let instance_member = if kind != AttributeContractKind::Receiver
-        && matches!(
-            class_member.place.ignore_possibly_undefined(),
-            Some(Type::SlotDescriptor(_))
-        ) {
+    let mut class_member = if kind == AttributeContractKind::Receiver {
+        PlaceAndQualifiers::unbound()
+    } else {
+        owner.own_class_member(db, env, None, name).inner
+    };
+    let instance_member = if matches!(
+        class_member.ignore_possibly_undefined(),
+        Some(Type::SlotDescriptor(_))
+    ) {
         // A slot provides storage without replacing an inherited annotation:
         //
         // ```python
@@ -166,23 +206,18 @@ fn member_contract<'db>(
         Place::Defined(DefinedPlace { origin: TypeOrigin::Declared, provenance, .. })
             if provenance.definition().is_some_and(|definition| definition.place(db).is_member())
     );
-    if kind == AttributeContractKind::Receiver
-        || kind == AttributeContractKind::Inherited
-            && has_receiver_declaration
-            && !class_member.qualifiers.contains(TypeQualifiers::CLASS_VAR)
-            && class_member
-                .place
-                .ignore_possibly_undefined()
-                .is_none_or(|ty| {
-                    ty.class_member_with_policy(
-                        db,
-                        env,
-                        "__get__",
-                        MemberLookupPolicy::REQUIRE_CONCRETE,
-                    )
-                    .place
-                    .is_undefined()
-                })
+    // An annotation such as `type[Any]` permits values that act as descriptors, but it
+    // still declares a writable attribute unless its type supplies a descriptor method.
+    let has_descriptor_method = !class_member.is_class_var()
+        && class_member.ignore_possibly_undefined().is_some_and(|ty| {
+            !ty.class_member_with_policy(db, env, "__get__", MemberLookupPolicy::REQUIRE_CONCRETE)
+                .is_undefined()
+                || ty.has_data_descriptor_method(db, env)
+        });
+    if kind == AttributeContractKind::Inherited
+        && has_receiver_declaration
+        && !class_member.is_class_var()
+        && !has_descriptor_method
     {
         // An unannotated default may inherit an ancestor's type. It must not hide the
         // receiver declaration when this class is compared with its own subclasses.
@@ -195,37 +230,45 @@ fn member_contract<'db>(
     if matches!(own_place.ty, Type::TypeAlias(_)) {
         return None;
     }
-    let alternatives = own_place
-        .ty
-        .as_union()
-        .map_or(std::slice::from_ref(&own_place.ty), |union| {
-            union.elements(db)
-        });
-    // A decorator can turn a function into a property, in which case its exposed
-    // value must be checked instead of the original function's signature.
-    let is_method = is_method_type(db, own_place.ty);
     let qualifiers = class_member.qualifiers | instance_member.qualifiers;
-    let is_final = qualifiers.contains(TypeQualifiers::FINAL);
-    let is_class_var = qualifiers.contains(TypeQualifiers::CLASS_VAR);
-    let is_property = alternatives.iter().any(Type::is_property_instance);
-    let is_frozen_field = literal.is_frozen_dataclass(db) == Some(true)
-        && literal.is_own_dataclass_instance_field(db, name);
-    let is_slot = matches!(own_place.ty, Type::SlotDescriptor(_));
-    let is_descriptor = !is_class_var
-        && !class_member.place.is_undefined()
-        && (is_slot
-            || own_place
-                .ty
-                .class_member_with_policy(db, env, "__get__", MemberLookupPolicy::REQUIRE_CONCRETE)
-                .place
-                .ignore_possibly_undefined()
-                .is_some());
+    let is_descriptor = has_descriptor_method && !qualifiers.contains(TypeQualifiers::CLASS_VAR);
     // Unannotated defaults with an inherited annotation already have a declared type.
     // Other inferred bindings do not define an independent write contract: their raw
     // types can retain literals that ordinary attribute access widens.
     if own_place.origin == TypeOrigin::Inferred && !is_descriptor {
         return Some(MemberContract::Inferred(own_place.ty));
     }
+    // A decorator can turn a function into a property, in which case its exposed
+    // value must be checked instead of the original function's signature.
+    Some(MemberContract::Attribute(UnboundAttribute {
+        literal,
+        ty: own_place.ty,
+        class_member,
+        instance_member,
+        is_descriptor,
+        is_method: is_method_type(db, own_place.ty),
+    }))
+}
+
+fn bind_attribute<'db>(
+    db: &'db dyn Db,
+    env: &ProgramEnvironment<'db>,
+    owner: ClassType<'db>,
+    receiver: Type<'db>,
+    name: &str,
+    attribute: &UnboundAttribute<'db>,
+) -> Option<AttributeContract<'db>> {
+    let UnboundAttribute {
+        literal,
+        ty,
+        class_member,
+        instance_member,
+        is_descriptor,
+        is_method,
+    } = *attribute;
+    let qualifiers = class_member.qualifiers | instance_member.qualifiers;
+    let is_class_var = qualifiers.contains(TypeQualifiers::CLASS_VAR);
+    let is_method_wrapper = matches!(ty, Type::KnownInstance(KnownInstanceType::MethodWrapper(_)));
     let (read, write) = if is_descriptor {
         let read = Type::resolve_descriptor_access(
             db,
@@ -242,29 +285,32 @@ fn member_contract<'db>(
         .bind_self_typevars(db, env, receiver);
         // Explicit `staticmethod(f)` and `classmethod(f)` assignments expose method
         // signatures, just like decorated definitions; the function's identity can change.
-        let read = if is_method
-            || matches!(
-                own_place.ty,
-                Type::KnownInstance(KnownInstanceType::MethodWrapper(_))
-            ) {
+        let read = if is_method || is_method_wrapper {
             read.try_upcast_to_callable(db, env)?.to_type(db, env)
         } else {
             read
         };
-        let write = if is_slot {
+        let write = if matches!(ty, Type::SlotDescriptor(_)) {
             Some(
                 owner
                     .converter_input_type_for_field(db, name)
                     .unwrap_or(read),
             )
         } else {
-            descriptor_write_domain(db, env, own_place.ty, receiver, read)
+            descriptor_write_domain(
+                db,
+                env,
+                ty,
+                receiver,
+                ty.method_shadowing_contract(db, env, receiver)
+                    .unwrap_or(read),
+            )
         };
         (read, write)
     } else {
         // The selected declaration defines the contract, including inherited annotations.
         // Inferred instance assignments do not narrow a class-body declaration.
-        let read = own_place.ty.bind_self_typevars(db, env, receiver);
+        let read = ty.bind_self_typevars(db, env, receiver);
         (
             read,
             Some(
@@ -274,25 +320,35 @@ fn member_contract<'db>(
             ),
         )
     };
-    Some(MemberContract::Attribute(AttributeContract {
+    let alternatives = ty
+        .as_union()
+        .map_or(std::slice::from_ref(&ty), |union| union.elements(db));
+    let is_frozen = literal.is_frozen_dataclass(db) == Some(true);
+    Some(AttributeContract {
         read,
         // Attributes on `object` are included here because typeshed declares attributes such as
         // `__module__: str` on `object`, which normally implies writable instance attributes. But
         // `object()` provides no instance-attribute storage, so it does not actually guarantee
         // writability of these attributes.
         write: if owner.is_object(db)
-            || is_final
-            || !is_class_var && literal.is_frozen_dataclass(db) == Some(true)
+            || qualifiers.contains(TypeQualifiers::FINAL)
+            || !is_class_var && is_frozen
         {
             None
         } else {
             write
         },
-        is_property,
-        is_method,
-        is_frozen_field,
+        is_property: alternatives.iter().any(Type::is_property_instance),
+        method_kind: if is_method {
+            AttributeMethodKind::Method
+        } else if is_descriptor && is_method_wrapper {
+            AttributeMethodKind::Wrapper
+        } else {
+            AttributeMethodKind::Other
+        },
+        is_frozen_field: is_frozen && literal.is_own_dataclass_instance_field(db, name),
         qualifiers,
-    }))
+    })
 }
 
 /// Return the input type accepted by every possible descriptor or instance-storage path.
@@ -322,12 +378,7 @@ fn descriptor_write_domain<'db>(
     match descriptor_setter_domain(db, env, descriptor, receiver) {
         DescriptorSetterDomain::Known(ty) => Some(ty),
         DescriptorSetterDomain::Deferred => Some(Type::unknown()),
-        DescriptorSetterDomain::Missing
-            if descriptor.as_property_instance().is_some()
-                || descriptor.is_data_descriptor(db, env) =>
-        {
-            None
-        }
+        DescriptorSetterDomain::Missing if descriptor.has_data_descriptor_method(db, env) => None,
         DescriptorSetterDomain::Missing => Some(storage_type),
     }
 }
@@ -347,9 +398,9 @@ impl AttributeViolation<'_> {
     /// Property violations have a dedicated rule, including incompatible writes.
     const fn rule(&self, involves_property: bool) -> &'static LintMetadata {
         match self {
-            _ if involves_property => &INVALID_PROPERTY_TYPE_OVERRIDE,
-            Self::Write { .. } => &INVALID_MUTABLE_OVERRIDE,
-            Self::Read { .. } | Self::ReadOnly => &INVALID_ATTRIBUTE_OVERRIDE,
+            _ if involves_property => &INCOMPATIBLE_PROPERTY_OVERRIDE,
+            Self::Write { .. } => &INCOMPATIBLE_MUTABLE_OVERRIDE,
+            Self::Read { .. } | Self::ReadOnly => &INCOMPATIBLE_ATTRIBUTE_OVERRIDE,
         }
     }
 }
@@ -369,12 +420,24 @@ fn attribute_violation<'db>(
     source: &AttributeContract<'db>,
     target: &AttributeContract<'db>,
 ) -> Option<AttributeViolation<'db>> {
-    if source.is_method && target.is_method
+    // Django encourages a pattern where nested `Meta` classes are used for model configuration
+    // that would lead to invalid override errors. We suppress errors for that exact pattern.
+    if name == "Meta"
+        && receiver
+            .nominal_class(db, env)
+            .and_then(|class| class.static_class_literal(db))
+            .is_some_and(|(class, _)| django::is_model(db, class))
+    {
+        return None;
+    }
+    let source_is_method = source.method_kind == AttributeMethodKind::Method;
+    let target_is_method = target.method_kind == AttributeMethodKind::Method;
+    if source_is_method && target_is_method
         || target.qualifiers.contains(TypeQualifiers::FINAL)
         || !source.is_property
             && !target.is_property
-            && !source.is_method
-            && !target.is_method
+            && !source_is_method
+            && !target_is_method
             && source.qualifiers.contains(TypeQualifiers::CLASS_VAR)
                 != target.qualifiers.contains(TypeQualifiers::CLASS_VAR)
     {
@@ -385,6 +448,18 @@ fn attribute_violation<'db>(
             source: source.read,
             target: target.read,
         });
+    }
+    if target.method_kind != AttributeMethodKind::Other {
+        // ty allows methods to be shadowed with instance attributes. For example, it allows
+        // `def method(self) -> object` on `Base` to be shadowed via `base.method = lambda: 1`
+        // (where `base: Base` could also be an instance of a subclass of `Base`).
+        //
+        // We also allow overrides where the return type is covariantly narrowed because
+        // that's what users expect. We skip the write check to preserve that behavior.
+        //
+        // These two rules are unsound together. The assignment above is valid through a
+        // `Base` reference, but it would break a subclass with a return type of `str`.
+        return None;
     }
     let write = target.write?;
     // A neutral dataclass-transform base explicitly permits frozen subclasses. Its
@@ -564,7 +639,8 @@ pub(super) fn check_override<'db>(
     let target = match member_contract(db, env, superclass, receiver, name, inherited_kind) {
         Some(MemberContract::Attribute(target)) => target,
         Some(MemberContract::Inferred(target))
-            if source.is_method && target.try_upcast_to_callable(db, env).is_some() =>
+            if source.method_kind == AttributeMethodKind::Method
+                && target.try_upcast_to_callable(db, env).is_some() =>
         {
             return OverrideCheck::Callable;
         }
@@ -573,7 +649,7 @@ pub(super) fn check_override<'db>(
     // Final attributes are exempt from attribute compatibility checks, but finality
     // and signature compatibility are independent: suppressing a finality diagnostic
     // must not hide an incompatible method signature.
-    if source.is_method
+    if source.method_kind == AttributeMethodKind::Method
         && target.qualifiers.contains(TypeQualifiers::FINAL)
         && target.read.try_upcast_to_callable(db, env).is_some()
     {
@@ -662,13 +738,10 @@ pub(super) fn check_instance_overrides<'db>(
     let Some((literal, _)) = class.static_class_literal(db) else {
         return;
     };
-    for name in class.own_instance_attribute_names(db) {
+    for name in super::declared_instance_attribute_names(db, literal.body_scope(db)) {
         // Ordinary assignments introduce no override contract. Do not infer their method
         // bodies just to discard the inferred type; a lazy cache can depend on its own reads.
-        if is_mangled_private(name)
-            || name == "__hash__"
-            || !super::has_own_instance_declaration(db, literal.body_scope(db), name)
-        {
+        if is_mangled_private(name) || name == "__hash__" {
             continue;
         }
         // Avoid inferring method bodies for names that do not override anything. Ordinary
@@ -745,23 +818,20 @@ fn already_inherited<'db>(
     env: &ProgramEnvironment<'db>,
     class: ClassType<'db>,
     target_owner: ClassType<'db>,
-    name: &str,
+    name: &Name,
     source: &AttributeContract<'db>,
     kind: AttributeContractKind,
 ) -> bool {
     let child_receiver = Type::instance(db, env, class);
+    let program = env.program(db);
+    let target = target_owner.class_literal(db);
     class
         .iter_mro(db)
         .skip(1)
         .filter_map(ClassBase::into_class)
         .any(|parent| {
-            let Some(owner) = parent
-                .iter_mro(db)
-                .filter_map(ClassBase::into_class)
-                .find(|owner| {
-                    !owner.own_class_member(db, env, None, name).is_undefined()
-                        || !owner.own_instance_member(db, env, name).is_undefined()
-                })
+            let Some(owner) =
+                conflicting_parent_member(db, program, parent, target, name.clone(), kind)
             else {
                 return false;
             };
@@ -770,43 +840,70 @@ fn already_inherited<'db>(
             else {
                 return false;
             };
-            if inherited.read != source.read
-                || inherited.write != source.write
-                || inherited.is_frozen_field != source.is_frozen_field
-                || inherited.qualifiers != source.qualifiers
-            {
-                return false;
-            }
-            let receiver = Type::instance(db, env, parent);
-            let Some(MemberContract::Attribute(inherited)) =
-                member_contract(db, env, owner, receiver, name, kind)
+            inherited.read == source.read
+                && inherited.write == source.write
+                && inherited.is_frozen_field == source.is_frozen_field
+                && inherited.qualifiers == source.qualifiers
+        })
+}
+
+/// Return the owner of the parent's selected attribute if that declaration already violates
+/// a specialization of `target`. These comparisons bind to the parent, so every child can
+/// reuse them. The caller still checks how the selected declaration binds to its receiver.
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "Salsa requires owned query keys, and lint expectations cannot observe diagnostics from the generated function"
+)]
+#[salsa::tracked(returns(copy), cycle_initial=|_, _, _, _, _, _, _| None, heap_size=ruff_memory_usage::heap_size)]
+fn conflicting_parent_member<'db>(
+    db: &'db dyn Db,
+    program: Program<'db>,
+    parent: ClassType<'db>,
+    target: ClassLiteral<'db>,
+    name: Name,
+    kind: AttributeContractKind,
+) -> Option<ClassType<'db>> {
+    let env = ProgramEnvironment::from_program(program);
+    let mut ancestors = parent
+        .iter_mro(db)
+        .skip(1)
+        .filter_map(ClassBase::into_class)
+        .chain(parent.iter_explicit_ancestors(db, &env).skip(1))
+        .filter(|ancestor| ancestor.class_literal(db) == target)
+        .peekable();
+    ancestors.peek()?;
+    let owner = parent
+        .iter_mro(db)
+        .filter_map(ClassBase::into_class)
+        .find(|owner| {
+            !owner.own_class_member(db, &env, None, &name).is_undefined()
+                || !owner.own_instance_member(db, &env, &name).is_undefined()
+        })?;
+    let receiver = Type::instance(db, &env, parent);
+    let Some(MemberContract::Attribute(source)) =
+        member_contract(db, &env, owner, receiver, &name, kind)
+    else {
+        return None;
+    };
+    ancestors
+        .any(|ancestor| {
+            let Some(MemberContract::Attribute(target)) =
+                member_contract(db, &env, ancestor, receiver, &name, kind)
             else {
                 return false;
             };
-            parent
-                .iter_mro(db)
-                .skip(1)
-                .filter_map(ClassBase::into_class)
-                .chain(parent.iter_explicit_ancestors(db, env).skip(1))
-                .filter(|ancestor| ancestor.class_literal(db) == target_owner.class_literal(db))
-                .any(|ancestor| {
-                    let Some(MemberContract::Attribute(target)) =
-                        member_contract(db, env, ancestor, receiver, name, kind)
-                    else {
-                        return false;
-                    };
-                    attribute_violation(
-                        db,
-                        env,
-                        receiver,
-                        Type::instance(db, env, ancestor),
-                        name,
-                        &inherited,
-                        &target,
-                    )
-                    .is_some()
-                })
+            attribute_violation(
+                db,
+                &env,
+                receiver,
+                Type::instance(db, &env, ancestor),
+                &name,
+                &source,
+                &target,
+            )
+            .is_some()
         })
+        .then_some(owner)
 }
 
 /// Check the selected attribute against every inherited declaration of that name.
@@ -828,23 +925,52 @@ pub(super) fn check_inherited_conflict<'db>(
     class: StaticClassLiteral<'db>,
     class_type: ClassType<'db>,
     owner: ClassType<'db>,
-    contracts: &[ClassType<'db>],
+    contracts: impl Iterator<Item = ClassType<'db>>,
     name: &Name,
 ) {
     let db = context.db();
     let env = &context.program_environment();
     let receiver = Type::instance(db, env, class_type);
     let kind = AttributeContractKind::Inherited;
-    let Some(MemberContract::Attribute(source)) =
-        member_contract(db, env, owner, receiver, name, kind)
-    else {
-        return;
-    };
-    for target_owner in contracts.iter().copied().filter(|target| *target != owner) {
+    // Most inherited names occur on just one base. Only look up the selected declaration
+    // once we know another base supplies a contract for the same name.
+    let declaration = LazyCell::new(|| unbound_member_contract(db, env, owner, name, kind));
+    let source = OnceCell::new();
+    for target_owner in contracts {
         let Some(MemberContract::Attribute(target)) =
-            member_contract(db, env, target_owner, receiver, name, kind)
+            unbound_member_contract(db, env, target_owner, name, kind)
         else {
             continue;
+        };
+        let Some(MemberContract::Attribute(declaration)) = &*declaration else {
+            return;
+        };
+        // `attribute_violation` accepts two methods regardless of their read and write types,
+        // so we can skip binding them to the subclass.
+        if declaration.is_method && target.is_method {
+            continue;
+        }
+        // This owner is itself a parent of the child. If its own selected declaration already
+        // conflicts with the target, `already_inherited` would match this same declaration
+        // bound to the child. No comparison on this receiver can introduce a new error.
+        if conflicting_parent_member(
+            db,
+            env.program(db),
+            owner,
+            target_owner.class_literal(db),
+            name.clone(),
+            kind,
+        ) == Some(owner)
+        {
+            continue;
+        }
+        let Some(target) = bind_attribute(db, env, target_owner, receiver, name, &target) else {
+            continue;
+        };
+        let Some(source) =
+            source.get_or_init(|| bind_attribute(db, env, owner, receiver, name, declaration))
+        else {
+            return;
         };
         let Some(violation) = attribute_violation(
             db,
@@ -852,12 +978,12 @@ pub(super) fn check_inherited_conflict<'db>(
             receiver,
             Type::instance(db, env, target_owner),
             name,
-            &source,
+            source,
             &target,
         ) else {
             continue;
         };
-        if already_inherited(db, env, class_type, target_owner, name, &source, kind) {
+        if already_inherited(db, env, class_type, target_owner, name, source, kind) {
             continue;
         }
         let rule = violation.rule(source.is_property || target.is_property);

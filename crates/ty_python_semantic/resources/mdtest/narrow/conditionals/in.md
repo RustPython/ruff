@@ -550,7 +550,7 @@ class AlwaysEqual:
 def unrelated_typevar(x: AlwaysEqual, y: U) -> U:
     if x in (y,):
         reveal_type(x)  # revealed: AlwaysEqual
-        # error: [invalid-return-type] "Return type does not match returned value: expected `U@unrelated_typevar`, found `AlwaysEqual`"
+        # error: [invalid-explicit-return] "Return type does not match returned value: expected `U@unrelated_typevar`, found `AlwaysEqual`"
         return x
     return y
 ```
@@ -1440,6 +1440,19 @@ def selected_colors(colors: list[Color]) -> list[SelectedColor]:
 def _(colors: list[Color]):
     inline = [color for color in colors if color in (Color.RED, Color.GREEN)]
     reveal_type(inline)  # revealed: list[Color]
+```
+
+Membership succeeds for the plain integer `1` as well as for the enum member `Code.OK`.
+
+```py
+from enum import IntEnum
+
+class Code(IntEnum):
+    OK = 1
+
+def check_membership(value: int):
+    if value in (Code.OK,):
+        reveal_type(value)  # revealed: int
 ```
 
 An enum that can have additional runtime members can still be narrowed by a membership test against

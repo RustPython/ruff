@@ -207,23 +207,22 @@ impl<'src> StringParser<'src> {
         LexicalError::new(error, self.range)
     }
 
-    fn parse_unicode_literal(
+    fn parse_unicode_literal<const N: usize>(
         &mut self,
-        literal_number: usize,
         escape_start: usize,
     ) -> Result<char, LexicalError> {
-        let kind = match literal_number {
+        let kind = match N {
             2 => UnicodeEscapeErrorKind::TruncatedHexByte,
             4 => UnicodeEscapeErrorKind::TruncatedShortUnicode,
             _ => UnicodeEscapeErrorKind::TruncatedLongUnicode,
         };
-        let mut p: u32 = 0u32;
-        for i in 1..=literal_number {
-            let Some(d) = self.peek_char().and_then(|c| c.to_digit(16)) else {
+        let mut p: u32 = 0;
+        for _ in 0..N {
+            let Some(d) = self.peek_byte().and_then(|b| char::from(b).to_digit(16)) else {
                 return Err(self.escape_error(kind, escape_start, self.cursor));
             };
             self.cursor += 1;
-            p += d << ((literal_number - i) * 4);
+            p = (p << 4) | d;
         }
         match p {
             0xD800..=0xDFFF => Ok(std::char::REPLACEMENT_CHARACTER),
@@ -315,9 +314,9 @@ impl<'src> StringParser<'src> {
             't' => '\t',
             'v' => '\x0b',
             o @ '0'..='7' => self.parse_octet(o as u8),
-            'x' => self.parse_unicode_literal(2, escape_start)?,
-            'u' if !self.flags.is_byte_string() => self.parse_unicode_literal(4, escape_start)?,
-            'U' if !self.flags.is_byte_string() => self.parse_unicode_literal(8, escape_start)?,
+            'x' => self.parse_unicode_literal::<2>(escape_start)?,
+            'u' if !self.flags.is_byte_string() => self.parse_unicode_literal::<4>(escape_start)?,
+            'U' if !self.flags.is_byte_string() => self.parse_unicode_literal::<8>(escape_start)?,
             'N' if !self.flags.is_byte_string() => self.parse_unicode_name(escape_start)?,
             // Special cases where the escape sequence is not a single character
             '\n' => return Ok(None),

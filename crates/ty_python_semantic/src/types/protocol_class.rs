@@ -130,7 +130,11 @@ impl<'db> ProtocolClass<'db> {
                 if !seen_members.insert(name.clone()) {
                     return;
                 }
-                let candidate = candidate.apply_specialization(db, specialization);
+                let candidate = candidate.apply_specialization(
+                    db,
+                    visitor.program_environment(),
+                    specialization,
+                );
                 candidate.walk_recursive_member_types(db, visitor);
             },
         );
@@ -337,7 +341,7 @@ impl<'db> ProtocolClass<'db> {
         else {
             return;
         };
-        if class.has_pep_695_type_params(db) || class.try_mro(db, None).is_err() {
+        if class.has_pep_695_type_params(db) || class.try_mro_ancestors(db, None).is_err() {
             return;
         }
         let env = ProgramEnvironment::from_scope(class.body_scope(db));
@@ -2505,42 +2509,44 @@ fn descriptor_decorated_protocol_member<'db>(
         return None;
     }
 
-    let Place::Defined(DefinedPlace {
-        definedness: Definedness::AlwaysDefined,
-        ..
-    }) = descriptor_ty
+    let getter = descriptor_ty
         .class_member_with_policy(db, env, "__get__", MemberLookupPolicy::REQUIRE_CONCRETE)
-        .place
-    else {
+        .place;
+    let receiver_ty = Type::instance(db, env, protocol);
+    let write = if descriptor_ty.is_data_descriptor(db, env) {
+        match descriptor_setter_domain(db, env, descriptor_ty, receiver_ty) {
+            DescriptorSetterDomain::Missing => None,
+            DescriptorSetterDomain::Known(domain) => Some(ProtocolMemberWrite::descriptor(
+                descriptor_ty,
+                Some(domain),
+                definition,
+            )),
+            DescriptorSetterDomain::Deferred => Some(ProtocolMemberWrite::descriptor(
+                descriptor_ty,
+                None,
+                definition,
+            )),
+        }
+    } else {
+        None
+    };
+
+    let read_ty = if getter.is_definitely_bound() {
+        descriptor_ty
+            .try_call_dunder_get(
+                db,
+                env,
+                Some(receiver_ty),
+                receiver_ty.to_meta_type(db, env),
+            )
+            .unwrap_or_else(|error| Some(error.fallback()))?
+            .return_type
+    } else if write.is_some() {
+        descriptor_ty
+    } else {
         return None;
     };
-
-    let receiver_ty = Type::instance(db, env, protocol);
-    let read_ty = descriptor_ty
-        .try_call_dunder_get(
-            db,
-            env,
-            Some(receiver_ty),
-            receiver_ty.to_meta_type(db, env),
-        )
-        .unwrap_or_else(|error| Some(error.fallback()))?
-        .return_type;
     let read = Some(ProtocolPropertyType::with_definition(read_ty, definition));
-
-    let write = match descriptor_setter_domain(db, env, descriptor_ty, receiver_ty) {
-        DescriptorSetterDomain::Missing => None,
-        DescriptorSetterDomain::Known(domain) => Some(ProtocolMemberWrite::descriptor(
-            descriptor_ty,
-            Some(domain),
-            definition,
-        )),
-        DescriptorSetterDomain::Deferred => Some(ProtocolMemberWrite::descriptor(
-            descriptor_ty,
-            None,
-            definition,
-        )),
-    };
-
     Some(ProtocolMemberData::property(read, write, definition))
 }
 
@@ -3428,9 +3434,13 @@ impl<'db> ProtocolMemberCandidate<'db> {
     fn apply_specialization(
         mut self,
         db: &'db dyn Db,
+        env: &ProgramEnvironment<'db>,
         specialization: Option<Specialization<'db>>,
     ) -> Self {
-        self.ty = self.ty.apply_optional_specialization(db, specialization);
+        self.ty = self
+            .ty
+            .freshen_member_for_owner_specialization(db, env, specialization)
+            .apply_optional_owner_specialization_to_member(db, specialization);
         self
     }
 
@@ -3582,7 +3592,7 @@ fn cached_protocol_interface<'db>(
 
         let specialization =
             specialization.map(|specialization| specialization.with_typevar_bounds(db));
-        let candidate = candidate.apply_specialization(db, specialization);
+        let candidate = candidate.apply_specialization(db, &env, specialization);
         let ProtocolMemberCandidate {
             ty,
             definition,

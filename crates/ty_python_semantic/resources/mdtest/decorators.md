@@ -164,7 +164,7 @@ from functools import cache
 def f(x: int) -> int:
     return x**2
 
-# revealed: _lru_cache_wrapper[int]
+# revealed: _lru_cache_wrapper[int, Hashable]
 reveal_type(f)
 # revealed: int
 reveal_type(f(1))
@@ -249,7 +249,7 @@ reveal_type(f)  # revealed: Unknown
 ```py
 non_callable = 1
 
-# error: [call-non-callable] "Object of type `Literal[1]` is not callable"
+# error: [not-callable] "Object of type `Literal[1]` is not callable"
 @non_callable
 def f(x): ...
 
@@ -434,7 +434,7 @@ reveal_type(Foo)  # revealed: int
 Using `None` as a decorator is an error:
 
 ```py
-# error: [call-non-callable]
+# error: [not-callable]
 @None
 class Bar: ...
 
@@ -562,7 +562,7 @@ class Animal: ...
 reveal_type(Animal)  # revealed: <class 'Animal'>
 reveal_type(Animal())  # revealed: Animal
 
-Animal().set_full_name("John")  # error: [unresolved-attribute]
+Animal().set_full_name("John")  # error: [missing-attribute]
 ```
 
 This also applies to unannotated callables that are not function definitions:
@@ -818,7 +818,7 @@ class ResourceEnabled(Protocol):
 SchemaT = TypeVar("SchemaT")
 
 def register(cls: type[SchemaT]) -> Intersection[type[SchemaT], ResourceEnabled]:
-    # error: [invalid-return-type] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
     return cls
 
 @register
@@ -848,7 +848,7 @@ class ResourceEnabled(Protocol):
 SchemaT = TypeVar("SchemaT")
 
 def register(cls: type[SchemaT]) -> Intersection[type[SchemaT], ResourceEnabled]:
-    # error: [invalid-return-type] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
     return cls
 
 @dataclass
@@ -879,7 +879,7 @@ class ResourceEnabled(Protocol):
 SchemaT = TypeVar("SchemaT")
 
 def register(cls: type[SchemaT]) -> Intersection[type[SchemaT], ResourceEnabled]:
-    # error: [invalid-return-type] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
+    # error: [invalid-explicit-return] "Return type does not match returned value: expected `type[SchemaT@register] & ResourceEnabled`, found `type[SchemaT@register]`"
     return cls
 
 def identity(cls: type[SchemaT]) -> type[SchemaT]:

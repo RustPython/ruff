@@ -72,7 +72,7 @@ use crate::package::PackageRoot;
 use crate::preview::{
     is_incorrect_dict_iterator_comprehension_enabled, is_undefined_export_in_dunder_init_enabled,
 };
-use crate::registry::Rule;
+use crate::registry::{LintSource, Rule};
 use crate::rules::flake8_bugbear::rules::ReturnInGenerator;
 use crate::rules::pyflakes::rules::{
     LateFutureImport, MultipleStarredExpressions, ReturnOutsideFunction,
@@ -1978,60 +1978,30 @@ impl<'a> Visitor<'a> for Checker<'a> {
                     self.semantic
                         .resolve_qualified_name(func)
                         .and_then(|qualified_name| {
-                            if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "cast")
-                            {
-                                Some(typing::Callable::Cast)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "TypeForm")
-                            {
-                                Some(typing::Callable::TypeForm)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "NewType")
-                            {
-                                Some(typing::Callable::NewType)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "TypeVar")
-                            {
-                                Some(typing::Callable::TypeVar)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "TypeAliasType")
-                            {
-                                Some(typing::Callable::TypeAliasType)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "NamedTuple")
-                            {
-                                Some(typing::Callable::NamedTuple)
-                            } else if self
-                                .semantic
-                                .match_typing_qualified_name(&qualified_name, "TypedDict")
-                            {
-                                Some(typing::Callable::TypedDict)
-                            } else if matches!(
-                                qualified_name.segments(),
-                                [
-                                    "mypy_extensions",
-                                    "Arg"
-                                        | "DefaultArg"
-                                        | "NamedArg"
-                                        | "DefaultNamedArg"
-                                        | "VarArg"
-                                        | "KwArg"
-                                ]
-                            ) {
-                                Some(typing::Callable::MypyExtension)
-                            } else if matches!(qualified_name.segments(), ["" | "builtins", "bool"])
-                            {
-                                Some(typing::Callable::Bool)
-                            } else {
-                                None
-                            }
+                            let segments = qualified_name.segments();
+                            let &name = segments.last()?;
+                            let callable = match name {
+                                "cast" => typing::Callable::Cast,
+                                "TypeForm" => typing::Callable::TypeForm,
+                                "NewType" => typing::Callable::NewType,
+                                "TypeVar" => typing::Callable::TypeVar,
+                                "TypeAliasType" => typing::Callable::TypeAliasType,
+                                "NamedTuple" => typing::Callable::NamedTuple,
+                                "TypedDict" => typing::Callable::TypedDict,
+                                "Arg" | "DefaultArg" | "NamedArg" | "DefaultNamedArg"
+                                | "VarArg" | "KwArg"
+                                    if matches!(segments, ["mypy_extensions", _]) =>
+                                {
+                                    return Some(typing::Callable::MypyExtension);
+                                }
+                                "bool" if matches!(segments, ["" | "builtins", _]) => {
+                                    return Some(typing::Callable::Bool);
+                                }
+                                _ => return None,
+                            };
+                            self.semantic
+                                .match_typing_qualified_name(&qualified_name, name)
+                                .then_some(callable)
                         });
                 match callable {
                     Some(typing::Callable::Bool) => {
@@ -2884,6 +2854,7 @@ impl<'a> Checker<'a> {
         }
 
         // Create the `Binding`.
+        let is_annotation = kind.is_annotation();
         let binding_id = self.semantic.push_binding(name, range, kind, flags);
 
         // If the name is private, mark is as such.
@@ -2891,16 +2862,15 @@ impl<'a> Checker<'a> {
             self.semantic.bindings[binding_id].flags |= BindingFlags::PRIVATE_DECLARATION;
         }
 
-        // If there's an existing binding in this scope, copy its references.
-        if let Some(shadowed_id) = self.semantic.scopes[scope_id].get(name) {
-            // If this is an annotation, and we already have an existing value in the same scope,
-            // don't treat it as an assignment, but track it as a delayed annotation.
-            if self.semantic.binding(binding_id).kind.is_annotation() {
-                self.semantic
-                    .add_delayed_annotation(shadowed_id, binding_id);
-                return binding_id;
-            }
+        // An annotation on an existing value is delayed and leaves the binding in place.
+        if is_annotation && let Some(shadowed_id) = self.semantic.scopes[scope_id].get(name) {
+            self.semantic
+                .add_delayed_annotation(shadowed_id, binding_id);
+            return binding_id;
+        }
 
+        // If this binding replaces an existing one, copy its references.
+        if let Some(shadowed_id) = self.semantic.scopes[scope_id].add(name, binding_id) {
             // Avoid shadowing builtins.
             let shadowed = &self.semantic.bindings[shadowed_id];
             if !matches!(
@@ -2936,10 +2906,6 @@ impl<'a> Checker<'a> {
                 .shadowed_bindings
                 .insert(binding_id, shadowed_id);
         }
-
-        // Add the binding to the scope.
-        let scope = &mut self.semantic.scopes[scope_id];
-        scope.add(name, binding_id);
 
         binding_id
     }
@@ -3667,10 +3633,8 @@ impl<'a> LintContext<'a> {
     /// Create a new collector for `path` with an empty collection of `Diagnostic`s.
     pub(crate) fn new(path: &'a Path, contents: &'a str, settings: &'a LinterSettings) -> Self {
         // Ignore diagnostics based on per-file-ignores.
-        let mut rules = settings.rules.clone();
-        for ignore in crate::fs::ignores_from_path(path, &settings.per_file_ignores) {
-            rules.disable(ignore);
-        }
+        let ignored = crate::fs::ignores_from_path(path, &settings.per_file_ignores);
+        let rules = settings.rules.clone().without(&ignored);
 
         Self {
             diagnostics: RefCell::default(),
@@ -3781,8 +3745,8 @@ impl<'a> LintContext<'a> {
     }
 
     #[inline]
-    pub(crate) fn iter_enabled_rules(&self) -> impl Iterator<Item = Rule> + '_ {
-        self.rules.iter_enabled()
+    pub(crate) fn has_rules_for(&self, source: LintSource) -> bool {
+        self.rules.any_enabled_in(source.rule_set())
     }
 
     #[inline]

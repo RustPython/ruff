@@ -1,12 +1,12 @@
 use std::fmt::Write;
 use std::path::PathBuf;
 
+use ruff_benchmark::checkout::get_project_cache_dir;
 use ruff_benchmark::criterion;
-use ruff_benchmark::real_world_projects::{
-    TY_ECOSYSTEM_PIN, get_project_cache_dir, install_dependencies_to_cache,
-};
+use ruff_benchmark::real_world_projects::{TY_ECOSYSTEM_PIN, install_dependencies_to_cache};
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
+use itertools::Itertools;
 use ty_project::metadata::python_version::SupportedPythonVersion;
 
 mod ty_shared;
@@ -140,6 +140,41 @@ fn benchmark_constraint_quantification(criterion: &mut Criterion) {
     }
 }
 
+/// Compare bottom sources and top targets against distinct signatures.
+fn benchmark_bottom_and_top_signature_comparisons(criterion: &mut Criterion) {
+    setup_rayon();
+
+    for name in ["bottom", "top"] {
+        let mut code = String::from(
+            "\
+from typing import Any, Callable, Literal
+from ty_extensions import Bottom, Top
+",
+        );
+        for i in 0..128 {
+            let signature = format!("Callable[[Literal[{i}], str, bytes], int]");
+            let (source, target) = if name == "bottom" {
+                ("Bottom[Callable[..., Any]]", signature.as_str())
+            } else {
+                (signature.as_str(), "Top[Callable[..., object]]")
+            };
+            writeln!(
+                &mut code,
+                "\ndef check_{i}(source: {source}) -> None:\n    target: {target} = source"
+            )
+            .ok();
+        }
+
+        criterion.bench_function(&format!("ty_micro[{name}_signature_comparisons]"), |b| {
+            b.iter_batched_ref(
+                || setup_micro_case(&code),
+                |Case { db }| assert_eq!(db.check().len(), 0),
+                BatchSize::SmallInput,
+            );
+        });
+    }
+}
+
 /// Benchmarks solving many union-bearing upper bounds while inferring a generic call.
 ///
 /// Each callable argument places a distinct union upper bound on `T` through callable-parameter
@@ -225,6 +260,76 @@ fn benchmark_many_upper_bound_callbacks(criterion: &mut Criterion) {
                 let result = db.check();
                 assert_eq!(result.len(), 0);
             },
+            BatchSize::SmallInput,
+        );
+    });
+}
+
+/// Matching a tuple against `T | tuple[T]` makes either the tuple or its element a lower bound
+/// for `T`. Both violate the declared bound, and each union member doubles the number of paths.
+fn benchmark_incompatible_lower_bound_alternatives(criterion: &mut Criterion) {
+    setup_rayon();
+
+    for members in [4, 8, 11, 12] {
+        let union = (0..members)
+            .map(|i| format!("tuple[Literal[{i}]]"))
+            .join(" | ");
+        let code = format!(
+            "from collections.abc import Callable
+from typing import Any, Literal, overload
+
+@overload
+def consume[T: list[Any]](make: Callable[[], T | tuple[T]]) -> None: ...
+@overload
+def consume(make: object) -> None: ...
+def consume(make: object) -> None: ...
+
+def check(make: Callable[[], {union}]) -> None:
+    consume(make)
+",
+        );
+
+        criterion.bench_function(
+            &format!("ty_micro[incompatible_lower_bound_alternatives/{members}]"),
+            |b| {
+                b.iter_batched_ref(
+                    || setup_micro_case(&code),
+                    |Case { db }| assert_eq!(db.check().len(), 0),
+                    BatchSize::SmallInput,
+                );
+            },
+        );
+    }
+}
+
+/// A long conjunction with only two solutions fits within the traversal budget.
+fn benchmark_long_valid_bound_prefix(criterion: &mut Criterion) {
+    setup_rayon();
+
+    let mut code = String::from(
+        "from typing import Any, Literal
+from ty_extensions import static_assert
+from ty_extensions._internal import ConstraintSet
+
+def check[T: tuple[Any]]() -> None:
+    bounds = (ConstraintSet.lower_bound(tuple[Literal[-1]], T)
+              | ConstraintSet.lower_bound(tuple[Literal[-2]], T))
+",
+    );
+    // Allocate the choice first so traversal reaches it after the 64 shared lower bounds.
+    for i in 0..64 {
+        writeln!(
+            &mut code,
+            "    bounds &= ConstraintSet.lower_bound(tuple[Literal[{i}]], T)"
+        )
+        .ok();
+    }
+    code.push_str("    static_assert(len(bounds.solutions(inferable=tuple[T])) == 2)\n");
+
+    criterion.bench_function("ty_micro[long_valid_bound_prefix]", |b| {
+        b.iter_batched_ref(
+            || setup_micro_case(&code),
+            |Case { db }| assert_eq!(db.check().len(), 0),
             BatchSize::SmallInput,
         );
     });
@@ -719,8 +824,11 @@ criterion_group!(
     benchmark_typevar_mapping_large_accumulation,
     benchmark_typevar_mapping_small_accumulations,
     benchmark_constraint_quantification,
+    benchmark_bottom_and_top_signature_comparisons,
     benchmark_factored_upper_bounds,
     benchmark_many_upper_bound_callbacks,
+    benchmark_incompatible_lower_bound_alternatives,
+    benchmark_long_valid_bound_prefix,
     benchmark_pandas_tdd,
     benchmark_mixed_typed_dict_union_copy,
     benchmark_missing_key_typed_dict_union_copy,

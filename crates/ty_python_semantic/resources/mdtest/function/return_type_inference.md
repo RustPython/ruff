@@ -555,7 +555,7 @@ subclass method returns an incompatible value:
 ```py
 class IncompatibleChild(Parent):
     def method(self):
-        # TODO: This should be an invalid-return-type error.
+        # TODO: This should be an invalid-explicit-return error.
         return "a"
 
 reveal_type(IncompatibleChild().method())  # revealed: int | None
@@ -832,7 +832,7 @@ class Box[T]:
         return value
 
 reveal_type(Box[int].identity(1))  # revealed: int | Unknown
-value: int = Box[int].identity(1)  # no diagnostic
+value: int = Box[int].identity(1)  # ok
 ```
 
 ## Overloaded functions
@@ -1019,8 +1019,7 @@ class C:
         return 42
 
 instance = C()
-# TODO: This shouldn't be an error
-instance.method()  # error: [missing-argument]
+instance.method()
 ```
 
 Calling `method` on the class object itself is also possible:

@@ -4,7 +4,7 @@ use ruff_db::{diagnostic::Annotation, source::source_text};
 use ruff_diagnostics::{Edit, Fix};
 use ruff_python_ast::{self as ast, PythonVersion, name::Name};
 use ruff_text_size::{Ranged, TextRange};
-use rustc_hash::FxHashSet;
+use rustc_hash::FxHashMap;
 
 use crate::attribute_assignments;
 use crate::{
@@ -24,8 +24,8 @@ use crate::{
         definition_expression_type,
         diagnostic::{
             ABSTRACT_METHOD_IN_FINAL_CLASS, CONFLICTING_METACLASS, CYCLIC_CLASS_DEFINITION,
-            DATACLASS_FIELD_ORDER, DUPLICATE_KW_ONLY, FINAL_WITHOUT_VALUE, INCONSISTENT_MRO,
-            INVALID_ARGUMENT_TYPE, INVALID_ASSIGNMENT, INVALID_BASE, INVALID_DATACLASS,
+            DUPLICATE_KW_ONLY, FINAL_WITHOUT_VALUE, INCONSISTENT_MRO, INVALID_ARGUMENT_TYPE,
+            INVALID_ASSIGNMENT, INVALID_BASE, INVALID_DATACLASS, INVALID_DATACLASS_FIELD_ORDER,
             INVALID_GENERIC_CLASS, INVALID_GENERIC_ENUM, INVALID_METACLASS, INVALID_NAMED_TUPLE,
             INVALID_PROTOCOL, INVALID_TYPED_DICT_HEADER, IncompatibleBases,
             SUBCLASS_OF_DATACLASS_WITH_ORDER, SUBCLASS_OF_FINAL_CLASS, UNKNOWN_ARGUMENT,
@@ -538,7 +538,7 @@ pub(crate) fn check_static_class_definitions<'db>(
 
     // Check that the class's MRO is resolvable
     let mut inconsistent_generic_bases = false;
-    match class.try_mro(db, None) {
+    match class.try_mro_ancestors(db, None) {
         Err(mro_error) => match mro_error.reason() {
             StaticMroErrorKind::DuplicateBases(duplicates) => {
                 for duplicate in duplicates {
@@ -1095,7 +1095,8 @@ pub(crate) fn check_static_class_definitions<'db>(
                 }
 
                 let report = |range: TextRange| {
-                    let Some(builder) = context.report_lint(&DATACLASS_FIELD_ORDER, range) else {
+                    let Some(builder) = context.report_lint(&INVALID_DATACLASS_FIELD_ORDER, range)
+                    else {
                         return false;
                     };
                     builder.into_diagnostic(format_args!(
@@ -1210,6 +1211,54 @@ fn has_inherited_dataclass_field_order_violation<'db>(
         })
 }
 
+/// Names a metaclass declares or assigns on its instances, shared by all its classes.
+#[salsa::tracked(returns(deref), heap_size=ruff_memory_usage::heap_size)]
+fn metaclass_namespace_members<'db>(
+    db: &'db dyn Db,
+    metaclass: ClassType<'db>,
+) -> Box<[(Name, bool)]> {
+    let mut members = FxHashMap::default();
+    for metaclass in metaclass
+        .iter_mro(db)
+        .filter_map(ClassBase::into_class)
+        .filter_map(|class| class.static_class_literal(db).map(|(literal, _)| literal))
+    {
+        let body_scope = metaclass.body_scope(db);
+        let metaclass_index = semantic_index(db, body_scope.program_file(db));
+        let body_scope_id = body_scope.file_scope_id(db);
+        let metaclass_table = metaclass_index.place_table(body_scope_id);
+        let metaclass_use_def = metaclass_index.use_def_map(body_scope_id);
+
+        for (symbol_id, _) in metaclass_use_def.all_end_of_scope_symbol_declarations() {
+            members
+                .entry(metaclass_table.symbol(symbol_id).name().clone())
+                .or_insert(false);
+        }
+
+        for function_scope in attribute_scopes(db, body_scope) {
+            for member in metaclass_index.place_table(function_scope).members() {
+                if let Some(name) = member.as_instance_attribute() {
+                    // A method-scope member may only be declared, as in `cls.attr: int`.
+                    // Only an assignment such as `cls.attr: int = 1` writes a value onto the
+                    // newly created class object, potentially overwriting a class-body value.
+                    let is_assigned =
+                        attribute_assignments(db, body_scope, name).any(|(bindings, _)| {
+                            bindings
+                                .into_iter()
+                                .any(|binding| binding.binding.definition().is_some())
+                        });
+                    let name = Name::new(name);
+                    *members.entry(name).or_default() |= is_assigned;
+                }
+            }
+        }
+    }
+
+    let mut members: Vec<_> = members.into_iter().collect();
+    members.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
+    members.into_boxed_slice()
+}
+
 /// Check compatibility between class namespace values and attributes populated by its metaclass.
 ///
 /// A binding in a class body is passed through the namespace used to construct the class object
@@ -1242,52 +1291,7 @@ fn check_class_namespace_against_metaclass_members<'db>(
         return;
     };
 
-    // Metaclass-populated members are generally sparse, while class namespaces such as enums can
-    // be large. Collect possible members first rather than probing the metaclass for every binding.
-    let mut metaclass_instance_members = FxHashSet::default();
-    let mut metaclass_assigned_members = FxHashSet::default();
-    for metaclass in metaclass
-        .iter_mro(db)
-        .filter_map(ClassBase::into_class)
-        .filter_map(|class| class.static_class_literal(db).map(|(literal, _)| literal))
-    {
-        let body_scope = metaclass.body_scope(db);
-        let metaclass_index = semantic_index(db, body_scope.program_file(db));
-        let body_scope_id = body_scope.file_scope_id(db);
-        let metaclass_table = metaclass_index.place_table(body_scope_id);
-        let metaclass_use_def = metaclass_index.use_def_map(body_scope_id);
-
-        for (symbol_id, _) in metaclass_use_def.all_end_of_scope_symbol_declarations() {
-            metaclass_instance_members.insert(metaclass_table.symbol(symbol_id).name().clone());
-        }
-
-        for function_scope in attribute_scopes(db, body_scope) {
-            for member in metaclass_index.place_table(function_scope).members() {
-                if let Some(name) = member.as_instance_attribute() {
-                    // A method-scope member may only be declared, as in `cls.attr: int`.
-                    // Only an assignment such as `cls.attr: int = 1` writes a value onto the
-                    // newly created class object, potentially overwriting a class-body value.
-                    let is_assigned =
-                        attribute_assignments(db, body_scope, name).any(|(bindings, _)| {
-                            bindings
-                                .into_iter()
-                                .any(|binding| binding.binding.definition().is_some())
-                        });
-                    let name = Name::new(name);
-                    if is_assigned {
-                        metaclass_assigned_members.insert(name.clone());
-                    }
-                    metaclass_instance_members.insert(name);
-                }
-            }
-        }
-    }
-
-    #[expect(
-        clippy::iter_over_hash_type,
-        reason = "each metaclass member is checked independently"
-    )]
-    for name in metaclass_instance_members {
+    for (name, is_assigned) in metaclass_namespace_members(db, metaclass) {
         let Some(symbol_id) = table.symbol_id(name.as_str()) else {
             continue;
         };
@@ -1333,7 +1337,7 @@ fn check_class_namespace_against_metaclass_members<'db>(
 
         // A declaration on the metaclass constrains class-object access, but does not itself
         // populate a replacement value into the constructed class's namespace.
-        if !metaclass_assigned_members.contains(name.as_str()) {
+        if !is_assigned {
             continue;
         }
 

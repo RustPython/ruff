@@ -12,7 +12,7 @@
 # blanket-ignore-comment = "warn"
 # missing-type-argument = "warn"
 # possibly-unresolved-reference = "warn"
-# unsound-return-statement = "warn"
+# unsound-return = "warn"
 # unsound-yield = "warn"
 # unsupported-dynamic-base = "warn"
 # division-by-zero = "warn"
@@ -68,7 +68,7 @@ def snake_case(name: str) -> str:
 
 
 def get_indent(line: str) -> str:
-    return re.match(r"^\s*", line).group()  # type: ignore[union-attr, ty:unresolved-attribute]
+    return re.match(r"^\s*", line).group()  # type: ignore[union-attr, ty:missing-union-attribute]
 
 
 def main(*, name: str, prefix: str, code: str, linter: str, category: str) -> None:

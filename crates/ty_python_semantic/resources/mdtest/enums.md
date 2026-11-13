@@ -2163,6 +2163,21 @@ for color in Color:
 reveal_type(list(Color))  # revealed: list[Color]
 ```
 
+## Combining flag members
+
+Flag operators accept other members of the same enum. A member's literal type does not restrict the
+other operand to that same member.
+
+```py
+from enum import Flag
+
+class Flags(Flag):
+    A = 1
+    B = 2
+
+Flags.A | Flags.B  # ok
+```
+
 ## Methods / non-member attributes
 
 Methods and non-member attributes defined in the enum class can be accessed on enum members:
@@ -2427,7 +2442,7 @@ bound. Their `Self` type preserves the particular member at call sites.
 python-version = "3.11"
 
 [rules]
-unsound-return-statement = "error"
+unsound-return = "error"
 ```
 
 ```py
@@ -2466,7 +2481,7 @@ An ordinary type variable bounded by an enum has the same special attributes as 
 
 ```toml
 [rules]
-unsound-return-statement = "error"
+unsound-return = "error"
 ```
 
 ```py
@@ -2494,7 +2509,7 @@ from every possible enum.
 
 ```toml
 [rules]
-unsound-return-statement = "error"
+unsound-return = "error"
 ```
 
 ```py
@@ -2656,9 +2671,9 @@ reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO)  # revealed: Literal[EnumWit
 
 # Attributes `.value` and `.name` can *not* be accessed on members of these enums:
 
-# error: [unresolved-attribute]
+# error: [missing-attribute]
 EnumWithSubclassOfEnumMetaMetaclass.NO.value
-# error: [unresolved-attribute]
+# error: [missing-attribute]
 EnumWithSubclassOfEnumMetaMetaclass.NO.name
 
 # But the internal underscore attributes are available:
@@ -2667,9 +2682,9 @@ reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO._value_)  # revealed: Any
 reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO._name_)  # revealed: Literal["NO"]
 
 def _(x: EnumWithSubclassOfEnumMetaMetaclass):
-    # error: [unresolved-attribute]
+    # error: [missing-attribute]
     x.value
-    # error: [unresolved-attribute]
+    # error: [missing-attribute]
     x.name
     reveal_type(x._value_)  # revealed: Any
     reveal_type(x._name_)  # revealed: Literal["NO", "YES"]
@@ -2730,9 +2745,9 @@ reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO)  # revealed: Literal[EnumWit
 
 # Attributes `.value` and `.name` can *not* be accessed on members of these enums:
 
-# error: [unresolved-attribute]
+# error: [missing-attribute]
 EnumWithSubclassOfEnumMetaMetaclass.NO.value
-# error: [unresolved-attribute]
+# error: [missing-attribute]
 EnumWithSubclassOfEnumMetaMetaclass.NO.name
 
 # But the internal underscore attributes are available:
@@ -2741,9 +2756,9 @@ reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO._value_)  # revealed: Any
 reveal_type(EnumWithSubclassOfEnumMetaMetaclass.NO._name_)  # revealed: Literal["NO"]
 
 def _(x: EnumWithSubclassOfEnumMetaMetaclass):
-    # error: [unresolved-attribute]
+    # error: [missing-attribute]
     x.value
-    # error: [unresolved-attribute]
+    # error: [missing-attribute]
     x.name
     reveal_type(x._value_)  # revealed: Any
     reveal_type(x._name_)  # revealed: Literal["NO", "YES"]
@@ -3554,7 +3569,7 @@ def color_name(color: Color) -> str:
     else:
         assert_never(color)
 
-# No `invalid-return-type` error here because the implicit `else` branch is detected as unreachable:
+# The implicit `else` branch is unreachable, so ty accepts this function's return type.
 def color_name_without_assertion(color: Color) -> str:
     if color is Color.RED:
         return "Red"
