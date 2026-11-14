@@ -792,6 +792,24 @@ impl<'src> Parser<'src> {
             None
         };
 
+        // `from <dotted_name> lazy import` is the invalid form of `lazy from`.
+
+        // test_err from_import_misplaced_lazy
+        // from os lazy import path
+        // from os.path lazy import join
+        // from .mod lazy import join
+        // from ..mod lazy import join
+        // from ...mod lazy import join
+        if self.at(TokenKind::Lazy) && self.peek() == TokenKind::Import {
+            self.add_error(
+                ParseErrorType::OtherError(
+                    "use 'lazy from ... ' instead of 'from ... lazy import'".to_string(),
+                ),
+                self.current_token_range(),
+            );
+            self.bump(TokenKind::Lazy);
+        }
+
         // test_ok from_import_no_space
         // from.import x
         // from...import x

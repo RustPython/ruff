@@ -1,0 +1,200 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/inline/err/from_import_misplaced_lazy.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..139,
+        body: [
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 0..24,
+                    module: Some(
+                        Identifier {
+                            id: Name("os"),
+                            range: 5..7,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 20..24,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("path"),
+                                range: 20..24,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 0,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 25..54,
+                    module: Some(
+                        Identifier {
+                            id: Name("os.path"),
+                            range: 30..37,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 50..54,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("join"),
+                                range: 50..54,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 0,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 55..81,
+                    module: Some(
+                        Identifier {
+                            id: Name("mod"),
+                            range: 61..64,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 77..81,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("join"),
+                                range: 77..81,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 1,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 82..109,
+                    module: Some(
+                        Identifier {
+                            id: Name("mod"),
+                            range: 89..92,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 105..109,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("join"),
+                                range: 105..109,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 2,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+            ImportFrom(
+                StmtImportFrom {
+                    node_index: NodeIndex(None),
+                    range: 110..138,
+                    module: Some(
+                        Identifier {
+                            id: Name("mod"),
+                            range: 118..121,
+                            node_index: NodeIndex(None),
+                        },
+                    ),
+                    names: [
+                        Alias {
+                            range: 134..138,
+                            node_index: NodeIndex(None),
+                            name: Identifier {
+                                id: Name("join"),
+                                range: 134..138,
+                                node_index: NodeIndex(None),
+                            },
+                            asname: None,
+                        },
+                    ],
+                    level: 3,
+                    is_lazy: false,
+                    runtime_level: None,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | from os lazy import path
+  |         ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
+2 | from os.path lazy import join
+3 | from .mod lazy import join
+  |
+
+
+  |
+1 | from os lazy import path
+2 | from os.path lazy import join
+  |              ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
+3 | from .mod lazy import join
+4 | from ..mod lazy import join
+  |
+
+
+  |
+1 | from os lazy import path
+2 | from os.path lazy import join
+3 | from .mod lazy import join
+  |           ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
+4 | from ..mod lazy import join
+5 | from ...mod lazy import join
+  |
+
+
+  |
+2 | from os.path lazy import join
+3 | from .mod lazy import join
+4 | from ..mod lazy import join
+  |            ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
+5 | from ...mod lazy import join
+  |
+
+
+  |
+3 | from .mod lazy import join
+4 | from ..mod lazy import join
+5 | from ...mod lazy import join
+  |             ^^^^ Syntax Error: use 'lazy from ... ' instead of 'from ... lazy import'
