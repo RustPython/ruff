@@ -796,6 +796,7 @@ impl<'src> Parser<'src> {
         };
 
         // `from <dotted_name> lazy import` is the invalid form of `lazy from`.
+
         // test_err from_import_misplaced_lazy
         // from os lazy import path
         // from os.path lazy import join
