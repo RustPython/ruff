@@ -86,6 +86,7 @@ enum EscapedChar {
 }
 
 struct StringParser<'src> {
+    runtime: Option<&'src dyn crate::ParseRuntime>,
     /// The raw content of the string e.g., the `foo` part in `"foo"`.
     source: &'src str,
     /// Current position of the parser in the source.
@@ -99,9 +100,16 @@ struct StringParser<'src> {
 }
 
 impl<'src> StringParser<'src> {
-    fn new(source: &'src str, flags: AnyStringFlags, offset: TextSize, range: TextRange) -> Self {
+    fn new(
+        source: &'src str,
+        flags: AnyStringFlags,
+        offset: TextSize,
+        range: TextRange,
+        runtime: Option<&'src dyn crate::ParseRuntime>,
+    ) -> Self {
         Self {
             source,
+            runtime,
             cursor: 0,
             flags,
             offset,
@@ -256,6 +264,11 @@ impl<'src> StringParser<'src> {
     }
 
     fn parse_unicode_name(&mut self, escape_start: usize) -> Result<char, LexicalError> {
+        if let Some(provider) = self.runtime {
+            provider.prepare().map_err(|_| {
+                LexicalError::new(LexicalErrorType::UnicodeNameProviderUnavailable, self.range)
+            })?;
+        }
         if self.peek_char() != Some('{') {
             return Err(self.escape_error(
                 UnicodeEscapeErrorKind::MalformedName,
@@ -279,16 +292,26 @@ impl<'src> StringParser<'src> {
             ));
         }
 
+        let provider = self.runtime;
         let name_and_ending = self.skip_bytes(close_idx + 1);
         let name = &name_and_ending[..name_and_ending.len() - 1];
 
-        unicode_names2::character(name).ok_or_else(|| {
-            self.escape_error(
-                UnicodeEscapeErrorKind::UnknownName,
-                escape_start,
-                self.cursor,
-            )
-        })
+        let codepoint = match provider {
+            Some(provider) => provider.lookup(name.as_bytes()),
+            None => unicode_names2::character(name).map(u32::from),
+        };
+        codepoint
+            .and_then(|codepoint| match codepoint {
+                0xD800..=0xDFFF => Some(char::REPLACEMENT_CHARACTER),
+                _ => char::from_u32(codepoint),
+            })
+            .ok_or_else(|| {
+                self.escape_error(
+                    UnicodeEscapeErrorKind::UnknownName,
+                    escape_start,
+                    self.cursor,
+                )
+            })
     }
 
     /// Parse an escaped character, returning the new character.
@@ -567,16 +590,26 @@ pub(crate) fn parse_string_literal(
     source: &str,
     flags: AnyStringFlags,
     range: TextRange,
+    runtime: Option<&dyn crate::ParseRuntime>,
 ) -> Result<StringType, LexicalError> {
-    StringParser::new(source, flags, range.start() + flags.opener_len(), range).parse()
+    StringParser::new(
+        source,
+        flags,
+        range.start() + flags.opener_len(),
+        range,
+        runtime,
+    )
+    .parse()
 }
 
 pub(crate) fn parse_interpolated_string_literal_element(
     source: &str,
     flags: AnyStringFlags,
     range: TextRange,
+    runtime: Option<&dyn crate::ParseRuntime>,
 ) -> Result<ast::InterpolatedStringLiteralElement, LexicalError> {
-    StringParser::new(source, flags, range.start(), range).parse_interpolated_string_middle()
+    StringParser::new(source, flags, range.start(), range, runtime)
+        .parse_interpolated_string_middle()
 }
 
 #[cfg(test)]
