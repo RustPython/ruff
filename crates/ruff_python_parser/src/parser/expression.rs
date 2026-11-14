@@ -737,8 +737,7 @@ impl<'src> Parser<'src> {
         self.parse_primary_expression(context)
     }
 
-    /// Checks the bitwise-or operand required by sequence and dictionary displays.
-    /// The caller can defer this check until a dictionary comprehension is ruled out.
+    /// Checks the bitwise-or operand and adds the conditional-unpacking diagnostic.
     fn validate_unpacking_precedence(
         &mut self,
         parsed_expr: &ParsedExpr,
@@ -2942,6 +2941,7 @@ impl<'src> Parser<'src> {
             let value =
                 self.parse_conditional_expression_without_comma_check(ExpressionContext::default());
             let unpack_range = TextRange::new(after_brace, value.range().end());
+            self.validate_unpacking_precedence(&value, after_brace, true);
 
             if matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For) {
                 self.add_unsupported_syntax_error(
@@ -2958,8 +2958,6 @@ impl<'src> Parser<'src> {
                     Some(TextRange::at(after_brace, TextSize::new(2))),
                 ));
             }
-
-            self.validate_unpacking_precedence(&value, after_brace, true);
 
             if self.at(TokenKind::Colon) {
                 self.add_error(
@@ -3115,9 +3113,7 @@ impl<'src> Parser<'src> {
             };
         }
         let mut parsed_expr = self.parse_named_expression_or_higher(
-            ExpressionContext::yield_or_starred_bitwise_or()
-                .with_for_excluded()
-                .with_starred_generator_allowed(),
+            ExpressionContext::yield_or_starred_bitwise_or().with_for_excluded(),
         );
 
         match self.current_token_kind() {
@@ -3689,12 +3685,7 @@ impl<'src> Parser<'src> {
             StarredExpressionPrecedence::BitwiseOr => {
                 let value = self
                     .parse_conditional_expression_without_comma_check(ExpressionContext::default());
-                let is_generator = self.errors.len() == errors_start
-                    && context.is_starred_generator_allowed()
-                    && matches!(self.current_token_kind(), TokenKind::Async | TokenKind::For);
-                if !is_generator {
-                    self.validate_unpacking_precedence(&value, start, false);
-                }
+                self.validate_unpacking_precedence(&value, start, false);
                 value
             }
         };
@@ -4213,9 +4204,6 @@ bitflags! {
         /// excluded from an expression.
         const EXCLUDE_FOR = 1 << 4;
 
-        /// The first element after `(` may become a generator expression. Its starred
-        /// operand can use full expression precedence if a comprehension clause follows.
-        const ALLOW_STARRED_GENERATOR = 1 << 5;
     }
 }
 
@@ -4286,16 +4274,6 @@ impl ExpressionContext {
     /// Returns a new [`ExpressionContext`] which excludes `for` from an expression.
     fn with_for_excluded(self) -> Self {
         ExpressionContext(self.0 | ExpressionContextFlags::EXCLUDE_FOR)
-    }
-
-    /// Allow the first parenthesized starred element to become a generator element.
-    fn with_starred_generator_allowed(self) -> Self {
-        ExpressionContext(self.0 | ExpressionContextFlags::ALLOW_STARRED_GENERATOR)
-    }
-
-    const fn is_starred_generator_allowed(self) -> bool {
-        self.0
-            .contains(ExpressionContextFlags::ALLOW_STARRED_GENERATOR)
     }
 
     /// Returns `true` if the `in` keyword should be excluded from a comparison expression.
