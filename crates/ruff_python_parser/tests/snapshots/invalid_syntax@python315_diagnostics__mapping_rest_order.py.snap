@@ -1,0 +1,98 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/mapping_rest_order.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..95,
+        body: [
+            Match(
+                StmtMatch {
+                    node_index: NodeIndex(None),
+                    range: 44..94,
+                    subject: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 50..51,
+                            id: Name("x"),
+                            ctx: Load,
+                        },
+                    ),
+                    cases: [
+                        MatchCase {
+                            range: 57..94,
+                            node_index: NodeIndex(None),
+                            pattern: MatchMapping(
+                                PatternMatchMapping {
+                                    node_index: NodeIndex(None),
+                                    range: 62..80,
+                                    keys: [
+                                        NumberLiteral(
+                                            ExprNumberLiteral {
+                                                node_index: NodeIndex(None),
+                                                range: 71..72,
+                                                value: Int(
+                                                    1,
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                    patterns: [
+                                        MatchAs(
+                                            PatternMatchAs {
+                                                node_index: NodeIndex(None),
+                                                range: 74..79,
+                                                pattern: None,
+                                                name: Some(
+                                                    Identifier {
+                                                        id: Name("value"),
+                                                        range: 74..79,
+                                                        node_index: NodeIndex(None),
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                    rest: Some(
+                                        Identifier {
+                                            id: Name("rest"),
+                                            range: 65..69,
+                                            node_index: NodeIndex(None),
+                                        },
+                                    ),
+                                    runtime_keys: None,
+                                    runtime_patterns: None,
+                                },
+                            ),
+                            guard: None,
+                            body: [
+                                Pass(
+                                    StmtPass {
+                                        node_index: NodeIndex(None),
+                                        range: 90..94,
+                                    },
+                                ),
+                            ],
+                            runtime_body: None,
+                        },
+                    ],
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | match x:
+3 |     case {**rest, 1: value}:
+  |             ^^^^ Syntax Error: double star pattern must be the last (right-most) subpattern in the mapping pattern
+4 |         pass
+  |

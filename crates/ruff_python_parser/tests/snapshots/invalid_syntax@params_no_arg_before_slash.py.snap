@@ -123,7 +123,7 @@ Module(
 
   |
 1 | def foo(/): ...
-  |         ^ Syntax Error: at least one argument must precede /
+  |         ^ Syntax Error: at least one parameter must precede /
 2 | def foo(/, a): ...
   |
 
@@ -131,4 +131,4 @@ Module(
   |
 1 | def foo(/): ...
 2 | def foo(/, a): ...
-  |         ^ Syntax Error: at least one argument must precede /
+  |         ^ Syntax Error: at least one parameter must precede /

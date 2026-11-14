@@ -1,0 +1,126 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/standalone_case_mapping_key.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..72,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..48,
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 44..48,
+                            id: Name("case"),
+                            ctx: Load,
+                        },
+                    ),
+                },
+            ),
+            AnnAssign(
+                StmtAnnAssign {
+                    node_index: NodeIndex(None),
+                    range: 49..62,
+                    target: Dict(
+                        ExprDict {
+                            node_index: NodeIndex(None),
+                            range: 49..61,
+                            items: [
+                                DictItem {
+                                    key: Some(
+                                        Attribute(
+                                            ExprAttribute {
+                                                node_index: NodeIndex(None),
+                                                range: 50..53,
+                                                value: Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 50..51,
+                                                        id: Name("_"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                                attr: Identifier {
+                                                    id: Name("x"),
+                                                    range: 52..53,
+                                                    node_index: NodeIndex(None),
+                                                },
+                                                ctx: Load,
+                                            },
+                                        ),
+                                    ),
+                                    value: Name(
+                                        ExprName {
+                                            node_index: NodeIndex(None),
+                                            range: 55..60,
+                                            id: Name("value"),
+                                            ctx: Load,
+                                        },
+                                    ),
+                                },
+                            ],
+                            runtime_values: None,
+                        },
+                    ),
+                    annotation: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 62..62,
+                            id: Name(""),
+                            ctx: Invalid,
+                        },
+                    ),
+                    value: None,
+                    simple: false,
+                    runtime_simple: None,
+                },
+            ),
+            Pass(
+                StmtPass {
+                    node_index: NodeIndex(None),
+                    range: 67..71,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | case {_.x: value}:
+  | ^^^^^^^^^^^^^^^^^^ Syntax Error: case statement must be inside match statement
+3 |     pass
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | case {_.x: value}:
+  |      ^ Syntax Error: invalid syntax
+3 |     pass
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | case {_.x: value}:
+  |                   ^ Syntax Error: invalid syntax
+3 |     pass
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | case {_.x: value}:
+3 |     pass
+  |    ^ Syntax Error: unexpected indent

@@ -1,0 +1,130 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/fstring_nested_field.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..67,
+        body: [
+            Assign(
+                StmtAssign {
+                    node_index: NodeIndex(None),
+                    range: 44..66,
+                    targets: [
+                        Name(
+                            ExprName {
+                                node_index: NodeIndex(None),
+                                range: 44..49,
+                                id: Name("value"),
+                                ctx: Store,
+                            },
+                        ),
+                    ],
+                    value: FString(
+                        ExprFString {
+                            node_index: NodeIndex(None),
+                            range: 52..66,
+                            value: FStringValue {
+                                inner: Single(
+                                    FString {
+                                        range: 52..66,
+                                        node_index: NodeIndex(None),
+                                        elements: [
+                                            Interpolation(
+                                                InterpolatedElement {
+                                                    range: 56..62,
+                                                    node_index: NodeIndex(None),
+                                                    expression: NumberLiteral(
+                                                        ExprNumberLiteral {
+                                                            node_index: NodeIndex(None),
+                                                            range: 57..58,
+                                                            value: Int(
+                                                                0,
+                                                            ),
+                                                        },
+                                                    ),
+                                                    debug_text: None,
+                                                    conversion: None,
+                                                    format_spec: Some(
+                                                        InterpolatedStringFormatSpec {
+                                                            range: 59..62,
+                                                            node_index: NodeIndex(None),
+                                                            elements: [
+                                                                Literal(
+                                                                    InterpolatedStringLiteralElement {
+                                                                        range: 59..60,
+                                                                        node_index: NodeIndex(None),
+                                                                        value: "\n",
+                                                                    },
+                                                                ),
+                                                                Interpolation(
+                                                                    InterpolatedElement {
+                                                                        range: 60..62,
+                                                                        node_index: NodeIndex(None),
+                                                                        expression: NumberLiteral(
+                                                                            ExprNumberLiteral {
+                                                                                node_index: NodeIndex(None),
+                                                                                range: 61..62,
+                                                                                value: Int(
+                                                                                    1,
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                        debug_text: None,
+                                                                        conversion: None,
+                                                                        format_spec: None,
+                                                                        runtime_str: None,
+                                                                        runtime_interpolation_format_spec: None,
+                                                                        runtime_formatted_value_format_spec: None,
+                                                                    },
+                                                                ),
+                                                            ],
+                                                        },
+                                                    ),
+                                                    runtime_str: None,
+                                                    runtime_interpolation_format_spec: None,
+                                                    runtime_formatted_value_format_spec: None,
+                                                },
+                                            ),
+                                        ],
+                                        flags: FStringFlags {
+                                            quote_style: Double,
+                                            prefix: Regular,
+                                            triple_quoted: true,
+                                            unclosed: false,
+                                        },
+                                    },
+                                ),
+                            },
+                            runtime_joined_str: None,
+                            runtime_values: None,
+                        },
+                    ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+2 | value = f"""{0:
+3 | {1
+4 | """
+  | ^ Syntax Error: f-string: expecting '}' to close '{' on line 3
+
+
+  |
+2 | value = f"""{0:
+3 | {1
+4 | """
+  | ^^^ Syntax Error: f-string: expecting '}'

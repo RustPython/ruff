@@ -1,0 +1,59 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/python315_diagnostics/assert_assignment.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..57,
+        body: [
+            Assert(
+                StmtAssert {
+                    node_index: NodeIndex(None),
+                    range: 44..52,
+                    test: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 51..52,
+                            id: Name("x"),
+                            ctx: Load,
+                        },
+                    ),
+                    msg: None,
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 55..56,
+                    value: NumberLiteral(
+                        ExprNumberLiteral {
+                            node_index: NodeIndex(None),
+                            range: 55..56,
+                            value: Int(
+                                1,
+                            ),
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | assert x = 1
+  |        ^^^^^ Syntax Error: cannot assign to name here. Maybe you meant '==' instead of '='?
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | assert x = 1
+  |          ^ Syntax Error: invalid syntax

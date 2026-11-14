@@ -128,7 +128,7 @@ Module(
 
   |
 1 | def foo(a, *args=(1, 2)): ...
-  |                 ^ Syntax Error: var-positional argument cannot have default value
+  |                 ^ Syntax Error: var-positional parameter cannot have default value
 
 
   |

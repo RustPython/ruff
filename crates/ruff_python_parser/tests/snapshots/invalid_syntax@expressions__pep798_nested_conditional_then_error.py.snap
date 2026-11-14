@@ -1,0 +1,240 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_nested_conditional_then_error.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..107,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..101,
+                    value: Call(
+                        ExprCall {
+                            node_index: NodeIndex(None),
+                            range: 44..101,
+                            func: Name(
+                                ExprName {
+                                    node_index: NodeIndex(None),
+                                    range: 44..45,
+                                    id: Name("f"),
+                                    ctx: Load,
+                                },
+                            ),
+                            arguments: Arguments {
+                                range: 45..101,
+                                node_index: NodeIndex(None),
+                                args: [
+                                    Generator(
+                                        ExprGenerator {
+                                            node_index: NodeIndex(None),
+                                            range: 46..100,
+                                            elt: Starred(
+                                                ExprStarred {
+                                                    node_index: NodeIndex(None),
+                                                    range: 46..88,
+                                                    value: If(
+                                                        ExprIf {
+                                                            node_index: NodeIndex(None),
+                                                            range: 47..88,
+                                                            test: Name(
+                                                                ExprName {
+                                                                    node_index: NodeIndex(None),
+                                                                    range: 80..81,
+                                                                    id: Name("d"),
+                                                                    ctx: Load,
+                                                                },
+                                                            ),
+                                                            body: Call(
+                                                                ExprCall {
+                                                                    node_index: NodeIndex(None),
+                                                                    range: 47..76,
+                                                                    func: Name(
+                                                                        ExprName {
+                                                                            node_index: NodeIndex(None),
+                                                                            range: 47..48,
+                                                                            id: Name("f"),
+                                                                            ctx: Load,
+                                                                        },
+                                                                    ),
+                                                                    arguments: Arguments {
+                                                                        range: 48..76,
+                                                                        node_index: NodeIndex(None),
+                                                                        args: [
+                                                                            Generator(
+                                                                                ExprGenerator {
+                                                                                    node_index: NodeIndex(None),
+                                                                                    range: 49..75,
+                                                                                    elt: Starred(
+                                                                                        ExprStarred {
+                                                                                            node_index: NodeIndex(None),
+                                                                                            range: 49..63,
+                                                                                            value: If(
+                                                                                                ExprIf {
+                                                                                                    node_index: NodeIndex(None),
+                                                                                                    range: 50..63,
+                                                                                                    test: Name(
+                                                                                                        ExprName {
+                                                                                                            node_index: NodeIndex(None),
+                                                                                                            range: 55..56,
+                                                                                                            id: Name("c"),
+                                                                                                            ctx: Load,
+                                                                                                        },
+                                                                                                    ),
+                                                                                                    body: Name(
+                                                                                                        ExprName {
+                                                                                                            node_index: NodeIndex(None),
+                                                                                                            range: 50..51,
+                                                                                                            id: Name("x"),
+                                                                                                            ctx: Load,
+                                                                                                        },
+                                                                                                    ),
+                                                                                                    orelse: Name(
+                                                                                                        ExprName {
+                                                                                                            node_index: NodeIndex(None),
+                                                                                                            range: 62..63,
+                                                                                                            id: Name("y"),
+                                                                                                            ctx: Load,
+                                                                                                        },
+                                                                                                    ),
+                                                                                                },
+                                                                                            ),
+                                                                                            ctx: Load,
+                                                                                        },
+                                                                                    ),
+                                                                                    generators: [
+                                                                                        Comprehension {
+                                                                                            range: 64..75,
+                                                                                            node_index: NodeIndex(None),
+                                                                                            target: Name(
+                                                                                                ExprName {
+                                                                                                    node_index: NodeIndex(None),
+                                                                                                    range: 68..69,
+                                                                                                    id: Name("x"),
+                                                                                                    ctx: Store,
+                                                                                                },
+                                                                                            ),
+                                                                                            iter: Name(
+                                                                                                ExprName {
+                                                                                                    node_index: NodeIndex(None),
+                                                                                                    range: 73..75,
+                                                                                                    id: Name("xs"),
+                                                                                                    ctx: Load,
+                                                                                                },
+                                                                                            ),
+                                                                                            ifs: [],
+                                                                                            is_async: false,
+                                                                                            runtime_ifs: None,
+                                                                                            runtime_is_async: None,
+                                                                                        },
+                                                                                    ],
+                                                                                    parenthesized: false,
+                                                                                },
+                                                                            ),
+                                                                        ],
+                                                                        keywords: [],
+                                                                        runtime_args: None,
+                                                                        runtime_bases: None,
+                                                                    },
+                                                                },
+                                                            ),
+                                                            orelse: Name(
+                                                                ExprName {
+                                                                    node_index: NodeIndex(None),
+                                                                    range: 87..88,
+                                                                    id: Name("z"),
+                                                                    ctx: Load,
+                                                                },
+                                                            ),
+                                                        },
+                                                    ),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                            generators: [
+                                                Comprehension {
+                                                    range: 89..100,
+                                                    node_index: NodeIndex(None),
+                                                    target: Name(
+                                                        ExprName {
+                                                            node_index: NodeIndex(None),
+                                                            range: 93..94,
+                                                            id: Name("z"),
+                                                            ctx: Store,
+                                                        },
+                                                    ),
+                                                    iter: Name(
+                                                        ExprName {
+                                                            node_index: NodeIndex(None),
+                                                            range: 98..100,
+                                                            id: Name("zs"),
+                                                            ctx: Load,
+                                                        },
+                                                    ),
+                                                    ifs: [],
+                                                    is_async: false,
+                                                    runtime_ifs: None,
+                                                    runtime_is_async: None,
+                                                },
+                                            ],
+                                            parenthesized: false,
+                                        },
+                                    ),
+                                ],
+                                keywords: [],
+                                runtime_args: None,
+                                runtime_bases: None,
+                            },
+                        },
+                    ),
+                },
+            ),
+            Assign(
+                StmtAssign {
+                    node_index: NodeIndex(None),
+                    range: 103..106,
+                    targets: [
+                        Name(
+                            ExprName {
+                                node_index: NodeIndex(None),
+                                range: 103..104,
+                                id: Name("a"),
+                                ctx: Store,
+                            },
+                        ),
+                    ],
+                    value: Name(
+                        ExprName {
+                            node_index: NodeIndex(None),
+                            range: 106..106,
+                            id: Name(""),
+                            ctx: Invalid,
+                        },
+                    ),
+                    runtime_targets: None,
+                    runtime_type_comment: None,
+                    runtime_type_comment_bytes: None,
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | f(*f(*x if c else y for x in xs) if d else z for z in zs); a =
+  |      ^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | f(*f(*x if c else y for x in xs) if d else z for z in zs); a =
+  |                                                               ^ Syntax Error: invalid syntax

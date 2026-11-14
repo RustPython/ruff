@@ -1403,7 +1403,7 @@ Module(
  6 | (*x and y, z, *x and y)
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
-   |   ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   |  ^^^^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
    |
@@ -1413,7 +1413,7 @@ Module(
  6 | (*x and y, z, *x and y)
  7 | (*x or y, z, *x or y)
  8 | (*x if True else y, z, *x if True else y)
-   |                         ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   |                        ^^^^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
  9 | (*lambda x: x, z, *lambda x: x)
 10 | (*x := 2, z, *x := 2)
    |
@@ -1533,7 +1533,7 @@ Module(
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
-   |  ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   | ^^^^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
    |
@@ -1543,7 +1543,7 @@ Module(
 16 | *x and y, z, *x and y
 17 | *x or y, z, *x or y
 18 | *x if True else y, z, *x if True else y
-   |                        ^^^^^^^^^^^^^^^^ Syntax Error: conditional expression cannot be used here
+   |                       ^^^^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
 19 | *lambda x: x, z, *lambda x: x
 20 | *x := 2, z, *x := 2
    |

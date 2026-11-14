@@ -1,0 +1,251 @@
+---
+source: crates/ruff_python_parser/tests/fixtures.rs
+input_file: crates/ruff_python_parser/resources/invalid/expressions/pep798_conditional_display.py
+---
+## AST
+
+```
+Module(
+    ModModule {
+        node_index: NodeIndex(None),
+        range: 0..114,
+        body: [
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 44..60,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 44..60,
+                            elts: [
+                                Starred(
+                                    ExprStarred {
+                                        node_index: NodeIndex(None),
+                                        range: 45..59,
+                                        value: If(
+                                            ExprIf {
+                                                node_index: NodeIndex(None),
+                                                range: 46..59,
+                                                test: Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 51..52,
+                                                        id: Name("x"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                                body: Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 46..47,
+                                                        id: Name("x"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                                orelse: Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 58..59,
+                                                        id: Name("y"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                        ctx: Load,
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 61..78,
+                    value: Dict(
+                        ExprDict {
+                            node_index: NodeIndex(None),
+                            range: 61..78,
+                            items: [
+                                DictItem {
+                                    key: None,
+                                    value: If(
+                                        ExprIf {
+                                            node_index: NodeIndex(None),
+                                            range: 64..77,
+                                            test: Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 69..70,
+                                                    id: Name("x"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                            body: Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 64..65,
+                                                    id: Name("x"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                            orelse: Name(
+                                                ExprName {
+                                                    node_index: NodeIndex(None),
+                                                    range: 76..77,
+                                                    id: Name("y"),
+                                                    ctx: Load,
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ],
+                            runtime_values: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 79..95,
+                    value: List(
+                        ExprList {
+                            node_index: NodeIndex(None),
+                            range: 79..95,
+                            elts: [
+                                If(
+                                    ExprIf {
+                                        node_index: NodeIndex(None),
+                                        range: 80..94,
+                                        test: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 85..86,
+                                                id: Name("x"),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                        body: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 80..81,
+                                                id: Name("x"),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                        orelse: Starred(
+                                            ExprStarred {
+                                                node_index: NodeIndex(None),
+                                                range: 92..94,
+                                                value: Name(
+                                                    ExprName {
+                                                        node_index: NodeIndex(None),
+                                                        range: 93..94,
+                                                        id: Name("y"),
+                                                        ctx: Load,
+                                                    },
+                                                ),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                            ctx: Load,
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+            Expr(
+                StmtExpr {
+                    node_index: NodeIndex(None),
+                    range: 96..113,
+                    value: Set(
+                        ExprSet {
+                            node_index: NodeIndex(None),
+                            range: 96..113,
+                            elts: [
+                                If(
+                                    ExprIf {
+                                        node_index: NodeIndex(None),
+                                        range: 97..112,
+                                        test: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 102..103,
+                                                id: Name("x"),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                        body: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 97..98,
+                                                id: Name("x"),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                        orelse: Name(
+                                            ExprName {
+                                                node_index: NodeIndex(None),
+                                                range: 111..112,
+                                                id: Name("y"),
+                                                ctx: Load,
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                            runtime_elts: None,
+                        },
+                    ),
+                },
+            ),
+        ],
+        runtime_body: None,
+    },
+)
+```
+## Errors
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [*x if x else y]
+  |  ^^^^^^^^^^^^^^ Syntax Error: invalid starred expression. Did you forget to wrap the conditional expression in parentheses?
+3 | {**x if x else y}
+4 | [x if x else *y]
+  |
+
+
+  |
+1 | # parse_options: {"target-version": "3.15"}
+2 | [*x if x else y]
+3 | {**x if x else y}
+  |  ^^^^^^^^^^^^^^^ Syntax Error: invalid double starred expression. Did you forget to wrap the conditional expression in parentheses?
+4 | [x if x else *y]
+5 | {x if x else **y}
+  |
+
+
+  |
+2 | [*x if x else y]
+3 | {**x if x else y}
+4 | [x if x else *y]
+  |              ^ Syntax Error: cannot unpack only part of a conditional expression
+5 | {x if x else **y}
+  |
+
+
+  |
+3 | {**x if x else y}
+4 | [x if x else *y]
+5 | {x if x else **y}
+  |              ^^ Syntax Error: cannot use dict unpacking on only part of a conditional expression
