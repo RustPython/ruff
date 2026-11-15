@@ -70,6 +70,51 @@ pub use crate::error::{
 };
 pub use crate::parser::ParseOptions;
 
+/// A per-parse Unicode character-name provider for embedded interpreters.
+///
+/// Preparation runs when a non-raw, non-bytes literal actually decodes `\N`, before
+/// validating its braces or name. Implementations should cache preparation for this parse,
+/// including failure: parser recovery may decode a literal more than once. No provider is retained after parsing.
+/// Names are passed as UTF-8 bytes, without case folding or normalization.
+/// Like numeric escapes, surrogate code points are represented by the replacement character
+/// in the scalar-only AST; this interface does not add surrogate-preserving strings.
+pub trait UnicodeNameProvider: std::fmt::Debug {
+    /// Load the database, or report the interpreter's Unicode name import failure.
+    fn prepare(&self) -> Result<(), UnicodeNameProviderUnavailable>;
+    /// Resolve one character name after preparation, excluding named sequences.
+    fn lookup(&self, name: &[u8]) -> Option<u32>;
+}
+
+/// Interpreter effects executed at string-decoding boundaries.
+///
+/// A runtime is borrowed only for this parse. Diagnostic reparses should share the same
+/// session cache so that module preparation and emitted warnings are not repeated.
+pub trait ParseRuntime: UnicodeNameProvider {
+    /// Called after a literal (or f/t-string literal fragment) has decoded successfully.
+    /// `source` is the undecoded content of that literal, without its quote delimiters.
+    /// An error aborts interpreter effects and survives grammar backtracking.
+    fn literal_decoded(
+        &self,
+        _source: &str,
+        _flags: ruff_python_ast::AnyStringFlags,
+        _range: ruff_text_size::TextRange,
+    ) -> Result<(), ParseError> {
+        Ok(())
+    }
+}
+
+/// The interpreter could not load its Unicode character-name database.
+#[derive(Debug, Clone, Copy)]
+pub struct UnicodeNameProviderUnavailable;
+
+impl std::fmt::Display for UnicodeNameProviderUnavailable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("\\N escapes not supported (can't load unicodedata module)")
+    }
+}
+
+impl std::error::Error for UnicodeNameProviderUnavailable {}
+
 use crate::parser::Parser;
 
 use ruff_python_ast::token::{Token, TokenFlags, TokenKind, Tokens};
@@ -289,6 +334,17 @@ pub fn parse(source: &str, options: ParseOptions) -> Result<Parsed<Mod>, ParseEr
 /// and returns the [`Parsed`] as is.
 pub fn parse_unchecked(source: &str, options: ParseOptions) -> Parsed<Mod> {
     Parser::new(source, options).parse()
+}
+
+/// Parse with interpreter-owned Unicode names and literal-warning dispatch.
+/// Decoder and runtime callback failures abort interpreter effects even when grammar
+/// diagnostics rewind. Existing parsing APIs use the built-in database without callbacks.
+pub fn parse_unchecked_with_runtime(
+    source: &str,
+    options: ParseOptions,
+    provider: &dyn ParseRuntime,
+) -> Parsed<Mod> {
+    Parser::new(source, options).with_runtime(provider).parse()
 }
 
 /// Parse the given Python source code using the specified [`PySourceType`].

@@ -64,6 +64,9 @@ impl NameInterner {
 #[derive(Debug)]
 pub(crate) struct Parser<'src> {
     source: &'src str,
+    runtime: Option<&'src dyn crate::ParseRuntime>,
+    /// Interpreter decoder failures cannot be undone by grammar backtracking.
+    decoder_abort: Option<ParseError>,
 
     /// Token source for the parser that skips over any non-trivia token.
     tokens: TokenSource<'src>,
@@ -162,6 +165,8 @@ impl<'src> Parser<'src> {
         Parser {
             options,
             source,
+            runtime: None,
+            decoder_abort: None,
             errors: Vec::new(),
             deferred_starred_unpacking_error: None,
             unsupported_syntax_errors: Vec::new(),
@@ -184,6 +189,49 @@ impl<'src> Parser<'src> {
             alias_scratch: ScratchBuffer::new(),
             elif_else_scratch: ScratchBuffer::new(),
         }
+    }
+
+    /// Recovery after a committed syntax error must not load interpreter modules while
+    /// decoding later literals. The built-in database remains available for recovery ASTs.
+    fn runtime_for_literal(&self, range: TextRange) -> Option<&'src dyn crate::ParseRuntime> {
+        let runtime = self.runtime?;
+        if self.decoder_abort.is_none()
+            && !self
+                .tokens
+                .has_tokenizer_error_in(TextRange::new(self.start_offset, range.start()))
+            && self.errors.is_empty()
+        {
+            Some(runtime)
+        } else {
+            None
+        }
+    }
+
+    fn literal_decoded(
+        &mut self,
+        source: &str,
+        flags: ruff_python_ast::AnyStringFlags,
+        range: TextRange,
+    ) {
+        if let Some(runtime) = self.runtime_for_literal(range)
+            && let Err(error) = runtime.literal_decoded(source, flags, range)
+        {
+            self.decoder_abort.get_or_insert(error);
+        }
+    }
+
+    fn record_decoder_abort(&mut self, error: &crate::error::LexicalError) {
+        if self.runtime_for_literal(error.location()).is_some() {
+            self.decoder_abort.get_or_insert_with(|| ParseError {
+                error: ParseErrorType::Lexical(error.error().clone()),
+                location: error.location(),
+            });
+        }
+    }
+
+    pub(crate) fn with_runtime(mut self, provider: &'src dyn crate::ParseRuntime) -> Self {
+        self.runtime = Some(provider);
+        self
     }
 
     /// Consumes the [`Parser`] and returns the parsed [`Parsed`].
@@ -263,6 +311,15 @@ impl<'src> Parser<'src> {
             TokenKind::EndOfFile,
             "Parser should be at the end of the file."
         );
+        if let Some(error) = self.decoder_abort {
+            let (tokens, _) = self.tokens.finish();
+            return Parsed {
+                syntax,
+                tokens: Tokens::new(tokens),
+                errors: vec![error],
+                unsupported_syntax_errors: self.unsupported_syntax_errors,
+            };
+        }
         // TODO consider re-integrating lexical error handling into the parser?
         let mut parse_errors = self.errors;
         if !parse_errors.is_empty()

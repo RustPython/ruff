@@ -13,7 +13,8 @@ use ruff_python_ast::{
 use ruff_text_size::{Ranged, TextLen, TextRange, TextSize};
 
 use crate::error::{
-    ComprehensionUnpackingKind, FStringKind, StarTupleKind, UnparenthesizedNamedExprKind,
+    ComprehensionUnpackingKind, FStringKind, LexicalError, LexicalErrorType, StarTupleKind,
+    UnparenthesizedNamedExprKind,
 };
 use crate::parser::progress::ParserProgress;
 use crate::parser::{FunctionKind, IpyEscapeContext, Parser, helpers};
@@ -267,6 +268,11 @@ impl<'src> Parser<'src> {
                         | TokenKind::Import
                         | TokenKind::From
                 ));
+        // The invalid conditional production evaluates its else expression before
+        // committing the statement diagnostic. Preserve those decoder effects.
+        if found && self.runtime.is_some() && self.at_expr() {
+            self.parse_conditional_expression_or_higher();
+        }
         self.rewind(checkpoint);
         if found {
             self.add_error(
@@ -416,6 +422,32 @@ impl<'src> Parser<'src> {
         {
             return;
         }
+        if self
+            .runtime_for_literal(self.current_token_range())
+            .is_some()
+        {
+            // invalid_expression uses expression_without_invalid on its right-hand side.
+            // Do not recursively run invalid-expression actions before committing its error.
+            let checkpoint = self.checkpoint();
+            self.parse_conditional_expression_without_comma_check(ExpressionContext::default());
+            self.rewind(checkpoint);
+
+            // If the missing-comma action declines to raise (outside brackets, or NAME
+            // STRING), CPython next tries invalid_legacy_expression: NAME !'(' star_expressions.
+            // That rule evaluates its operand even for names other than print and exec.
+            if let Expr::Name(name) = &first.expr
+                && !first.is_parenthesized
+                && !self.at(TokenKind::Lpar)
+                && (self.bracket_level() == 0
+                    || self.at(TokenKind::String)
+                    || matches!(name.id.as_str(), "print" | "exec"))
+                && self.decoder_abort.is_none()
+            {
+                let checkpoint = self.checkpoint();
+                self.parse_expression_list(ExpressionContext::starred_bitwise_or());
+                self.rewind(checkpoint);
+            }
+        }
         if let Expr::Name(name) = &first.expr
             && !first.is_parenthesized
         {
@@ -444,7 +476,11 @@ impl<'src> Parser<'src> {
         // [a b +]
         let checkpoint = self.checkpoint();
         let errors_before = self.errors.len();
-        let second = self.parse_conditional_expression_or_higher();
+        let second = if self.runtime.is_some() {
+            self.parse_conditional_expression_without_comma_check(ExpressionContext::default())
+        } else {
+            self.parse_conditional_expression_or_higher()
+        };
         let second_end = self.complete_prefix_end(&second.expr, errors_before);
         self.rewind(checkpoint);
         let Some(second_end) = second_end else {
@@ -2020,9 +2056,13 @@ impl<'src> Parser<'src> {
 
         let value = self.bump_string_value();
 
-        match parse_string_literal(value, flags, range) {
-            Ok(string) => string,
+        match parse_string_literal(value, flags, range, self.runtime_for_literal(range)) {
+            Ok(string) => {
+                self.literal_decoded(value, flags, range);
+                string
+            }
             Err(error) => {
+                self.record_decoder_abort(&error);
                 let location = error.location();
                 self.add_error(ParseErrorType::Lexical(error.into_error()), location);
 
@@ -2068,11 +2108,12 @@ impl<'src> Parser<'src> {
         kind: InterpolatedStringKind,
     ) -> InterpolatedStringData {
         let start = self.node_start();
+        let errors_before = self.errors.len();
         let mut flags = self.tokens.current_flags().as_any_string_flags();
 
         self.bump(kind.start_token());
         let outer_escape_error = self.interpolated_string_escape_error.take();
-        let elements = self.parse_interpolated_string_elements(
+        let mut elements = self.parse_interpolated_string_elements(
             flags,
             InterpolatedStringElementsKind::Regular(kind),
             kind,
@@ -2081,6 +2122,12 @@ impl<'src> Parser<'src> {
         let end_range = self.current_token_range();
         if !self.expect(kind.end_token()) {
             flags = flags.with_unclosed(true);
+        }
+        if self.runtime.is_some()
+            && self.errors.len() == errors_before
+            && !self.tokens.has_tokenizer_error_in(self.node_range(start))
+        {
+            self.decode_interpolated_literals(&mut elements, flags);
         }
         // test_err interpolated_string_escape_error
         // f'a\N b{x}'
@@ -2096,6 +2143,35 @@ impl<'src> Parser<'src> {
             elements,
             range: self.node_range(start),
             flags,
+        }
+    }
+
+    fn decode_interpolated_literals(
+        &mut self,
+        elements: &mut ast::InterpolatedStringElements,
+        flags: ast::AnyStringFlags,
+    ) {
+        for element in elements {
+            if let InterpolatedStringElement::Literal(literal) = element {
+                let range = literal.range;
+                let source = self.src_text(range);
+                match parse_interpolated_string_literal_element(
+                    source,
+                    flags,
+                    range,
+                    self.runtime_for_literal(range),
+                ) {
+                    Ok(decoded) => {
+                        self.literal_decoded(source, flags, range);
+                        *literal = decoded;
+                    }
+                    Err(error) => {
+                        self.record_decoder_abort(&error);
+                        self.interpolated_string_escape_error
+                            .get_or_insert(error.into_error());
+                    }
+                }
+            }
         }
     }
 
@@ -2148,9 +2224,45 @@ impl<'src> Parser<'src> {
                         let range = parser.current_token_range();
                         let value = parser.current_token_text();
                         parser.bump(middle_token_kind);
-                        InterpolatedStringElement::Literal(
-                            parse_interpolated_string_literal_element(value, flags, range)
+                        if parser.runtime.is_some()
+                            && matches!(elements_kind, InterpolatedStringElementsKind::Regular(_))
+                        {
+                            // The joined-string semantic action runs only after its grammar
+                            // succeeds. Expression literals are evaluated independently.
+                            InterpolatedStringElement::Literal(
+                                ast::InterpolatedStringLiteralElement {
+                                    value: "".into(),
+                                    range,
+                                    node_index: AtomicNodeIndex::NONE,
+                                },
+                            )
+                        } else {
+                            InterpolatedStringElement::Literal(
+                                parse_interpolated_string_literal_element(
+                                    value,
+                                    flags,
+                                    range,
+                                    parser.runtime_for_literal(range),
+                                )
+                                .inspect(|_| {
+                                    parser.literal_decoded(value, flags, range);
+                                })
                                 .unwrap_or_else(|lex_error| {
+                                    let lex_error = if parser.runtime_for_literal(range).is_some()
+                                        && matches!(
+                                            elements_kind,
+                                            InterpolatedStringElementsKind::FormatSpec(_)
+                                        ) {
+                                        LexicalError::new(
+                                            LexicalErrorType::FormatSpecDecodeError(Box::new(
+                                                lex_error.into_error(),
+                                            )),
+                                            range,
+                                        )
+                                    } else {
+                                        lex_error
+                                    };
+                                    parser.record_decoder_abort(&lex_error);
                                     // test_err invalid_fstring_literal_element
                                     // f'hello \N{INVALID} world'
                                     // f"""hello \N{INVALID} world"""
@@ -2163,7 +2275,8 @@ impl<'src> Parser<'src> {
                                         node_index: AtomicNodeIndex::NONE,
                                     }
                                 }),
-                        )
+                            )
+                        }
                     }
                     // `Invalid` tokens are created when there's a lexical error, so
                     // we ignore it here to avoid creating unexpected token errors
